@@ -12,10 +12,12 @@ public class Player(Game windowData, int zIndex = 1) : Entity(windowData, zIndex
     private Texture2D _sprite = null!;
     private Vector2 _origin = Vector2.Zero;
 
-    private readonly float TerminalVelocity = 1f;
+    private readonly float TerminalVelocity = 1.5f;
     private readonly float Acceleration = 0.5f;
 
     public bool IsOnFloor = false;
+
+    public readonly float JumpVelocity = 4f;
 
     public override void LoadContent()
     {
@@ -25,7 +27,7 @@ public class Player(Game windowData, int zIndex = 1) : Entity(windowData, zIndex
         _origin = new Vector2(_sprite.Width / 2, _sprite.Height / 2);
     }
 
-    public override void Update(Microsoft.Xna.Framework.GameTime time)
+    public override void Update(GameTime time)
     {
         if (InputManager.IsKeyDown(Keys.A))
         {
@@ -42,13 +44,13 @@ public class Player(Game windowData, int zIndex = 1) : Entity(windowData, zIndex
 
         if (IsOnFloor && InputManager.IsKeyPressed(Keys.Space))
         {
-            Velocity.Y = -3;
+            Velocity.Y = -JumpVelocity;
             IsOnFloor = false;
         }
 
         if (!IsOnFloor)
         {
-            Velocity.Y = MathUtility.MoveTowards(Velocity.Y, TerminalVelocity, 0.3f);
+            Velocity.Y = MathUtility.MoveTowards(Velocity.Y, TerminalVelocity, 0.5f);
         }
 
         Position += Velocity;

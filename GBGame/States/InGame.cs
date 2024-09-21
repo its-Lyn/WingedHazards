@@ -14,6 +14,7 @@ public class InGame(GameWindow windowData) : State(windowData)
 {
     private record struct GroundTile(Texture2D Sprite, int X, int Y);
 
+    private List<Texture2D> _grass = [];
     private List<Texture2D> _ground = [];
     private List<GroundTile> _groundTiles = [];
 
@@ -24,7 +25,7 @@ public class InGame(GameWindow windowData) : State(windowData)
     private float _cameraOffset = 40;
     private EntityController _controller = new EntityController();
 
-    private float _groundLine;
+    private int _groundLine;
     private int _gameWidth;
 
     private Texture2D _island = null!;
@@ -36,26 +37,42 @@ public class InGame(GameWindow windowData) : State(windowData)
             _ground.Add(WindowData.Content.Load<Texture2D>($"Sprites/Ground/Ground_{i}"));
         }
 
+        for (int i = 1; i <= 2; i++)
+        {
+            _grass.Add(WindowData.Content.Load<Texture2D>($"Sprites/Grass/Grass_{i}"));
+        }
+
         GameWindow window = (GameWindow)WindowData;
 
         _gameWidth = (int)(window.GameSize.Y * 2);
-        int tileCount = (int)(window.GameSize.Y - TileSize);
+        int tileCountY = (int)(window.GameSize.Y - TileSize);
+        int tileCountX = _gameWidth / TileSize;
 
         int basePosition = 0;
-        
         for (int i = 0; i < _gameWidth / TileSize; i++)
         {
             // Get a random ground tile
             Texture2D tile = _ground[Random.Shared.Next(0, 2)]; // 0, 1 range
-            _groundTiles.Add(new GroundTile(tile, basePosition, tileCount - TileSize));
+            _groundTiles.Add(new GroundTile(tile, basePosition, tileCountY - TileSize));
 
             // Add the plain ground below, so we get a set of 2.
-            _groundTiles.Add(new GroundTile(_ground[2], basePosition, tileCount));
+            _groundTiles.Add(new GroundTile(_ground[2], basePosition, tileCountY));
 
             basePosition += TileSize;
         }
 
-        _groundLine = tileCount - TileSize - TileSize / 2; // TileSize / 2 is the player width origin.
+        int grassCount = Random.Shared.Next(3, 15);
+        for (int i = 0; i < grassCount; i++) 
+        {
+            Texture2D tile = _grass[Random.Shared.Next(0, 2)];
+
+            // Get a random position on the grid
+            int gridX = Random.Shared.Next(0, tileCountX);
+
+            _groundTiles.Add(new GroundTile(tile, gridX * TileSize, tileCountY - TileSize * 2));
+        }
+
+        _groundLine = tileCountY - TileSize - TileSize / 2; // TileSize / 2 is the player width origin.
 
         _island = WindowData.Content.Load<Texture2D>("Sprites/BackGround/Island");
 
@@ -92,7 +109,7 @@ public class InGame(GameWindow windowData) : State(windowData)
     {
         WindowData.GraphicsDevice.Clear(BackDrop);
         batch.Begin(transformMatrix: _camera.Transform);
-            batch.Draw(_island, _camera.ScreenToWorld(new Vector2(0, -10)), Color.White * 0.6f);
+            batch.Draw(_island, _camera.ScreenToWorld(new Vector2(0, -10)), Color.White * 0.4f);
 
             foreach (GroundTile tile in _groundTiles) 
             {
