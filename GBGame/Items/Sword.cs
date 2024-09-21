@@ -1,10 +1,11 @@
 using System;
+using GBGame.Entities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGayme.Components;
 
 namespace GBGame.Items;
-
-public class Sword(Game windowData) : Item(windowData)
+public class Sword(Game windowData, AnimatedSpriteSheet sheet, Player player) : Item(windowData)
 {
     public override void LoadContent()
     {
@@ -16,6 +17,22 @@ public class Sword(Game windowData) : Item(windowData)
 
     public override void Use() 
     {
-        Console.WriteLine("Using sword.");
+        if (sheet.Done)
+        {
+            Console.WriteLine("Using sword.");
+            sheet.Done = false;
+
+            if (player.IsOnFloor)
+            {
+                if (player.FacingRight)
+                {
+                    player.Position.X += 1f;
+                }
+                else
+                {
+                    player.Position.X -= 1f;
+                }
+            }
+        }
     }
 }

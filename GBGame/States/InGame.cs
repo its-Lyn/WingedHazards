@@ -34,6 +34,16 @@ public class InGame(GameWindow windowData) : State(windowData)
 
     private Inventory _inventory = new Inventory();
 
+    private AnimatedSpriteSheet _sheet = null!;
+
+    private Bomb _bomb = null!;
+
+    private Vector2 _shakeOffset;
+    private bool _shaking = false;
+    private float _intensity = 0;
+    private float _shakeDuration = 0.2f;
+    private float _shakeMagnitude = 3f;
+
     public override void LoadContent()
     {
         for (int i = 1; i <= 4; i++) 
@@ -91,9 +101,13 @@ public class InGame(GameWindow windowData) : State(windowData)
         player.Position.Y = _groundLine;
         _controller.AddEntity(player);
 
+        _sheet = new AnimatedSpriteSheet(WindowData.Content.Load<Texture2D>("Sprites/Strike"), new Vector2(6, 1), 0.02f);
+        
         _inventory.LoadContent(WindowData);
-        _inventory.AddItem(new Sword(WindowData));
-        _inventory.AddItem(new Bomb(WindowData));
+        _inventory.AddItem(new Sword(WindowData, _sheet, player));
+
+        _bomb = new Bomb(WindowData, player); 
+        _inventory.AddItem(_bomb);
     }
 
     public override void Update(GameTime time)
@@ -109,7 +123,11 @@ public class InGame(GameWindow windowData) : State(windowData)
         GameWindow window = (GameWindow)WindowData;
 
         // Keep the camera position between the game sizes, so the player doesn't see outside the map.
-        _camera.X = Math.Clamp(MathF.Floor(player.Position.X - _cameraOffset), 0, _gameWidth - window.GameSize.X);
+        _camera.X = Math.Clamp(MathF.Floor(player.Position.X - _cameraOffset + _shakeOffset.X), 0, _gameWidth - window.GameSize.X);
+        if (_shaking)
+        {
+            _camera.Y = _shakeOffset.Y;
+        }
 
         if (InputManager.IsKeyPressed(Keys.Up))
         {
@@ -134,6 +152,38 @@ public class InGame(GameWindow windowData) : State(windowData)
 
             player.IsOnFloor = true;
         }
+
+        if (!_sheet.Done)
+        {
+            _sheet.CycleAnimation(time);
+        }
+
+        if (!_bomb.Sheet.Done)
+        {
+            _bomb.Sheet.CycleAnimation(time);
+            _bomb.CanPlace = _bomb.Sheet.Done;
+
+            _shaking = _bomb.Sheet.Done;
+            if (_shaking)
+            {
+                _intensity = 1;
+                _shakeOffset = Vector2.Zero;
+            }
+        }
+
+        if (_shaking)
+        {
+            _intensity -= (float)time.ElapsedGameTime.TotalSeconds / _shakeDuration;
+            if (_intensity <= 0) 
+            {
+                _shaking = false;
+                _shakeOffset = Vector2.Zero;
+                return;
+            }
+
+            float rot = Random.Shared.NextSingle() * MathF.Tau;
+            _shakeOffset = new Vector2(MathF.Cos(rot), MathF.Sin(rot)) * _shakeMagnitude * _intensity;
+        }
     }
    
     public override void Draw(GameTime time, SpriteBatch batch)
@@ -148,6 +198,26 @@ public class InGame(GameWindow windowData) : State(windowData)
             }
 
             _controller.DrawEntities(batch, time);
+            if (!_sheet.Done)
+            {
+                Player? player = _controller.GetFirst<Player>();
+                if (player is null) {
+                    Console.Error.WriteLine("This isn't supposed to happen... (The player is missing.)");
+                    return;
+                }
+
+                Vector2 strikePosition = new Vector2(
+                    player.FacingRight ? player.Position.X + 4 : player.Position.X - 12,
+                    player.Position.Y - 4
+                );
+
+                _sheet.Draw(batch, strikePosition, !player.FacingRight);
+            }
+
+            if(!_bomb.Sheet.Done)
+            {
+                _bomb.Draw(batch);
+            }
 
             _inventory.Draw(batch, _camera);
         batch.End();

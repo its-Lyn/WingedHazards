@@ -16,6 +16,7 @@ public class Player(Game windowData, int zIndex = 1) : Entity(windowData, zIndex
     private readonly float Acceleration = 0.5f;
 
     public bool IsOnFloor = false;
+    public bool FacingRight = true;
 
     public readonly float JumpVelocity = 4f;
 
@@ -32,10 +33,12 @@ public class Player(Game windowData, int zIndex = 1) : Entity(windowData, zIndex
         if (InputManager.IsKeyDown(Keys.A))
         {
             Velocity.X = MathUtility.MoveTowards(Velocity.X, -TerminalVelocity, Acceleration);
+            FacingRight = false;
         } 
         else if (InputManager.IsKeyDown(Keys.D))
         {
             Velocity.X = MathUtility.MoveTowards(Velocity.X, TerminalVelocity, Acceleration);
+            FacingRight = true;
         }
         else 
         {

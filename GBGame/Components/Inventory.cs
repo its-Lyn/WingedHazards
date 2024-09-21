@@ -28,6 +28,9 @@ public class Inventory
         Items[_activeItemIndex].Use();
     }
 
+    public T? GetActive<T>() where T : Item 
+        => (T?)Items.Find(item => item.GetType() == typeof(T));
+
     public void LoadContent(Game windowData) 
     {
         _inventorySprite = windowData.Content.Load<Texture2D>("Sprites/UI/ItemFrame");
