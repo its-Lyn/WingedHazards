@@ -39,49 +39,21 @@ public class Inventory
         Item item = Items[_activeItemIndex];
 
         Vector2 pos = Vector2.One;
+        Vector2 namePos = new Vector2(_inventorySprite.Width + 2, 1);
+        Vector2 descPos = new Vector2(_inventorySprite.Height + 2, 8);
+
         if (camera is not null)
         {
-            pos = camera.ScreenToWorld(Vector2.One);
+            pos = camera.ScreenToWorld(pos);
+            namePos = camera.ScreenToWorld(namePos);
+            descPos = camera.ScreenToWorld(descPos);
         }
 
         batch.Draw(_inventorySprite, pos, Color.White);
         batch.Draw(item.InventorySprite, pos, Color.White);
 
-        Vector2 namePos = Vector2.One;
-        if (camera is not null)
-        {
-            namePos = camera.ScreenToWorld(
-                new Vector2(
-                    _inventorySprite.Width + 2,
-                    1
-                )
-            );
-        } 
-
-        Vector2 descPos = Vector2.One;
-        if (camera is not null)
-        {
-            descPos = camera.ScreenToWorld(
-                new Vector2(
-                    _inventorySprite.Height + 2,
-                    8
-                )
-            );
-        }
-
-        batch.DrawString(
-            _font,
-            item.Name,
-            namePos,
-            _nameColour
-        );
-
-        batch.DrawString(
-            _font,
-            item.Description,
-            descPos,
-            _descColour * 0.3f
-        );
+        batch.DrawString(_font, item.Name, namePos, _nameColour);
+        batch.DrawString(_font, item.Description, descPos, _descColour * 0.3f); 
     }
 
     public int ActiveItemIndex {
