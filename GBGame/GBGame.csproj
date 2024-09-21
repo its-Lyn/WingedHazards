@@ -25,6 +25,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Content/Icons/" />
+    <Folder Include="Content/Sprites/Ground/" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\MonoGayme\MonoGayme\MonoGayme.csproj" />

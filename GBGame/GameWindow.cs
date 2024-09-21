@@ -1,6 +1,9 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Threading;
+using GBGame.States;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGayme.States;
 using MonoGayme.Utilities;
 
 namespace GBGame;
@@ -13,6 +16,7 @@ public class GameWindow : Game
     private Renderer _renderer;
 
     public Vector2 GameSize { get; private set;}
+    public StateContext Context { get; private set; }
 
     public GameWindow()
     {
@@ -26,6 +30,8 @@ public class GameWindow : Game
         _renderer = new Renderer(GameSize, GraphicsDevice); 
 
         Window.AllowUserResizing = true;
+
+        Context = new StateContext();
     }
 
     protected override void Initialize()
@@ -36,6 +42,7 @@ public class GameWindow : Game
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
+        Context.SwitchState(new InGame(this));
     }
 
     protected override void Update(GameTime gameTime)
@@ -43,13 +50,17 @@ public class GameWindow : Game
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
 
+        Context.Update(gameTime);
+
         base.Update(gameTime);
     }
 
     protected override void Draw(GameTime gameTime)
     {
+        InputManager.GetState();
+        
         _renderer.SetRenderer();
-        GraphicsDevice.Clear(Color.White);
+        Context.Draw(gameTime, _spriteBatch);
 
         _renderer.DrawRenderer(_spriteBatch);
 
