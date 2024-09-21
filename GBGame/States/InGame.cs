@@ -4,9 +4,11 @@ using MonoGayme.States;
 using System.Collections.Generic;
 using System;
 using MonoGayme.Components;
+using GBGame.Entities;
+using GBGame.Components;
+using GBGame.Items;
 using MonoGayme.Utilities;
 using Microsoft.Xna.Framework.Input;
-using GBGame.Entities;
 
 namespace GBGame.States;
 
@@ -29,6 +31,8 @@ public class InGame(GameWindow windowData) : State(windowData)
     private int _gameWidth;
 
     private Texture2D _island = null!;
+
+    private Inventory _inventory = new Inventory();
 
     public override void LoadContent()
     {
@@ -61,13 +65,20 @@ public class InGame(GameWindow windowData) : State(windowData)
             basePosition += TileSize;
         }
 
-        int grassCount = Random.Shared.Next(3, 15);
+        int grassCount = Random.Shared.Next(5, 10);
+        HashSet<int> usedGridPositions = new HashSet<int>();
         for (int i = 0; i < grassCount; i++) 
         {
             Texture2D tile = _grass[Random.Shared.Next(0, 2)];
 
             // Get a random position on the grid
-            int gridX = Random.Shared.Next(0, tileCountX);
+            int gridX;
+            do 
+            {
+                gridX = Random.Shared.Next(0, tileCountX);
+            }
+            while (usedGridPositions.Contains(gridX));
+            usedGridPositions.Add(gridX);
 
             _groundTiles.Add(new GroundTile(tile, gridX * TileSize, tileCountY - TileSize * 2));
         }
@@ -79,6 +90,10 @@ public class InGame(GameWindow windowData) : State(windowData)
         Player player = new Player(WindowData);
         player.Position.Y = _groundLine;
         _controller.AddEntity(player);
+
+        _inventory.LoadContent(WindowData);
+        _inventory.AddItem(new Sword(WindowData));
+        _inventory.AddItem(new Bomb(WindowData));
     }
 
     public override void Update(GameTime time)
@@ -96,6 +111,22 @@ public class InGame(GameWindow windowData) : State(windowData)
         // Keep the camera position between the game sizes, so the player doesn't see outside the map.
         _camera.X = Math.Clamp(MathF.Floor(player.Position.X - _cameraOffset), 0, _gameWidth - window.GameSize.X);
 
+        if (InputManager.IsKeyPressed(Keys.Up))
+        {
+            _inventory.ActiveItemIndex--;
+        }
+
+        if (InputManager.IsKeyPressed(Keys.Down))
+        {
+            _inventory.ActiveItemIndex++;
+        }
+
+        if (InputManager.IsKeyPressed(Keys.LeftShift))
+        {
+            _inventory.UseActive();
+        }
+
+        // Hardcoded ground checking (we don't need anything more complicated.)
         if (player.Position.Y > _groundLine) 
         {
             player.Velocity.Y = 0;
@@ -117,6 +148,8 @@ public class InGame(GameWindow windowData) : State(windowData)
             }
 
             _controller.DrawEntities(batch, time);
+
+            _inventory.Draw(batch, _camera);
         batch.End();
     }
 }
