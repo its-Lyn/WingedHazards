@@ -23,7 +23,7 @@ public class Player(Game windowData, int zIndex = 1) : Entity(windowData, zIndex
     {
         Position.X = 40;
         
-        _sprite = WindowData.Content.Load<Texture2D>("Sprites/Ground/Ground_3");
+        _sprite = WindowData.Content.Load<Texture2D>("Sprites/Ground/Ground_4");
         _origin = new Vector2(_sprite.Width / 2, _sprite.Height / 2);
     }
 

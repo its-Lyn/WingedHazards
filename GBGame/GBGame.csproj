@@ -26,7 +26,6 @@
   <ItemGroup>
     <Folder Include="Content/Icons/" />
     <Folder Include="Content/Sprites/Fonts/" />
-    <Folder Include="Content/Sprites/Ground/" />
     <Folder Include="Content/Sprites/UI/" />
   </ItemGroup>
   <ItemGroup>

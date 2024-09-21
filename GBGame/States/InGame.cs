@@ -36,7 +36,7 @@ public class InGame(GameWindow windowData) : State(windowData)
 
     public override void LoadContent()
     {
-        for (int i = 1; i <= 3; i++) 
+        for (int i = 1; i <= 4; i++) 
         {
             _ground.Add(WindowData.Content.Load<Texture2D>($"Sprites/Ground/Ground_{i}"));
         }
@@ -56,11 +56,11 @@ public class InGame(GameWindow windowData) : State(windowData)
         for (int i = 0; i < _gameWidth / TileSize; i++)
         {
             // Get a random ground tile
-            Texture2D tile = _ground[Random.Shared.Next(0, 2)]; // 0, 1 range
+            Texture2D tile = _ground[Random.Shared.Next(0, 3)]; // 0, 2 range
             _groundTiles.Add(new GroundTile(tile, basePosition, tileCountY - TileSize));
 
             // Add the plain ground below, so we get a set of 2.
-            _groundTiles.Add(new GroundTile(_ground[2], basePosition, tileCountY));
+            _groundTiles.Add(new GroundTile(_ground[3], basePosition, tileCountY));
 
             basePosition += TileSize;
         }
