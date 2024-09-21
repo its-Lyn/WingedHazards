@@ -124,10 +124,7 @@ public class InGame(GameWindow windowData) : State(windowData)
 
         // Keep the camera position between the game sizes, so the player doesn't see outside the map.
         _camera.X = Math.Clamp(MathF.Floor(player.Position.X - _cameraOffset + _shakeOffset.X), 0, _gameWidth - window.GameSize.X);
-        if (_shaking)
-        {
-            _camera.Y = _shakeOffset.Y;
-        }
+        _camera.Y = _shakeOffset.Y;
 
         if (InputManager.IsKeyPressed(Keys.Up))
         {
