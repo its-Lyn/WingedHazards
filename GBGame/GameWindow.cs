@@ -15,7 +15,8 @@ public class GameWindow : Game
 
     private Renderer _renderer;
 
-    public Vector2 GameSize { get; private set;}
+    public Vector2 GameSize { get; private set; }
+    public Vector2 MousePosition { get; private set; }
     public StateContext Context { get; private set; }
 
     public GameWindow()
@@ -52,6 +53,7 @@ public class GameWindow : Game
             _graphics.ToggleFullScreen();
         }
 
+        MousePosition = _renderer.GetVirtualMousePosition();
         Context.Update(gameTime);
 
         base.Update(gameTime);

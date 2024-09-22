@@ -47,6 +47,13 @@
 /processorParam:TextureFormat=Compressed
 /build:Sprites/Fonts/File.spritefont
 
+#begin Sprites/Fonts/FontBig.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Sprites/Fonts/FontBig.spritefont
+
 #begin Sprites/Grass/Grass_1.png
 /importer:TextureImporter
 /processor:TextureProcessor

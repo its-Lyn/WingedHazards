@@ -9,6 +9,7 @@ using GBGame.Components;
 using GBGame.Items;
 using MonoGayme.Utilities;
 using Microsoft.Xna.Framework.Input;
+using MonoGayme.UI;
 
 namespace GBGame.States;
 
@@ -33,7 +34,7 @@ public class InGame(GameWindow windowData) : State(windowData)
     private Texture2D _island = null!;
 
     private Inventory _inventory = new Inventory();
-
+    private Pause _pause = null!;
     private AnimatedSpriteSheet _sheet = null!;
 
     private Bomb _bomb = null!;
@@ -108,10 +109,23 @@ public class InGame(GameWindow windowData) : State(windowData)
 
         _bomb = new Bomb(WindowData, player); 
         _inventory.AddItem(_bomb);
+
+        _pause = new Pause(window);
     }
 
     public override void Update(GameTime time)
     {
+        if (InputManager.IsGamePadPressed(Buttons.Start) || InputManager.IsKeyPressed(Keys.Escape))
+        {
+            _pause.Paused = !_pause.Paused;
+        }
+
+        if (_pause.Paused)
+        {
+            _pause.Update();
+            return;
+        }
+
         _controller.UpdateEntities(WindowData.GraphicsDevice, time);
 
         Player? player = _controller.GetFirst<Player>();
@@ -217,6 +231,11 @@ public class InGame(GameWindow windowData) : State(windowData)
             }
 
             _inventory.Draw(batch, _camera);
+
+            if (_pause.Paused)
+            {
+                _pause.Draw(batch, _camera);
+            }
         batch.End();
     }
 }

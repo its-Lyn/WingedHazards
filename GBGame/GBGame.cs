@@ -4,8 +4,8 @@ namespace GBGame;
 
 public static class GBGame 
 {
-    public static Keys KeyboardRight = Keys.A;
-    public static Keys KeyboardLeft = Keys.D;
+    public static Keys KeyboardRight = Keys.D;
+    public static Keys KeyboardLeft = Keys.A;
     public static Keys KeyboardInventoryUp = Keys.W;
     public static Keys KeyboardInventoryDown = Keys.S;
 
