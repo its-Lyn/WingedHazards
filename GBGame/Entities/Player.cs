@@ -30,12 +30,12 @@ public class Player(Game windowData, int zIndex = 1) : Entity(windowData, zIndex
 
     public override void Update(GameTime time)
     {
-        if (InputManager.IsKeyDown(Keys.A))
+        if (InputManager.IsKeyDown(GBGame.KeyboardLeft) || InputManager.IsGamePadDown(GBGame.ControllerLeft))
         {
             Velocity.X = MathUtility.MoveTowards(Velocity.X, -TerminalVelocity, Acceleration);
             FacingRight = false;
         } 
-        else if (InputManager.IsKeyDown(Keys.D))
+        else if (InputManager.IsKeyDown(GBGame.KeyboardRight) || InputManager.IsGamePadDown(GBGame.ControllerRight))
         {
             Velocity.X = MathUtility.MoveTowards(Velocity.X, TerminalVelocity, Acceleration);
             FacingRight = true;
@@ -45,7 +45,7 @@ public class Player(Game windowData, int zIndex = 1) : Entity(windowData, zIndex
             Velocity.X = MathUtility.MoveTowards(Velocity.X, 0, Acceleration);
         }
 
-        if (IsOnFloor && InputManager.IsKeyPressed(Keys.Space))
+        if (IsOnFloor && (InputManager.IsKeyPressed(GBGame.KeyboardJump) || InputManager.IsGamePadPressed(GBGame.ControllerJump)))
         {
             Velocity.Y = -JumpVelocity;
             IsOnFloor = false;

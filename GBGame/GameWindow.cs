@@ -47,9 +47,6 @@ public class GameWindow : Game
 
     protected override void Update(GameTime gameTime)
     {
-        if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || InputManager.IsKeyDown(Keys.Escape))
-            Exit();
-
         if (InputManager.IsKeyPressed(Keys.F))
         {
             _graphics.ToggleFullScreen();

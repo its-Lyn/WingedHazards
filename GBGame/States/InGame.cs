@@ -126,17 +126,17 @@ public class InGame(GameWindow windowData) : State(windowData)
         _camera.X = Math.Clamp(MathF.Floor(player.Position.X - _cameraOffset + _shakeOffset.X), 0, _gameWidth - window.GameSize.X);
         _camera.Y = _shakeOffset.Y;
 
-        if (InputManager.IsKeyPressed(Keys.Up))
+        if (InputManager.IsKeyPressed(GBGame.KeyboardInventoryUp) || InputManager.IsGamePadPressed(GBGame.ControllerInventoryUp))
         {
             _inventory.ActiveItemIndex--;
         }
 
-        if (InputManager.IsKeyPressed(Keys.Down))
+        if (InputManager.IsKeyPressed(GBGame.KeyboardInventoryDown) || InputManager.IsGamePadPressed(GBGame.ControllerInventoryDown))
         {
             _inventory.ActiveItemIndex++;
         }
 
-        if (InputManager.IsKeyPressed(Keys.LeftShift))
+        if (InputManager.IsKeyPressed(GBGame.KeyboardAction) || InputManager.IsGamePadPressed(GBGame.ControllerAction))
         {
             _inventory.UseActive();
         }
