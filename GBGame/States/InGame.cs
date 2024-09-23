@@ -10,6 +10,7 @@ using GBGame.Items;
 using MonoGayme.Utilities;
 using Microsoft.Xna.Framework.Input;
 using MonoGayme.UI;
+using GBGame.Entities.Enemies;
 
 namespace GBGame.States;
 

@@ -18,7 +18,7 @@ public class Player(Game windowData, int zIndex = 1) : Entity(windowData, zIndex
     public bool IsOnFloor = false;
     public bool FacingRight = true;
 
-    public readonly float JumpVelocity = 4f;
+    public readonly float JumpVelocity = 6f;
 
     public override void LoadContent()
     {
@@ -53,7 +53,7 @@ public class Player(Game windowData, int zIndex = 1) : Entity(windowData, zIndex
 
         if (!IsOnFloor)
         {
-            Velocity.Y = MathUtility.MoveTowards(Velocity.Y, TerminalVelocity, 0.5f);
+            Velocity.Y = MathUtility.MoveTowards(Velocity.Y, TerminalVelocity, 0.8f);
         }
 
         Position += Velocity;
