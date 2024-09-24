@@ -46,6 +46,8 @@ public class InGame(GameWindow windowData) : State(windowData)
     private float _shakeDuration = 0.2f;
     private float _shakeMagnitude = 3f;
 
+    private Bat _bat = null!;
+
     public override void LoadContent()
     {
         for (int i = 1; i <= 4; i++) 
@@ -112,6 +114,10 @@ public class InGame(GameWindow windowData) : State(windowData)
         _inventory.AddItem(_bomb);
 
         _pause = new Pause(window);
+
+        _bat = new Bat(window, new Vector2(50, 50));
+        _bat.LoadContent();
+        _bat.Lock(player);
     }
 
     public override void Update(GameTime time)
@@ -126,6 +132,8 @@ public class InGame(GameWindow windowData) : State(windowData)
             _pause.Update();
             return;
         }
+
+        _bat.Update(time);
 
         _controller.UpdateEntities(WindowData.GraphicsDevice, time);
 
@@ -203,7 +211,7 @@ public class InGame(GameWindow windowData) : State(windowData)
         WindowData.GraphicsDevice.Clear(BackDrop);
         batch.Begin(transformMatrix: _camera.Transform);
             batch.Draw(_island, _camera.ScreenToWorld(new Vector2(0, -10)), Color.White * 0.4f);
-
+            _bat.Draw(batch, time);
             foreach (GroundTile tile in _groundTiles) 
             {
                 batch.Draw(tile.Sprite, new Vector2(tile.X, tile.Y), Color.White);    
