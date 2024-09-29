@@ -115,9 +115,11 @@ public class InGame(GameWindow windowData) : State(windowData)
             _inventory.UseActive();
     }
 
-    private void StartShake(float intensity)
+    private void StartShake(float intensity, float magnitude)
     { 
         _shaking = true;
+
+        _shakeMagnitude = magnitude;
         _intensity = intensity;
     }
 
@@ -165,7 +167,7 @@ public class InGame(GameWindow windowData) : State(windowData)
             {
                 if (_striking && Collision.CheckRects(_strikeCollider, collider.Collider))
                 {
-                    StartShake(1);
+                    StartShake(1, 1.5f);
                     _enemyController.QueueRemove(entity);
                 }
             }
@@ -219,10 +221,9 @@ public class InGame(GameWindow windowData) : State(windowData)
             _bomb.Sheet.CycleAnimation(time);
             _bomb.CanPlace = _bomb.Sheet.Done;
 
-            _shaking = _bomb.Sheet.Done;
-            if (_shaking)
+            if (_bomb.Sheet.Done)
             {
-                _intensity = 1;
+                StartShake(1, 3);
                 _shakeOffset = Vector2.Zero;
             }
         }
