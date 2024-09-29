@@ -54,6 +54,8 @@ public class InGame(GameWindow windowData) : State(windowData)
     private bool _striking = false;
     private Rectangle _strikeCollider;
 
+    private Player _player = null!;
+
     private void SetupGround(int tileCountX, int tileCountY)
     { 
         int basePosition = 0;
@@ -142,19 +144,21 @@ public class InGame(GameWindow windowData) : State(windowData)
         // TileSize / 2 is the player width origin.
         _groundLine = tileCountY - TileSize - TileSize / 2;
 
-        Player player = new Player(WindowData);
-        player.Position.Y = _groundLine;
-        _controller.AddEntity(player);
+        _player = new Player(WindowData);
+        _player.Position.Y = _groundLine;
+        _controller.AddEntity(_player);
 
         _island = WindowData.Content.Load<Texture2D>("Sprites/BackGround/Island");
 
         _sheet = new AnimatedSpriteSheet(WindowData.Content.Load<Texture2D>("Sprites/Strike"), new Vector2(6, 1), 0.02f);
-        _sheet.OnSheetFinished = () => { _striking = false; };
+        _sheet.OnSheetFinished = () => { 
+            _striking = false;
+        };
         
         _inventory.LoadContent(WindowData);
-        _inventory.AddItem(new Sword(WindowData, _sheet, player));
+        _inventory.AddItem(new Sword(WindowData, _sheet, _player));
 
-        _bomb = new Bomb(WindowData, player);
+        _bomb = new Bomb(WindowData, _player);
         _inventory.AddItem(_bomb);
 
         _bomb.Sheet.OnSheetFinished = () => { 
@@ -167,7 +171,7 @@ public class InGame(GameWindow windowData) : State(windowData)
         _pause = new Pause(window);
 
         Bat bat = new Bat(window, new Vector2(50, 50));
-        bat.Lock(player);
+        bat.Lock(_player);
 
         _enemyController.AddEntity(bat);
         _enemyController.OnEntityUpdate = (device, time, entity) => {
@@ -199,33 +203,24 @@ public class InGame(GameWindow windowData) : State(windowData)
         _enemyController.UpdateEntities(WindowData.GraphicsDevice, time);
         _controller.UpdateEntities(WindowData.GraphicsDevice, time);
 
-        Player? player = _controller.GetFirst<Player>();
-        if (player is null) {
-            Console.Error.WriteLine("This isn't supposed to happen... (The player is missing.)");
-            return;
-        }
-
         // Hardcoded ground checking (we don't need anything more complicated.)
-        if (player.Position.Y > _groundLine) 
+        if (_player.Position.Y > _groundLine) 
         {
-            player.Velocity.Y = 0;
-            player.Position.Y = _groundLine;
+            _player.Velocity.Y = 0;
+            _player.Position.Y = _groundLine;
 
-            player.IsOnFloor = true;
+            _player.IsOnFloor = true;
         }
 
-        // Keep the camera position between the game sizes, so the player doesn't see outside the map.
+        // Keep the camera position between the game sizes, so the _player doesn't see outside the map.
         GameWindow window = (GameWindow)WindowData;
-        _camera.X = Math.Clamp(MathF.Floor(player.Position.X - _cameraOffset + _shakeOffset.X), 0, _gameWidth - window.GameSize.X);
+        _camera.X = Math.Clamp(MathF.Floor(_player.Position.X - _cameraOffset + _shakeOffset.X), 0, _gameWidth - window.GameSize.X);
         _camera.Y = _shakeOffset.Y; 
 
         HandleInventoryInput();
 
-        if (!_sheet.Done)
-            _sheet.CycleAnimation(time);
-
-        if (!_bomb.Sheet.Done)
-            _bomb.Sheet.CycleAnimation(time);
+        if (!_sheet.Done) _sheet.CycleAnimation(time);
+        if (!_bomb.Sheet.Done) _bomb.Sheet.CycleAnimation(time);
 
         ShakeCamera(time);
     }
@@ -246,16 +241,9 @@ public class InGame(GameWindow windowData) : State(windowData)
 
             if (!_sheet.Done)
             {
-                Player? player = _controller.GetFirst<Player>();
-                if (player is null) 
-                {
-                    Console.Error.WriteLine("This isn't supposed to happen... (The player is missing.)");
-                    return;
-                }
-
                 Vector2 strikePosition = new Vector2(
-                    player.FacingRight ? player.Position.X + 4 : player.Position.X - 12,
-                    player.Position.Y - 4
+                    _player.FacingRight ? _player.Position.X + 4 : _player.Position.X - 12,
+                    _player.Position.Y - 4
                 );
 
                 _strikeCollider.X = (int)strikePosition.X + 2;
@@ -265,7 +253,7 @@ public class InGame(GameWindow windowData) : State(windowData)
 
                 _striking = true;
 
-                _sheet.Draw(batch, strikePosition, !player.FacingRight);
+                _sheet.Draw(batch, strikePosition, !_player.FacingRight);
             }
 
             // Draw the sprite sheets.
