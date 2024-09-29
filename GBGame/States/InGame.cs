@@ -149,12 +149,20 @@ public class InGame(GameWindow windowData) : State(windowData)
         _island = WindowData.Content.Load<Texture2D>("Sprites/BackGround/Island");
 
         _sheet = new AnimatedSpriteSheet(WindowData.Content.Load<Texture2D>("Sprites/Strike"), new Vector2(6, 1), 0.02f);
+        _sheet.OnSheetFinished = () => { _striking = false; };
         
         _inventory.LoadContent(WindowData);
         _inventory.AddItem(new Sword(WindowData, _sheet, player));
 
-        _bomb = new Bomb(WindowData, player); 
+        _bomb = new Bomb(WindowData, player);
         _inventory.AddItem(_bomb);
+
+        _bomb.Sheet.OnSheetFinished = () => { 
+            _bomb.CanPlace = true;
+
+            StartShake(1, 3);
+            _shakeOffset = Vector2.Zero;
+        };
 
         _pause = new Pause(window);
 
@@ -217,16 +225,7 @@ public class InGame(GameWindow windowData) : State(windowData)
             _sheet.CycleAnimation(time);
 
         if (!_bomb.Sheet.Done)
-        {
             _bomb.Sheet.CycleAnimation(time);
-            _bomb.CanPlace = _bomb.Sheet.Done;
-
-            if (_bomb.Sheet.Done)
-            {
-                StartShake(1, 3);
-                _shakeOffset = Vector2.Zero;
-            }
-        }
 
         ShakeCamera(time);
     }
@@ -243,7 +242,7 @@ public class InGame(GameWindow windowData) : State(windowData)
                 batch.Draw(tile.Sprite, new Vector2(tile.X, tile.Y), Color.White);
 
             _enemyController.DrawEntities(batch, time);
-            _controller.DrawEntities(batch, time);
+            _controller.DrawEntities(batch, time); 
 
             if (!_sheet.Done)
             {
@@ -264,7 +263,7 @@ public class InGame(GameWindow windowData) : State(windowData)
                 _strikeCollider.Width = 4;
                 _strikeCollider.Height = 8;
 
-                _striking = !_sheet.Done;
+                _striking = true;
 
                 _sheet.Draw(batch, strikePosition, !player.FacingRight);
             }
@@ -278,6 +277,12 @@ public class InGame(GameWindow windowData) : State(windowData)
 
             // Draw the inventory on top of everything else.
             _inventory.Draw(batch, _camera);
+
+            // Test
+            if (_striking)
+            {
+                batch.Draw(_grass[0], Vector2.Zero, Color.White);
+            }
         batch.End();
     }
 }
