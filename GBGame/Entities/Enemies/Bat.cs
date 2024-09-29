@@ -18,8 +18,6 @@ public class Bat(Game windowData, Vector2 pos, int zIndex = 0) : Entity(windowDa
 
     public Rectangle Collider { get; set; }
 
-    private Shapes _shapes = null!;
-
     public void Lock(Entity entity) {
         _lockedEntity = entity;
         _locked = true;
@@ -29,8 +27,6 @@ public class Bat(Game windowData, Vector2 pos, int zIndex = 0) : Entity(windowDa
     {
         _sprite = WindowData.Content.Load<Texture2D>("Sprites/Ground/Ground_4");
         Position = pos;
-
-        _shapes = new Shapes(WindowData.GraphicsDevice);
     }
 
     public override void Update(GameTime time)
@@ -57,6 +53,5 @@ public class Bat(Game windowData, Vector2 pos, int zIndex = 0) : Entity(windowDa
     public override void Draw(SpriteBatch batch, GameTime time)
     {
         batch.Draw(_sprite, Position, Color.White);
-        _shapes.DrawRectangleLines(Collider, Color.Red, batch);
     }
 }

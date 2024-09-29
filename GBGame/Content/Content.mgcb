@@ -25,18 +25,6 @@
 /processorParam:TextureFormat=Color
 /build:Sprites/BackGround/Island.png
 
-#begin Sprites/BombPlaced.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Sprites/BombPlaced.png
-
 #begin Sprites/Fonts/Early GameBoy.ttf
 /copy:Sprites/Fonts/Early GameBoy.ttf
 
@@ -126,7 +114,7 @@
 /processorParam:TextureFormat=Color
 /build:Sprites/Ground/Ground_4.png
 
-#begin Sprites/Strike.png
+#begin Sprites/Objects/CommandCentre.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -136,7 +124,31 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Sprites/Strike.png
+/build:Sprites/Objects/CommandCentre.png
+
+#begin Sprites/SpriteSheets/BombPlaced.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Sprites/SpriteSheets/BombPlaced.png
+
+#begin Sprites/SpriteSheets/Strike.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Sprites/SpriteSheets/Strike.png
 
 #begin Sprites/UI/Bomb.png
 /importer:TextureImporter

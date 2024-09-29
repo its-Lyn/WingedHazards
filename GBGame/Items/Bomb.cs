@@ -15,6 +15,9 @@ public class Bomb(Game windowData, Player player) : Item(windowData)
     
     private Vector2 _pos;
 
+    public bool Exploded = false;
+    public Rectangle KillRadius;
+
     public override void LoadContent()
     {
         InventorySprite = WindowData.Content.Load<Texture2D>("Sprites/UI/Bomb");
@@ -22,7 +25,7 @@ public class Bomb(Game windowData, Player player) : Item(windowData)
         Name = "Bomb";
         Description = $"{BombCount} bombs left.";
 
-        Sheet = new AnimatedSpriteSheet(WindowData.Content.Load<Texture2D>("Sprites/BombPlaced"), new Vector2(5, 1), 0.5f);
+        Sheet = new AnimatedSpriteSheet(WindowData.Content.Load<Texture2D>("Sprites/SpriteSheets/BombPlaced"), new Vector2(5, 1), 0.5f);
     }
 
     public override void Use()
@@ -39,6 +42,7 @@ public class Bomb(Game windowData, Player player) : Item(windowData)
         CanPlace = false;
         Sheet.Done = false;
         _pos = Vector2.Floor(player.Position / 8) * 8;
+        KillRadius = new Rectangle((int)_pos.X - 16, (int)_pos.Y - 16, 40, 40);
         
         Console.WriteLine("Used Bomb.");
     }

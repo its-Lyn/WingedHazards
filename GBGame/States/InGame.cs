@@ -56,6 +56,8 @@ public class InGame(GameWindow windowData) : State(windowData)
 
     private Player _player = null!;
 
+    private SpriteFont _font = null!;
+
     private void SetupGround(int tileCountX, int tileCountY)
     { 
         int basePosition = 0;
@@ -97,6 +99,10 @@ public class InGame(GameWindow windowData) : State(windowData)
             {
                 _shaking = false;
                 _shakeOffset = Vector2.Zero;
+
+                if(_bomb.Exploded)
+                    _bomb.Exploded = false;
+
                 return;
             }
 
@@ -150,7 +156,7 @@ public class InGame(GameWindow windowData) : State(windowData)
 
         _island = WindowData.Content.Load<Texture2D>("Sprites/BackGround/Island");
 
-        _sheet = new AnimatedSpriteSheet(WindowData.Content.Load<Texture2D>("Sprites/Strike"), new Vector2(6, 1), 0.02f);
+        _sheet = new AnimatedSpriteSheet(WindowData.Content.Load<Texture2D>("Sprites/SpriteSheets/Strike"), new Vector2(6, 1), 0.02f);
         _sheet.OnSheetFinished = () => { 
             _striking = false;
         };
@@ -163,6 +169,7 @@ public class InGame(GameWindow windowData) : State(windowData)
 
         _bomb.Sheet.OnSheetFinished = () => { 
             _bomb.CanPlace = true;
+            _bomb.Exploded = true;
 
             StartShake(1, 3);
             _shakeOffset = Vector2.Zero;
@@ -179,13 +186,22 @@ public class InGame(GameWindow windowData) : State(windowData)
             {
                 if (_striking && Collision.CheckRects(_strikeCollider, collider.Collider))
                 {
-                    StartShake(1, 1.5f);
+                    StartShake(1, 2);
                     _enemyController.QueueRemove(entity);
+                    return;
+                }
+
+                if (_bomb.Exploded && Collision.CheckRects(_bomb.KillRadius, collider.Collider))
+                {
+                    _enemyController.QueueRemove(entity);
+                    return;
                 }
             }
         };
 
         _shapes = new Shapes(window.GraphicsDevice);
+
+        _font = WindowData.Content.Load<SpriteFont>("Sprites/Fonts/File");
     }
 
     public override void Update(GameTime time)
@@ -265,12 +281,6 @@ public class InGame(GameWindow windowData) : State(windowData)
 
             // Draw the inventory on top of everything else.
             _inventory.Draw(batch, _camera);
-
-            // Test
-            if (_striking)
-            {
-                batch.Draw(_grass[0], Vector2.Zero, Color.White);
-            }
         batch.End();
     }
 }
