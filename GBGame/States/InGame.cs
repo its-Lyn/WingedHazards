@@ -11,6 +11,7 @@ using MonoGayme.Utilities;
 using Microsoft.Xna.Framework.Input;
 using MonoGayme.UI;
 using GBGame.Entities.Enemies;
+using MonoGayme.Entities.Colliders;
 
 namespace GBGame.States;
 
@@ -27,7 +28,9 @@ public class InGame(GameWindow windowData) : State(windowData)
 
     private Camera2D _camera = new Camera2D(Vector2.Zero);
     private float _cameraOffset = 40;
+
     private EntityController _controller = new EntityController();
+    private EntityController _enemyController = new EntityController();
 
     private int _groundLine;
     private int _gameWidth;
@@ -46,7 +49,10 @@ public class InGame(GameWindow windowData) : State(windowData)
     private float _shakeDuration = 0.2f;
     private float _shakeMagnitude = 3f;
 
-    private Bat _bat = null!;
+    private Shapes _shapes = null!;
+
+    private bool _striking = false;
+    private Rectangle _strikeCollider;
 
     public override void LoadContent()
     {
@@ -115,9 +121,23 @@ public class InGame(GameWindow windowData) : State(windowData)
 
         _pause = new Pause(window);
 
-        _bat = new Bat(window, new Vector2(50, 50));
-        _bat.LoadContent();
-        _bat.Lock(player);
+        Bat bat = new Bat(window, new Vector2(50, 50));
+        bat.Lock(player);
+
+        _enemyController.AddEntity(bat);
+        _enemyController.OnEntityUpdate = (device, time, entity) => {
+            if (entity is IRectCollider collider)
+            {
+                if (_striking && Collision.CheckRects(_strikeCollider, collider.Collider))
+                {
+                    _shaking = true;
+                    _intensity = 1;
+                    _enemyController.QueueRemove(entity);
+                }
+            }
+        };
+
+        _shapes = new Shapes(window.GraphicsDevice);
     }
 
     public override void Update(GameTime time)
@@ -133,8 +153,7 @@ public class InGame(GameWindow windowData) : State(windowData)
             return;
         }
 
-        _bat.Update(time);
-
+        _enemyController.UpdateEntities(WindowData.GraphicsDevice, time);
         _controller.UpdateEntities(WindowData.GraphicsDevice, time);
 
         Player? player = _controller.GetFirst<Player>();
@@ -176,6 +195,7 @@ public class InGame(GameWindow windowData) : State(windowData)
         if (!_sheet.Done)
         {
             _sheet.CycleAnimation(time);
+            _striking = !_sheet.Done;
         }
 
         if (!_bomb.Sheet.Done)
@@ -186,7 +206,7 @@ public class InGame(GameWindow windowData) : State(windowData)
             _shaking = _bomb.Sheet.Done;
             if (_shaking)
             {
-                _intensity = 1;
+                _intensity = 1f;
                 _shakeOffset = Vector2.Zero;
             }
         }
@@ -211,12 +231,12 @@ public class InGame(GameWindow windowData) : State(windowData)
         WindowData.GraphicsDevice.Clear(BackDrop);
         batch.Begin(transformMatrix: _camera.Transform);
             batch.Draw(_island, _camera.ScreenToWorld(new Vector2(0, -10)), Color.White * 0.4f);
-            _bat.Draw(batch, time);
             foreach (GroundTile tile in _groundTiles) 
             {
-                batch.Draw(tile.Sprite, new Vector2(tile.X, tile.Y), Color.White);    
+                batch.Draw(tile.Sprite, new Vector2(tile.X, tile.Y), Color.White);
             }
 
+            _enemyController.DrawEntities(batch, time);
             _controller.DrawEntities(batch, time);
             if (!_sheet.Done)
             {
@@ -231,7 +251,15 @@ public class InGame(GameWindow windowData) : State(windowData)
                     player.Position.Y - 4
                 );
 
+                _strikeCollider.X = (int)strikePosition.X + 2;
+                _strikeCollider.Y = (int)strikePosition.Y;
+                _strikeCollider.Width = 4;
+                _strikeCollider.Height = 8;
+
+                _striking = true;
+
                 _sheet.Draw(batch, strikePosition, !player.FacingRight);
+                _shapes.DrawRectangleLines(_strikeCollider, Color.White, batch);
             }
 
             if(!_bomb.Sheet.Done)
