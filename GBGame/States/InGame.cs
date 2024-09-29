@@ -54,24 +54,8 @@ public class InGame(GameWindow windowData) : State(windowData)
     private bool _striking = false;
     private Rectangle _strikeCollider;
 
-    public override void LoadContent()
-    {
-        for (int i = 1; i <= 4; i++) 
-        {
-            _ground.Add(WindowData.Content.Load<Texture2D>($"Sprites/Ground/Ground_{i}"));
-        }
-
-        for (int i = 1; i <= 2; i++)
-        {
-            _grass.Add(WindowData.Content.Load<Texture2D>($"Sprites/Grass/Grass_{i}"));
-        }
-
-        GameWindow window = (GameWindow)WindowData;
-
-        _gameWidth = (int)(window.GameSize.Y * 2);
-        int tileCountY = (int)(window.GameSize.Y - TileSize);
-        int tileCountX = _gameWidth / TileSize;
-
+    private void SetupGround(int tileCountX, int tileCountY)
+    { 
         int basePosition = 0;
         for (int i = 0; i < _gameWidth / TileSize; i++)
         {
@@ -93,23 +77,74 @@ public class InGame(GameWindow windowData) : State(windowData)
 
             // Get a random position on the grid
             int gridX;
-            do 
-            {
-                gridX = Random.Shared.Next(0, tileCountX);
-            }
+            do gridX = Random.Shared.Next(0, tileCountX);
             while (usedGridPositions.Contains(gridX));
+
             usedGridPositions.Add(gridX);
 
             _groundTiles.Add(new GroundTile(tile, gridX * TileSize, tileCountY - TileSize * 2));
+        }  
+    }
+
+    private void ShakeCamera(GameTime time)
+    { 
+        if (_shaking)
+        {
+            _intensity -= (float)time.ElapsedGameTime.TotalSeconds / _shakeDuration;
+            if (_intensity <= 0) 
+            {
+                _shaking = false;
+                _shakeOffset = Vector2.Zero;
+                return;
+            }
+
+            float rot = Random.Shared.NextSingle() * MathF.Tau;
+            _shakeOffset = new Vector2(MathF.Cos(rot), MathF.Sin(rot)) * _shakeMagnitude * _intensity;
         }
+    }
 
-        _groundLine = tileCountY - TileSize - TileSize / 2; // TileSize / 2 is the player width origin.
+    private void HandleInventoryInput()
+    { 
+        if (InputManager.IsKeyPressed(GBGame.KeyboardInventoryUp) || InputManager.IsGamePadPressed(GBGame.ControllerInventoryUp))
+            _inventory.ActiveItemIndex--;
 
-        _island = WindowData.Content.Load<Texture2D>("Sprites/BackGround/Island");
+        if (InputManager.IsKeyPressed(GBGame.KeyboardInventoryDown) || InputManager.IsGamePadPressed(GBGame.ControllerInventoryDown))
+            _inventory.ActiveItemIndex++;
+
+        if (InputManager.IsKeyPressed(GBGame.KeyboardAction) || InputManager.IsGamePadPressed(GBGame.ControllerAction))
+            _inventory.UseActive();
+    }
+
+    private void StartShake(float intensity)
+    { 
+        _shaking = true;
+        _intensity = intensity;
+    }
+
+    public override void LoadContent()
+    {
+        for (int i = 1; i <= 4; i++) 
+            _ground.Add(WindowData.Content.Load<Texture2D>($"Sprites/Ground/Ground_{i}"));
+        
+        for (int i = 1; i <= 2; i++)
+            _grass.Add(WindowData.Content.Load<Texture2D>($"Sprites/Grass/Grass_{i}"));
+
+        GameWindow window = (GameWindow)WindowData;
+
+        _gameWidth = (int)(window.GameSize.Y * 2);
+
+        int tileCountY = (int)(window.GameSize.Y - TileSize);
+        int tileCountX = _gameWidth / TileSize; 
+        SetupGround(tileCountX, tileCountY);
+
+        // TileSize / 2 is the player width origin.
+        _groundLine = tileCountY - TileSize - TileSize / 2;
 
         Player player = new Player(WindowData);
         player.Position.Y = _groundLine;
         _controller.AddEntity(player);
+
+        _island = WindowData.Content.Load<Texture2D>("Sprites/BackGround/Island");
 
         _sheet = new AnimatedSpriteSheet(WindowData.Content.Load<Texture2D>("Sprites/Strike"), new Vector2(6, 1), 0.02f);
         
@@ -130,8 +165,7 @@ public class InGame(GameWindow windowData) : State(windowData)
             {
                 if (_striking && Collision.CheckRects(_strikeCollider, collider.Collider))
                 {
-                    _shaking = true;
-                    _intensity = 1;
+                    StartShake(1);
                     _enemyController.QueueRemove(entity);
                 }
             }
@@ -143,9 +177,7 @@ public class InGame(GameWindow windowData) : State(windowData)
     public override void Update(GameTime time)
     {
         if (InputManager.IsGamePadPressed(Buttons.Start) || InputManager.IsKeyPressed(Keys.Escape))
-        {
             _pause.Paused = !_pause.Paused;
-        }
 
         if (_pause.Paused)
         {
@@ -153,6 +185,7 @@ public class InGame(GameWindow windowData) : State(windowData)
             return;
         }
 
+        // Update controllers.
         _enemyController.UpdateEntities(WindowData.GraphicsDevice, time);
         _controller.UpdateEntities(WindowData.GraphicsDevice, time);
 
@@ -160,27 +193,6 @@ public class InGame(GameWindow windowData) : State(windowData)
         if (player is null) {
             Console.Error.WriteLine("This isn't supposed to happen... (The player is missing.)");
             return;
-        }
-
-        GameWindow window = (GameWindow)WindowData;
-
-        // Keep the camera position between the game sizes, so the player doesn't see outside the map.
-        _camera.X = Math.Clamp(MathF.Floor(player.Position.X - _cameraOffset + _shakeOffset.X), 0, _gameWidth - window.GameSize.X);
-        _camera.Y = _shakeOffset.Y;
-
-        if (InputManager.IsKeyPressed(GBGame.KeyboardInventoryUp) || InputManager.IsGamePadPressed(GBGame.ControllerInventoryUp))
-        {
-            _inventory.ActiveItemIndex--;
-        }
-
-        if (InputManager.IsKeyPressed(GBGame.KeyboardInventoryDown) || InputManager.IsGamePadPressed(GBGame.ControllerInventoryDown))
-        {
-            _inventory.ActiveItemIndex++;
-        }
-
-        if (InputManager.IsKeyPressed(GBGame.KeyboardAction) || InputManager.IsGamePadPressed(GBGame.ControllerAction))
-        {
-            _inventory.UseActive();
         }
 
         // Hardcoded ground checking (we don't need anything more complicated.)
@@ -192,11 +204,15 @@ public class InGame(GameWindow windowData) : State(windowData)
             player.IsOnFloor = true;
         }
 
+        // Keep the camera position between the game sizes, so the player doesn't see outside the map.
+        GameWindow window = (GameWindow)WindowData;
+        _camera.X = Math.Clamp(MathF.Floor(player.Position.X - _cameraOffset + _shakeOffset.X), 0, _gameWidth - window.GameSize.X);
+        _camera.Y = _shakeOffset.Y; 
+
+        HandleInventoryInput();
+
         if (!_sheet.Done)
-        {
             _sheet.CycleAnimation(time);
-            _striking = !_sheet.Done;
-        }
 
         if (!_bomb.Sheet.Done)
         {
@@ -206,42 +222,33 @@ public class InGame(GameWindow windowData) : State(windowData)
             _shaking = _bomb.Sheet.Done;
             if (_shaking)
             {
-                _intensity = 1f;
+                _intensity = 1;
                 _shakeOffset = Vector2.Zero;
             }
         }
 
-        if (_shaking)
-        {
-            _intensity -= (float)time.ElapsedGameTime.TotalSeconds / _shakeDuration;
-            if (_intensity <= 0) 
-            {
-                _shaking = false;
-                _shakeOffset = Vector2.Zero;
-                return;
-            }
-
-            float rot = Random.Shared.NextSingle() * MathF.Tau;
-            _shakeOffset = new Vector2(MathF.Cos(rot), MathF.Sin(rot)) * _shakeMagnitude * _intensity;
-        }
+        ShakeCamera(time);
     }
    
     public override void Draw(GameTime time, SpriteBatch batch)
     {
         WindowData.GraphicsDevice.Clear(BackDrop);
+
         batch.Begin(transformMatrix: _camera.Transform);
+            // Draw the background
             batch.Draw(_island, _camera.ScreenToWorld(new Vector2(0, -10)), Color.White * 0.4f);
+
             foreach (GroundTile tile in _groundTiles) 
-            {
                 batch.Draw(tile.Sprite, new Vector2(tile.X, tile.Y), Color.White);
-            }
 
             _enemyController.DrawEntities(batch, time);
             _controller.DrawEntities(batch, time);
+
             if (!_sheet.Done)
             {
                 Player? player = _controller.GetFirst<Player>();
-                if (player is null) {
+                if (player is null) 
+                {
                     Console.Error.WriteLine("This isn't supposed to happen... (The player is missing.)");
                     return;
                 }
@@ -256,23 +263,20 @@ public class InGame(GameWindow windowData) : State(windowData)
                 _strikeCollider.Width = 4;
                 _strikeCollider.Height = 8;
 
-                _striking = true;
+                _striking = !_sheet.Done;
 
                 _sheet.Draw(batch, strikePosition, !player.FacingRight);
-                _shapes.DrawRectangleLines(_strikeCollider, Color.White, batch);
             }
 
+            // Draw the sprite sheets.
             if(!_bomb.Sheet.Done)
-            {
                 _bomb.Draw(batch);
-            }
-
-            _inventory.Draw(batch, _camera);
 
             if (_pause.Paused)
-            {
                 _pause.Draw(batch, _camera);
-            }
+
+            // Draw the inventory on top of everything else.
+            _inventory.Draw(batch, _camera);
         batch.End();
     }
 }
