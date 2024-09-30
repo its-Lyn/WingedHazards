@@ -1,15 +1,15 @@
 using System;
+using GBGame.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGayme.Components;
 using MonoGayme.Components.Colliders;
 using MonoGayme.Entities;
-using MonoGayme.Entities.Colliders;
 using MonoGayme.Utilities;
 
 namespace GBGame.Entities.Enemies;
 
-public class Bat(Game windowData, Vector2 pos, int zIndex = 0) : Entity(windowData, zIndex), IRectCollider
-{
+public class Bat(Game windowData, Vector2 pos, int zIndex = 0) : Entity(windowData, zIndex){
     private Texture2D _sprite = null!;
     
     private bool _locked = false;
@@ -17,7 +17,8 @@ public class Bat(Game windowData, Vector2 pos, int zIndex = 0) : Entity(windowDa
 
     private float _speed = 0.6f;
 
-    public RectCollider Collider { get; set; } = null!;
+    private RectCollider _rectCollider;
+    private Timer _immunityTimer;
 
     public void Lock(Entity entity) {
         _lockedEntity = entity;
@@ -29,7 +30,14 @@ public class Bat(Game windowData, Vector2 pos, int zIndex = 0) : Entity(windowDa
         _sprite = WindowData.Content.Load<Texture2D>("Sprites/Ground/Ground_4");
         Position = pos;
 
-        Collider = new RectCollider();
+        Components.AddComponent(new RectCollider());
+        Components.AddComponent(new Timer(1, true, false, "ImmunityTimer"));
+        Components.AddComponent(new Health(2));
+
+        _rectCollider = Components.GetComponent<RectCollider>()!;
+
+        _immunityTimer = Components.GetComponent<Timer>("ImmunityTimer")!;
+        _immunityTimer.OnTimeOut = () => { _rectCollider.Enabled = true; };
     }
 
     public override void Update(GameTime time)
@@ -42,7 +50,7 @@ public class Bat(Game windowData, Vector2 pos, int zIndex = 0) : Entity(windowDa
                 return;
             }
             
-            Vector2 dir = _lockedEntity.Position - Position;
+            Vector2 dir = _lockedEntity.Position with { Y = _lockedEntity.Position.Y - 4 } - Position;
             dir.Normalize();
 
             Vector2 target = dir * _speed;
@@ -50,7 +58,9 @@ public class Bat(Game windowData, Vector2 pos, int zIndex = 0) : Entity(windowDa
         }
 
         Position += Velocity;
-        Collider.Bounds = new Rectangle((int)Position.X, (int)Position.Y, 8, 8);
+        _rectCollider.Bounds = new Rectangle((int)Position.X, (int)Position.Y, 8, 8);
+
+        _immunityTimer.Cycle(time);
     }
 
     public override void Draw(SpriteBatch batch, GameTime time)

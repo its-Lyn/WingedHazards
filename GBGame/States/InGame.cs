@@ -9,8 +9,9 @@ using GBGame.Components;
 using GBGame.Items;
 using MonoGayme.Utilities;
 using Microsoft.Xna.Framework.Input;
-using MonoGayme.Entities.Colliders;
 using GBGame.Entities.Enemies;
+using MonoGayme.Controllers;
+using MonoGayme.Components.Colliders;
 
 namespace GBGame.States;
 
@@ -54,7 +55,7 @@ public class InGame(GameWindow windowData) : State(windowData)
     private Shapes _shapes = null!;
 
     private bool _striking = false;
-    private Rectangle _strikeCollider;
+    private RectCollider _strikeCollider = new RectCollider();
 
     private Player _player = null!;
 
@@ -137,6 +138,8 @@ public class InGame(GameWindow windowData) : State(windowData)
 
     public override void LoadContent()
     {
+        _strikeCollider.Bounds = new Rectangle();
+
         for (int i = 1; i <= 4; i++) 
             _ground.Add(WindowData.Content.Load<Texture2D>($"Sprites/Ground/Ground_{i}"));
         
@@ -182,20 +185,47 @@ public class InGame(GameWindow windowData) : State(windowData)
         _pause = new Pause(window);
 
         _enemyController.OnEntityUpdate = (device, time, entity) => {
-            if (entity is IRectCollider rect)
+            RectCollider? rect = entity.Components.GetComponent<RectCollider>();
+            if (rect is null) return;
+
+            if (_striking && rect.Collides(_strikeCollider))
             {
-                if (_striking && Collision.CheckRects(_strikeCollider, rect.Collider.Bounds))
+                Vector2 entityCentre = rect.GetCentre();
+                Vector2 strikeCentre = _strikeCollider.GetCentre();
+                Vector2 distance = entityCentre - strikeCentre;
+
+                Vector2 dir = Vector2.Normalize(distance);
+                entity.Velocity += 2 * dir;
+
+                rect.Enabled = false;
+                Timer? immunityTimer = entity.Components.GetComponent<Timer>("ImmunityTimer");
+                if (immunityTimer is not null)
                 {
-                    StartShake(0.6f, 2);
-                    _enemyController.QueueRemove(entity);
-                    return;
+                    if (!immunityTimer.Enabled)
+                    {
+                        immunityTimer.Reset();
+                        immunityTimer.Start();
+                    }
                 }
 
-                if (_bomb.Exploded && Collision.CheckRects(_bomb.KillRadius, rect.Collider.Bounds))
+                StartShake(0.6f, 2);
+
+                Health? health = entity.Components.GetComponent<Health>();
+                if (health is null) return;
+
+                health.HealthPoints--;
+                if (health.HealthPoints <= 0) 
                 {
                     _enemyController.QueueRemove(entity);
-                    return;
                 }
+
+                return;
+            }
+
+            if (_bomb.Exploded && rect.Collides(_bomb.KillRadius))
+            {
+                _enemyController.QueueRemove(entity);
+                return;
             }
         };
 
@@ -276,10 +306,10 @@ public class InGame(GameWindow windowData) : State(windowData)
                     _player.Position.Y - 4
                 );
 
-                _strikeCollider.X = (int)strikePosition.X + 2;
-                _strikeCollider.Y = (int)strikePosition.Y;
-                _strikeCollider.Width = 4;
-                _strikeCollider.Height = 8;
+                _strikeCollider.Bounds.X = (int)strikePosition.X + 2;
+                _strikeCollider.Bounds.Y = (int)strikePosition.Y;
+                _strikeCollider.Bounds.Width = 4;
+                _strikeCollider.Bounds.Height = 8;
 
                 _striking = true;
 
