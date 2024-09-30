@@ -1,6 +1,7 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGayme.Components.Colliders;
 using MonoGayme.Entities;
 using MonoGayme.Entities.Colliders;
 using MonoGayme.Utilities;
@@ -16,7 +17,7 @@ public class Bat(Game windowData, Vector2 pos, int zIndex = 0) : Entity(windowDa
 
     private float _speed = 0.6f;
 
-    public Rectangle Collider { get; set; }
+    public RectCollider Collider { get; set; } = null!;
 
     public void Lock(Entity entity) {
         _lockedEntity = entity;
@@ -27,6 +28,8 @@ public class Bat(Game windowData, Vector2 pos, int zIndex = 0) : Entity(windowDa
     {
         _sprite = WindowData.Content.Load<Texture2D>("Sprites/Ground/Ground_4");
         Position = pos;
+
+        Collider = new RectCollider();
     }
 
     public override void Update(GameTime time)
@@ -47,7 +50,7 @@ public class Bat(Game windowData, Vector2 pos, int zIndex = 0) : Entity(windowDa
         }
 
         Position += Velocity;
-        Collider = new Rectangle((int)Position.X, (int)Position.Y, 8, 8);
+        Collider.Bounds = new Rectangle((int)Position.X, (int)Position.Y, 8, 8);
     }
 
     public override void Draw(SpriteBatch batch, GameTime time)

@@ -17,10 +17,10 @@ public class Sword(Game windowData, AnimatedSpriteSheet sheet, Player player) : 
 
     public override void Use() 
     {
-        if (sheet.Done)
+        if (sheet.Finished)
         {
             Console.WriteLine("Using sword.");
-            sheet.Done = false;
+            sheet.Finished = false;
 
             if (player.IsOnFloor)
             {

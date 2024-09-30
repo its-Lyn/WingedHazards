@@ -9,14 +9,16 @@ using GBGame.Components;
 using GBGame.Items;
 using MonoGayme.Utilities;
 using Microsoft.Xna.Framework.Input;
-using MonoGayme.UI;
-using GBGame.Entities.Enemies;
 using MonoGayme.Entities.Colliders;
+using GBGame.Entities.Enemies;
 
 namespace GBGame.States;
 
 public class InGame(GameWindow windowData) : State(windowData)
 {
+    const int BatSpawnerHeight = -8;
+    const int BatSpawnerWidth = 40;
+
     private record struct GroundTile(Texture2D Sprite, int X, int Y);
 
     private List<Texture2D> _grass = [];
@@ -57,6 +59,8 @@ public class InGame(GameWindow windowData) : State(windowData)
     private Player _player = null!;
 
     private SpriteFont _font = null!;
+
+    private Timer _timer = new Timer(5, true, false); 
 
     private void SetupGround(int tileCountX, int tileCountY)
     { 
@@ -110,6 +114,14 @@ public class InGame(GameWindow windowData) : State(windowData)
             _shakeOffset = new Vector2(MathF.Cos(rot), MathF.Sin(rot)) * _shakeMagnitude * _intensity;
         }
     }
+    
+    private void StartShake(float intensity, float magnitude)
+    { 
+        _shaking = true;
+
+        _shakeMagnitude = magnitude;
+        _intensity = intensity;
+    }
 
     private void HandleInventoryInput()
     { 
@@ -121,14 +133,6 @@ public class InGame(GameWindow windowData) : State(windowData)
 
         if (InputManager.IsKeyPressed(GBGame.KeyboardAction) || InputManager.IsGamePadPressed(GBGame.ControllerAction))
             _inventory.UseActive();
-    }
-
-    private void StartShake(float intensity, float magnitude)
-    { 
-        _shaking = true;
-
-        _shakeMagnitude = magnitude;
-        _intensity = intensity;
     }
 
     public override void LoadContent()
@@ -177,21 +181,17 @@ public class InGame(GameWindow windowData) : State(windowData)
 
         _pause = new Pause(window);
 
-        Bat bat = new Bat(window, new Vector2(50, 50));
-        bat.Lock(_player);
-
-        _enemyController.AddEntity(bat);
         _enemyController.OnEntityUpdate = (device, time, entity) => {
-            if (entity is IRectCollider collider)
+            if (entity is IRectCollider rect)
             {
-                if (_striking && Collision.CheckRects(_strikeCollider, collider.Collider))
+                if (_striking && Collision.CheckRects(_strikeCollider, rect.Collider.Bounds))
                 {
-                    StartShake(1, 2);
+                    StartShake(0.6f, 2);
                     _enemyController.QueueRemove(entity);
                     return;
                 }
 
-                if (_bomb.Exploded && Collision.CheckRects(_bomb.KillRadius, collider.Collider))
+                if (_bomb.Exploded && Collision.CheckRects(_bomb.KillRadius, rect.Collider.Bounds))
                 {
                     _enemyController.QueueRemove(entity);
                     return;
@@ -199,8 +199,20 @@ public class InGame(GameWindow windowData) : State(windowData)
             }
         };
 
-        _shapes = new Shapes(window.GraphicsDevice);
+        _timer.OnTimeOut = () => {
+            int minPosition = (int)(_player.Position.X - BatSpawnerWidth);
+            int width = minPosition + (BatSpawnerWidth * 2);
+            Vector2 batPosition = new Vector2(Random.Shared.Next(minPosition, width), BatSpawnerHeight);
 
+            Bat bat = new Bat(window, batPosition);
+
+            // The bat will always follow the player
+            bat.Lock(_player);
+
+            _enemyController.AddEntity(bat);
+        };
+
+        _shapes = new Shapes(window.GraphicsDevice);
         _font = WindowData.Content.Load<SpriteFont>("Sprites/Fonts/File");
     }
 
@@ -235,10 +247,12 @@ public class InGame(GameWindow windowData) : State(windowData)
 
         HandleInventoryInput();
 
-        if (!_sheet.Done) _sheet.CycleAnimation(time);
-        if (!_bomb.Sheet.Done) _bomb.Sheet.CycleAnimation(time);
+        if (!_sheet.Finished) _sheet.CycleAnimation(time);
+        if (!_bomb.Sheet.Finished) _bomb.Sheet.CycleAnimation(time);
 
         ShakeCamera(time);
+
+        _timer.Cycle(time);
     }
    
     public override void Draw(GameTime time, SpriteBatch batch)
@@ -255,7 +269,7 @@ public class InGame(GameWindow windowData) : State(windowData)
             _enemyController.DrawEntities(batch, time);
             _controller.DrawEntities(batch, time); 
 
-            if (!_sheet.Done)
+            if (!_sheet.Finished)
             {
                 Vector2 strikePosition = new Vector2(
                     _player.FacingRight ? _player.Position.X + 4 : _player.Position.X - 12,
@@ -272,12 +286,8 @@ public class InGame(GameWindow windowData) : State(windowData)
                 _sheet.Draw(batch, strikePosition, !_player.FacingRight);
             }
 
-            // Draw the sprite sheets.
-            if(!_bomb.Sheet.Done)
-                _bomb.Draw(batch);
-
-            if (_pause.Paused)
-                _pause.Draw(batch, _camera);
+            if(!_bomb.Sheet.Finished) _bomb.Draw(batch);
+            if (_pause.Paused) _pause.Draw(batch, _camera);
 
             // Draw the inventory on top of everything else.
             _inventory.Draw(batch, _camera);

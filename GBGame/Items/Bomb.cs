@@ -40,7 +40,7 @@ public class Bomb(Game windowData, Player player) : Item(windowData)
         Description = BombCount == 1 ? "1 bomb left." : $"{(BombCount == 0 ? "No" : BombCount)} bombs left."; 
 
         CanPlace = false;
-        Sheet.Done = false;
+        Sheet.Finished = false;
         _pos = Vector2.Floor(player.Position / 8) * 8;
         KillRadius = new Rectangle((int)_pos.X - 16, (int)_pos.Y - 16, 40, 40);
         
