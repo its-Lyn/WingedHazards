@@ -190,14 +190,14 @@ public class InGame(GameWindow windowData) : State(windowData)
 
             if (_striking && rect.Collides(_strikeCollider))
             {
-                Vector2 entityCentre = rect.GetCentre();
-                Vector2 strikeCentre = _strikeCollider.GetCentre();
-                Vector2 distance = entityCentre - strikeCentre;
+                Vector2 distance = rect.GetCentre() - _strikeCollider.GetCentre();
 
                 Vector2 dir = Vector2.Normalize(distance);
                 entity.Velocity += 2 * dir;
 
                 rect.Enabled = false;
+
+                // Basically "iframes" except it uses actual time.
                 Timer? immunityTimer = entity.Components.GetComponent<Timer>("ImmunityTimer");
                 if (immunityTimer is not null)
                 {
