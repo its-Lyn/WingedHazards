@@ -24,6 +24,7 @@ public class ProjectileBat(Game windowData, Vector2 pos, int zIndex = 0) : Entit
     private EntityController _bulletController = null!;
 
     private RectCollider _collider = null!;
+    private RectCollider _hitterCollider = null!;
 
     private bool _hasShot = false;
 
@@ -53,12 +54,30 @@ public class ProjectileBat(Game windowData, Vector2 pos, int zIndex = 0) : Entit
         Components.AddComponent(new Timer(1, false, false, "WaitTimer"));
         Components.AddComponent(new Timer(0.5f, true, true, "ImmunityTimer"));
         Components.AddComponent(new EntityController());
-        Components.AddComponent(new RectCollider());
+        Components.AddComponent(new RectCollider("PlayerStriker"));
+        Components.AddComponent(new RectCollider("PlayerHitter"));
         Components.AddComponent(new Health(3));
 
-        _collider = Components.GetComponent<RectCollider>()!;
+        _collider = Components.GetComponent<RectCollider>("PlayerStriker")!;
+        _hitterCollider = Components.GetComponent<RectCollider>("PlayerHitter")!;
 
         _bulletController = Components.GetComponent<EntityController>()!;
+        _bulletController.OnEntityUpdate = (device, time, entity) => {
+            if (_locked && _lockedEntity is not null)
+            {
+                if (_lockedEntity is Player player)
+                {
+                    RectCollider? collider = entity.Components.GetComponent<RectCollider>();
+                    if (collider is null) return;
+
+                    if (player.Collider.Collides(collider))
+                    {
+                        player.ApplyKnockBack(collider);
+                        _bulletController.QueueRemove(entity);
+                    }
+                }
+            }
+        };
 
         _stateTimer = Components.GetComponent<Timer>("StateTimer")!;
         _stateTimer.OnTimeOut = () => {
@@ -125,11 +144,12 @@ public class ProjectileBat(Game windowData, Vector2 pos, int zIndex = 0) : Entit
 
         Position += Velocity;
         _collider.Bounds = new Rectangle((int)Position.X, (int)Position.Y, 8, 8);
+        _hitterCollider.Bounds = new Rectangle((int)Position.X + 2, (int)Position.Y + 2, 4, 4);
     }
     
     public override void Draw(SpriteBatch batch, GameTime time)
     {
         _bulletController.DrawEntities(batch, time);
-        batch.Draw(_sprite, Position, Color.Red);
+        batch.Draw(_sprite, Position, Color.Blue);
     }
 }

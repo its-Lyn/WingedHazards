@@ -58,6 +58,7 @@ public class InGame(GameWindow windowData) : State(windowData)
     private RectCollider _strikeCollider = new RectCollider();
 
     private Player _player = null!;
+    private RectCollider _playerCollider = null!;
 
     private SpriteFont _font = null!;
 
@@ -180,6 +181,8 @@ public class InGame(GameWindow windowData) : State(windowData)
         _player.Position.Y = _groundLine;
         _controller.AddEntity(_player);
 
+        _playerCollider = _player.Components.GetComponent<RectCollider>()!;
+
         _island = WindowData.Content.Load<Texture2D>("Sprites/BackGround/Island");
 
         _sheet = new AnimatedSpriteSheet(WindowData.Content.Load<Texture2D>("Sprites/SpriteSheets/Strike"), new Vector2(6, 1), 0.02f);
@@ -204,8 +207,18 @@ public class InGame(GameWindow windowData) : State(windowData)
         _pause = new Pause(window);
 
         _enemyController.OnEntityUpdate = (device, time, entity) => {
-            RectCollider? rect = entity.Components.GetComponent<RectCollider>();
+            RectCollider? rect = entity.Components.GetComponent<RectCollider>("PlayerStriker");
             if (rect is null) return;
+
+            RectCollider? playerHitter = entity.Components.GetComponent<RectCollider>("PlayerHitter");
+            if (playerHitter is not null)
+            {
+                if (_playerCollider.Collides(playerHitter))
+                {
+                    _player.ApplyKnockBack(playerHitter);
+                    StartShake(1, 2);
+                }
+            }
 
             if (_striking && rect.Collides(_strikeCollider))
             {
@@ -268,8 +281,8 @@ public class InGame(GameWindow windowData) : State(windowData)
         }
 
         // Update controllers.
-        _enemyController.UpdateEntities(WindowData.GraphicsDevice, time);
         _controller.UpdateEntities(WindowData.GraphicsDevice, time);
+        _enemyController.UpdateEntities(WindowData.GraphicsDevice, time);
 
         // Hardcoded ground checking (we don't need anything more complicated.)
         if (_player.Position.Y > _groundLine) 
@@ -278,6 +291,11 @@ public class InGame(GameWindow windowData) : State(windowData)
             _player.Position.Y = _groundLine;
 
             _player.IsOnFloor = true;
+        }
+
+        if (_player.Position.Y < _groundLine && _player.IsOnFloor)
+        {
+            _player.IsOnFloor = false;
         }
 
         // Keep the camera position between the game sizes, so the _player doesn't see outside the map.

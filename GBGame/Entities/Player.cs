@@ -1,9 +1,11 @@
-using System;
+using GBGame.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
+using MonoGayme.Components;
+using MonoGayme.Components.Colliders;
 using MonoGayme.Entities;
 using MonoGayme.Utilities;
+using System;
 
 namespace GBGame.Entities;
 
@@ -12,7 +14,7 @@ public class Player(Game windowData, int zIndex = 1) : Entity(windowData, zIndex
     private Texture2D _sprite = null!;
     private Vector2 _origin = Vector2.Zero;
 
-    private readonly float TerminalVelocity = 1.5f;
+    private readonly float TerminalVelocity = 2f;
     private readonly float Acceleration = 0.5f;
 
     public bool IsOnFloor = false;
@@ -20,16 +22,51 @@ public class Player(Game windowData, int zIndex = 1) : Entity(windowData, zIndex
 
     public readonly float JumpVelocity = 6f;
 
+    public RectCollider Collider = null!;
+    private Timer _immunityTimer = null!;
+
+    private Health _health = null!;
+
+    public void ApplyKnockBack(RectCollider other)
+    {
+        Vector2 dir = Vector2.Normalize(Collider.GetCentre() - other.GetCentre());
+        Velocity += 5 * dir;
+
+        _health.HealthPoints--;
+        if (_health.HealthPoints <= 0)
+        {
+            // :trollface:
+            WindowData.Exit();
+        }
+
+        Collider.Enabled = false;
+        _immunityTimer.Start();
+    }
+
     public override void LoadContent()
     {
         Position.X = 40;
         
         _sprite = WindowData.Content.Load<Texture2D>("Sprites/Ground/Ground_4");
         _origin = new Vector2(_sprite.Width / 2, _sprite.Height / 2);
+
+        Components.AddComponent(new RectCollider());
+        Collider = Components.GetComponent<RectCollider>()!;
+
+        Components.AddComponent(new Timer(1, false, true, "ImmunityTimer"));
+        _immunityTimer = Components.GetComponent<Timer>()!;
+        _immunityTimer.OnTimeOut = () => {
+            Collider.Enabled = true;
+        };
+
+        Components.AddComponent(new Health(2));
+        _health = Components.GetComponent<Health>()!;
     }
 
     public override void Update(GameTime time)
     {
+        _immunityTimer.Cycle(time);
+
         if (InputManager.IsKeyDown(GBGame.KeyboardLeft) || InputManager.IsGamePadDown(GBGame.ControllerLeft))
         {
             Velocity.X = MathUtility.MoveTowards(Velocity.X, -TerminalVelocity, Acceleration);
@@ -57,6 +94,9 @@ public class Player(Game windowData, int zIndex = 1) : Entity(windowData, zIndex
         }
 
         Position += Velocity;
+        Position.X = float.Round(Position.X);
+
+        Collider.Bounds = new Rectangle((int)Position.X - 2, (int)Position.Y - 2, 4, 4);
     }
 
     public override void Draw(SpriteBatch batch, GameTime time)

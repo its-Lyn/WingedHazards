@@ -19,6 +19,7 @@ public class NormalBat(Game windowData, Vector2 pos, int zIndex = 0) : Entity(wi
     private readonly float _speed = 0.6f;
 
     private RectCollider _rectCollider = null!;
+    private RectCollider _playerHitter = null!;
     private Timer _immunityTimer = null!;
 
     public void LockOn(Entity entity)
@@ -32,11 +33,13 @@ public class NormalBat(Game windowData, Vector2 pos, int zIndex = 0) : Entity(wi
         _sprite = WindowData.Content.Load<Texture2D>("Sprites/Ground/Ground_4");
         Position = pos;
 
-        Components.AddComponent(new RectCollider());
+        Components.AddComponent(new RectCollider("PlayerStriker"));
+        Components.AddComponent(new RectCollider("PlayerHitter"));
         Components.AddComponent(new Timer(0.5f, true, true, "ImmunityTimer"));
         Components.AddComponent(new Health(2));
 
-        _rectCollider = Components.GetComponent<RectCollider>()!;
+        _rectCollider = Components.GetComponent<RectCollider>("PlayerStriker")!;
+        _playerHitter = Components.GetComponent<RectCollider>("PlayerHitter")!;
 
         _immunityTimer = Components.GetComponent<Timer>("ImmunityTimer")!;
         _immunityTimer.OnTimeOut = () => { _rectCollider.Enabled = true; };
@@ -61,6 +64,7 @@ public class NormalBat(Game windowData, Vector2 pos, int zIndex = 0) : Entity(wi
 
         Position += Velocity;
         _rectCollider.Bounds = new Rectangle((int)Position.X, (int)Position.Y, 8, 8);
+        _playerHitter.Bounds = new Rectangle((int)Position.X + 2, (int)Position.Y + 2, 4, 4);
 
         _immunityTimer.Cycle(time);
     }
