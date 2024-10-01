@@ -61,7 +61,7 @@ public class InGame(GameWindow windowData) : State(windowData)
 
     private SpriteFont _font = null!;
 
-    private Timer _timer = new Timer(5, true, false); 
+    private Timer _batTimer = new Timer(5, true, false); 
 
     private void SetupGround(int tileCountX, int tileCountY)
     { 
@@ -136,6 +136,25 @@ public class InGame(GameWindow windowData) : State(windowData)
             _inventory.UseActive();
     }
 
+    private void AddBat(Vector2 position)
+    {
+        if (Random.Shared.Next(0, 4) == 1)
+        {
+            ProjectileBat pbat = new ProjectileBat(WindowData, position); 
+            pbat.LockOn(_player);
+
+            _enemyController.AddEntity(pbat);
+            
+            return;
+        }
+
+        NormalBat bat = new NormalBat(WindowData, position); 
+        bat.LockOn(_player);
+
+        _enemyController.AddEntity(bat);
+
+    }
+
     public override void LoadContent()
     {
         _strikeCollider.Bounds = new Rectangle();
@@ -201,11 +220,7 @@ public class InGame(GameWindow windowData) : State(windowData)
                 Timer? immunityTimer = entity.Components.GetComponent<Timer>("ImmunityTimer");
                 if (immunityTimer is not null)
                 {
-                    if (!immunityTimer.Enabled)
-                    {
-                        immunityTimer.Reset();
-                        immunityTimer.Start();
-                    }
+                    if (!immunityTimer.Enabled) immunityTimer.Start();
                 }
 
                 StartShake(0.6f, 2);
@@ -229,17 +244,12 @@ public class InGame(GameWindow windowData) : State(windowData)
             }
         };
 
-        _timer.OnTimeOut = () => {
+        _batTimer.OnTimeOut = () => {
             int minPosition = (int)(_player.Position.X - BatSpawnerWidth);
             int width = minPosition + (BatSpawnerWidth * 2);
             Vector2 batPosition = new Vector2(Random.Shared.Next(minPosition, width), BatSpawnerHeight);
 
-            Bat bat = new Bat(window, batPosition);
-
-            // The bat will always follow the player
-            bat.Lock(_player);
-
-            _enemyController.AddEntity(bat);
+            AddBat(batPosition);
         };
 
         _shapes = new Shapes(window.GraphicsDevice);
@@ -282,7 +292,7 @@ public class InGame(GameWindow windowData) : State(windowData)
 
         ShakeCamera(time);
 
-        _timer.Cycle(time);
+        _batTimer.Cycle(time);
     }
    
     public override void Draw(GameTime time, SpriteBatch batch)
@@ -317,10 +327,10 @@ public class InGame(GameWindow windowData) : State(windowData)
             }
 
             if(!_bomb.Sheet.Finished) _bomb.Draw(batch);
-            if (_pause.Paused) _pause.Draw(batch, _camera);
 
-            // Draw the inventory on top of everything else.
             _inventory.Draw(batch, _camera);
+
+            if (_pause.Paused) _pause.Draw(batch, _camera);
         batch.End();
     }
 }

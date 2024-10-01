@@ -9,18 +9,20 @@ using MonoGayme.Utilities;
 
 namespace GBGame.Entities.Enemies;
 
-public class Bat(Game windowData, Vector2 pos, int zIndex = 0) : Entity(windowData, zIndex){
+public class NormalBat(Game windowData, Vector2 pos, int zIndex = 0) : Entity(windowData, zIndex)
+{
     private Texture2D _sprite = null!;
     
     private bool _locked = false;
     private Entity? _lockedEntity;
 
-    private float _speed = 0.6f;
+    private readonly float _speed = 0.6f;
 
-    private RectCollider _rectCollider;
-    private Timer _immunityTimer;
+    private RectCollider _rectCollider = null!;
+    private Timer _immunityTimer = null!;
 
-    public void Lock(Entity entity) {
+    public void LockOn(Entity entity)
+    {
         _lockedEntity = entity;
         _locked = true;
     }
@@ -31,7 +33,7 @@ public class Bat(Game windowData, Vector2 pos, int zIndex = 0) : Entity(windowDa
         Position = pos;
 
         Components.AddComponent(new RectCollider());
-        Components.AddComponent(new Timer(1, true, false, "ImmunityTimer"));
+        Components.AddComponent(new Timer(0.5f, true, true, "ImmunityTimer"));
         Components.AddComponent(new Health(2));
 
         _rectCollider = Components.GetComponent<RectCollider>()!;
