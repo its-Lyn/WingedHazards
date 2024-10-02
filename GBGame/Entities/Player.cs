@@ -6,10 +6,11 @@ using MonoGayme.Components.Colliders;
 using MonoGayme.Entities;
 using MonoGayme.Utilities;
 using System;
+using System.Collections.Generic;
 
 namespace GBGame.Entities;
 
-public class Player(Game windowData, int zIndex = 1) : Entity(windowData, zIndex)
+public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(windowData, zIndex)
 {
     private Texture2D _sprite = null!;
     private Vector2 _origin = Vector2.Zero;
@@ -25,15 +26,19 @@ public class Player(Game windowData, int zIndex = 1) : Entity(windowData, zIndex
     public RectCollider Collider = null!;
     private Timer _immunityTimer = null!;
 
-    private Health _health = null!;
+    public Health Health = null!;
+
+    private List<SpriteSheet> _health = [];
 
     public void ApplyKnockBack(RectCollider other)
     {
         Vector2 dir = Vector2.Normalize(Collider.GetCentre() - other.GetCentre());
         Velocity += 5 * dir;
 
-        _health.HealthPoints--;
-        if (_health.HealthPoints <= 0)
+        _health[Health.HealthPoints - 1].DecrementY();
+
+        Health.HealthPoints--;
+        if (Health.HealthPoints <= 0)
         {
             // :trollface:
             WindowData.Exit();
@@ -59,8 +64,20 @@ public class Player(Game windowData, int zIndex = 1) : Entity(windowData, zIndex
             Collider.Enabled = true;
         };
 
-        Components.AddComponent(new Health(2));
-        _health = Components.GetComponent<Health>()!;
+        Components.AddComponent(new Health(3));
+        Health = Components.GetComponent<Health>()!;
+
+        int basePosition = 1;
+        Texture2D healthSheet = WindowData.Content.Load<Texture2D>("Sprites/UI/Health");
+        for (int i = 0; i < Health.HealthPoints; i++)
+        {
+            SpriteSheet sheet = new SpriteSheet(healthSheet, new Vector2(1, 2), new Vector2(basePosition, 20));
+            sheet.IncrementY();
+
+            _health.Add(sheet);
+
+            basePosition += 17;
+        }
     }
 
     public override void Update(GameTime time)
@@ -102,5 +119,10 @@ public class Player(Game windowData, int zIndex = 1) : Entity(windowData, zIndex
     public override void Draw(SpriteBatch batch, GameTime time)
     {
         batch.Draw(_sprite, Position, null, Color.White, 0, _origin, 1, SpriteEffects.None, 0);
+
+        foreach (SpriteSheet health in _health)
+        {
+            health.Draw(batch, camera);
+        }
     }
 }

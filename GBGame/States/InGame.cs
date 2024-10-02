@@ -62,7 +62,7 @@ public class InGame(GameWindow windowData) : State(windowData)
 
     private SpriteFont _font = null!;
 
-    private Timer _batTimer = new Timer(5, true, false); 
+    private Timer _batTimer = new Timer(5, true, false);
 
     private void SetupGround(int tileCountX, int tileCountY)
     { 
@@ -177,7 +177,7 @@ public class InGame(GameWindow windowData) : State(windowData)
         // TileSize / 2 is the player width origin.
         _groundLine = tileCountY - TileSize - TileSize / 2;
 
-        _player = new Player(WindowData);
+        _player = new Player(WindowData, _camera);
         _player.Position.Y = _groundLine;
         _controller.AddEntity(_player);
 

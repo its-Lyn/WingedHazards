@@ -88,7 +88,7 @@ public class ProjectileBat(Game windowData, Vector2 pos, int zIndex = 0) : Entit
                 {
                     _state = AIState.Shooting;
                 }
-            }
+            } 
         };
 
         _waitTimer = Components.GetComponent<Timer>("WaitTimer")!;
