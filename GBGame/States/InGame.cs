@@ -263,6 +263,12 @@ public class InGame(GameWindow windowData) : State(windowData)
             Vector2 batPosition = new Vector2(Random.Shared.Next(minPosition, width), BatSpawnerHeight);
 
             AddBat(batPosition);
+
+            // 1/4 chance to spawn two bats with one on the opposite side
+            if (Random.Shared.Next(0, 4) == 1)
+            {
+                AddBat(batPosition with { X = 2 * _player.Position.X - batPosition.X });
+            }
         };
 
         _shapes = new Shapes(window.GraphicsDevice);
@@ -317,7 +323,7 @@ public class InGame(GameWindow windowData) : State(windowData)
     {
         WindowData.GraphicsDevice.Clear(BackDrop);
 
-        batch.Begin(transformMatrix: _camera.Transform);
+        batch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: _camera.Transform);
             // Draw the background
             batch.Draw(_island, _camera.ScreenToWorld(new Vector2(0, -10)), Color.White * 0.4f);
 

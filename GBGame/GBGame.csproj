@@ -27,6 +27,7 @@
     <Folder Include="Content/Icons/" />
     <Folder Include="Content/Sprites/Fonts/" />
     <Folder Include="Content/Sprites/UI/" />
+    <Folder Include="Content\Sprites\Entities\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\MonoGayme\MonoGayme\MonoGayme.csproj" />

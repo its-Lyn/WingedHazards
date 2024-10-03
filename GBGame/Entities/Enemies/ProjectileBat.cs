@@ -28,7 +28,12 @@ public class ProjectileBat(Game windowData, Vector2 pos, int zIndex = 0) : Entit
 
     private bool _hasShot = false;
 
-    private Texture2D _sprite = null!;
+    private AnimatedSpriteSheet _activeSprite = null!;
+
+    private AnimatedSpriteSheet _walkSprite = null!;
+    private AnimatedSpriteSheet _shootSprite = null!;
+
+    private bool _flipped = false;
 
     private enum AIState
     {
@@ -48,7 +53,13 @@ public class ProjectileBat(Game windowData, Vector2 pos, int zIndex = 0) : Entit
     {
         Position = pos;
 
-        _sprite = WindowData.Content.Load<Texture2D>("Sprites/Ground/Ground_4");
+        Texture2D walk = WindowData.Content.Load<Texture2D>("Sprites/Entities/ProjectileBat_Walk");
+        _walkSprite = new AnimatedSpriteSheet(walk, new Vector2(3, 1), 0.15f, true);
+
+        Texture2D shoot = WindowData.Content.Load<Texture2D>("Sprites/Entities/ProjectileBat_Shoot");
+        _shootSprite = new AnimatedSpriteSheet(shoot, new Vector2(4, 1), 0.1f);
+
+        _activeSprite = _walkSprite;
 
         Components.AddComponent(new Timer(1, true, false, "StateTimer"));
         Components.AddComponent(new Timer(1, false, false, "WaitTimer"));
@@ -104,6 +115,9 @@ public class ProjectileBat(Game windowData, Vector2 pos, int zIndex = 0) : Entit
             else
             {
                 _hasShot = true;
+
+                _activeSprite = _shootSprite;
+                _activeSprite.Finished = false;
                 
                 if (_lockedEntity is null || !_locked) return;
                 _bulletController.AddEntity(new Bullet(WindowData, Position, _lockedEntity.Position));
@@ -142,14 +156,33 @@ public class ProjectileBat(Game windowData, Vector2 pos, int zIndex = 0) : Entit
             break;
         }
 
+        if (_lockedEntity is not null)
+        { 
+            if (Position.X - _lockedEntity.Position.X < 0)
+            {
+                _flipped = false;
+            }
+            else
+            {
+                _flipped = true;
+            }
+        } 
+
         Position += Velocity;
         _collider.Bounds = new Rectangle((int)Position.X, (int)Position.Y, 8, 8);
         _hitterCollider.Bounds = new Rectangle((int)Position.X + 2, (int)Position.Y + 2, 4, 4);
+
+        _activeSprite.CycleAnimation(time);
+
+        if (_activeSprite == _shootSprite && _activeSprite.Finished)
+        {
+            _activeSprite = _walkSprite;
+        }
     }
     
     public override void Draw(SpriteBatch batch, GameTime time)
     {
         _bulletController.DrawEntities(batch, time);
-        batch.Draw(_sprite, Position, Color.Blue);
+        _activeSprite.Draw(batch, Position, _flipped);
     }
 }

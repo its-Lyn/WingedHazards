@@ -11,7 +11,8 @@ namespace GBGame.Entities.Enemies;
 
 public class NormalBat(Game windowData, Vector2 pos, int zIndex = 0) : Entity(windowData, zIndex)
 {
-    private Texture2D _sprite = null!;
+    private AnimatedSpriteSheet _sprite = null!;
+    private bool _flipped = false;
     
     private bool _locked = false;
     private Entity? _lockedEntity;
@@ -30,7 +31,8 @@ public class NormalBat(Game windowData, Vector2 pos, int zIndex = 0) : Entity(wi
 
     public override void LoadContent()
     {
-        _sprite = WindowData.Content.Load<Texture2D>("Sprites/Ground/Ground_4");
+        Texture2D batSheet = WindowData.Content.Load<Texture2D>("Sprites/Entities/NormalBat");
+        _sprite = new AnimatedSpriteSheet(batSheet, new Vector2(3, 1), 0.25f, true);
         Position = pos;
 
         Components.AddComponent(new RectCollider("PlayerStriker"));
@@ -60,17 +62,28 @@ public class NormalBat(Game windowData, Vector2 pos, int zIndex = 0) : Entity(wi
 
             Vector2 target = dir * _speed;
             Velocity = MathUtility.MoveTowards(Velocity, target, 0.05f);
+
+            if (Position.X - _lockedEntity.Position.X < 0)
+            {
+                _flipped = false;
+            }
+            else
+            {
+                _flipped = true;
+            }
         }
 
         Position += Velocity;
+
         _rectCollider.Bounds = new Rectangle((int)Position.X, (int)Position.Y, 8, 8);
         _playerHitter.Bounds = new Rectangle((int)Position.X + 2, (int)Position.Y + 2, 4, 4);
 
         _immunityTimer.Cycle(time);
+        _sprite.CycleAnimation(time);
     }
 
     public override void Draw(SpriteBatch batch, GameTime time)
     {
-        batch.Draw(_sprite, Position, Color.White);
+        _sprite.Draw(batch, Position, _flipped);
     }
 }
