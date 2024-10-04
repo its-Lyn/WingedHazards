@@ -19,6 +19,9 @@ public class GameWindow : Game
     public Vector2 MousePosition { get; private set; }
     public StateContext Context { get; private set; }
 
+    private Vector2 _sizeBeforeResize;
+    private bool _isFullScreen = false;
+
     public GameWindow()
     {
         _graphics = new GraphicsDeviceManager(this);
@@ -50,6 +53,21 @@ public class GameWindow : Game
     {
         if (InputManager.IsKeyPressed(Keys.F))
         {
+            if (_isFullScreen)
+            {
+                _graphics.SetWindowSize(_sizeBeforeResize);
+            }
+            else
+            {
+                _sizeBeforeResize = new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
+
+                _graphics.SetWindowSize(
+                    GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width,
+                    GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height
+                );
+            }
+
+            _isFullScreen = !_isFullScreen;
             _graphics.ToggleFullScreen();
         }
 

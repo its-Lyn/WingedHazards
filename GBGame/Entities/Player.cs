@@ -30,6 +30,9 @@ public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(w
 
     private List<SpriteSheet> _health = [];
 
+    public int Level = 1;
+    public int XP = 0;
+
     public void ApplyKnockBack(RectCollider other)
     {
         Vector2 dir = Vector2.Normalize(Collider.GetCentre() - other.GetCentre());

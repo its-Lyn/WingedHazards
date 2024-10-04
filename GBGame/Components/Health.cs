@@ -4,5 +4,5 @@ namespace GBGame.Components;
 
 public class Health(int hp) : Component
 {
-    public int HealthPoints = hp;
+    public int HealthPoints { get; set; } = hp;
 }

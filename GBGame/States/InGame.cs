@@ -12,6 +12,7 @@ using Microsoft.Xna.Framework.Input;
 using GBGame.Entities.Enemies;
 using MonoGayme.Controllers;
 using MonoGayme.Components.Colliders;
+using MonoGayme.Entities;
 
 namespace GBGame.States;
 
@@ -60,9 +61,16 @@ public class InGame(GameWindow windowData) : State(windowData)
     private Player _player = null!;
     private RectCollider _playerCollider = null!;
 
+    private readonly Color _levelColour = new Color(176, 192, 160);
+    private readonly Color _xpColour = new Color(96, 112, 80);
     private SpriteFont _font = null!;
 
+    private Texture2D _starSprite = null!;
+
     private Timer _batTimer = new Timer(5, true, false);
+
+    private int _baseXP = 14;
+    private int _toLevelUp;
 
     private void SetupGround(int tileCountX, int tileCountY)
     { 
@@ -139,7 +147,7 @@ public class InGame(GameWindow windowData) : State(windowData)
 
     private void AddBat(Vector2 position)
     {
-        if (Random.Shared.Next(0, 4) == 1)
+        if (Random.Shared.Next(0, 3) == 1)
         {
             ProjectileBat pbat = new ProjectileBat(WindowData, position); 
             pbat.LockOn(_player);
@@ -156,8 +164,31 @@ public class InGame(GameWindow windowData) : State(windowData)
 
     }
 
+    private void CalculateXP(Entity entity)
+    { 
+        XPDropper? dropper = entity.Components.GetComponent<XPDropper>();
+        if (dropper is null) return;
+
+        _player.XP += dropper.XP;
+        if (_player.XP >= _toLevelUp)
+        {
+            _player.Level++;
+
+            if (_player.XP - _toLevelUp > 0)
+                _player.XP -= _toLevelUp;
+            else
+                _player.XP = 0;
+
+            // Double XP every level
+            _toLevelUp *= 2;
+        }
+    }
+
     public override void LoadContent()
     {
+        _toLevelUp = _baseXP;
+        _starSprite = WindowData.Content.Load<Texture2D>("Sprites/UI/LevelStar");
+
         _strikeCollider.Bounds = new Rectangle();
 
         for (int i = 1; i <= 4; i++) 
@@ -221,6 +252,7 @@ public class InGame(GameWindow windowData) : State(windowData)
             }
 
             if (_striking && rect.Collides(_strikeCollider))
+
             {
                 Vector2 distance = rect.GetCentre() - _strikeCollider.GetCentre();
 
@@ -243,7 +275,8 @@ public class InGame(GameWindow windowData) : State(windowData)
 
                 health.HealthPoints--;
                 if (health.HealthPoints <= 0) 
-                {
+                { 
+                    CalculateXP(entity);
                     _enemyController.QueueRemove(entity);
                 }
 
@@ -252,7 +285,9 @@ public class InGame(GameWindow windowData) : State(windowData)
 
             if (_bomb.Exploded && rect.Collides(_bomb.KillRadius))
             {
+                CalculateXP(entity);
                 _enemyController.QueueRemove(entity);
+
                 return;
             }
         };
@@ -324,6 +359,7 @@ public class InGame(GameWindow windowData) : State(windowData)
         WindowData.GraphicsDevice.Clear(BackDrop);
 
         batch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: _camera.Transform);
+        { 
             // Draw the background
             batch.Draw(_island, _camera.ScreenToWorld(new Vector2(0, -10)), Color.White * 0.4f);
 
@@ -354,7 +390,15 @@ public class InGame(GameWindow windowData) : State(windowData)
 
             _inventory.Draw(batch, _camera);
 
+            // Draw the player XP
+            batch.DrawString(_font, $"{_player.XP} - {_toLevelUp}", _camera.ScreenToWorld(new Vector2(1, 25)), _xpColour);
+
+            // Draw the player level
+            batch.Draw(_starSprite, _camera.ScreenToWorld(new Vector2(0, 34)), Color.White);
+            batch.DrawString(_font, $"{_player.Level}", _camera.ScreenToWorld(new Vector2(10, 33)), _levelColour);
+
             if (_pause.Paused) _pause.Draw(batch, _camera);
+        } 
         batch.End();
     }
 }
