@@ -69,7 +69,10 @@ public class InGame(GameWindow windowData) : State(windowData)
 
     private Timer _batTimer = new Timer(5, true, false);
 
-    private int _baseXP = 14;
+    private ControlCentre _centre = null!;
+    private RectCollider _centreCollider = null!;
+
+    private readonly int _baseXP = 14;
     private int _toLevelUp;
 
     private void SetupGround(int tileCountX, int tileCountY)
@@ -181,6 +184,8 @@ public class InGame(GameWindow windowData) : State(windowData)
 
             // Double XP every level
             _toLevelUp *= 2;
+
+            _centre.SkillPoints++;
         }
     }
 
@@ -211,6 +216,10 @@ public class InGame(GameWindow windowData) : State(windowData)
         _player = new Player(WindowData, _camera);
         _player.Position.Y = _groundLine;
         _controller.AddEntity(_player);
+
+        _centre = new ControlCentre(window, _groundLine);
+        _centre.LoadContent();
+        _centreCollider = _centre.Components.GetComponent<RectCollider>()!;
 
         _playerCollider = _player.Components.GetComponent<RectCollider>()!;
 
@@ -312,7 +321,7 @@ public class InGame(GameWindow windowData) : State(windowData)
 
     public override void Update(GameTime time)
     {
-        if (InputManager.IsGamePadPressed(Buttons.Start) || InputManager.IsKeyPressed(Keys.Escape))
+        if (!_centre.Interacting && (InputManager.IsGamePadPressed(Buttons.Start) || InputManager.IsKeyPressed(Keys.Escape)))
             _pause.Paused = !_pause.Paused;
 
         if (_pause.Paused)
@@ -320,6 +329,12 @@ public class InGame(GameWindow windowData) : State(windowData)
             _pause.Update();
             return;
         }
+
+        // idek
+        _centre.CanInteract = _centreCollider.Collides(_playerCollider);
+        _centre.Update(time);
+
+        if (_centre.Interacting) return;
 
         // Update controllers.
         _controller.UpdateEntities(WindowData.GraphicsDevice, time);
@@ -396,6 +411,8 @@ public class InGame(GameWindow windowData) : State(windowData)
             // Draw the player level
             batch.Draw(_starSprite, _camera.ScreenToWorld(new Vector2(0, 34)), Color.White);
             batch.DrawString(_font, $"{_player.Level}", _camera.ScreenToWorld(new Vector2(10, 33)), _levelColour);
+
+            _centre.Draw(batch, time);
 
             if (_pause.Paused) _pause.Draw(batch, _camera);
         } 

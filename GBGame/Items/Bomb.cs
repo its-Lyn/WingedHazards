@@ -25,7 +25,7 @@ public class Bomb(Game windowData, Player player) : Item(windowData)
         Name = "Bomb";
         Description = $"{BombCount} bombs left.";
 
-        Sheet = new AnimatedSpriteSheet(WindowData.Content.Load<Texture2D>("Sprites/SpriteSheets/BombPlaced"), new Vector2(5, 1), 0.5f);
+        Sheet = new AnimatedSpriteSheet(WindowData.Content.Load<Texture2D>("Sprites/SpriteSheets/BombPlaced"), new Vector2(5, 1), 0.25f);
     }
 
     public override void Use()
