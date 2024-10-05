@@ -81,8 +81,7 @@ public class ControlCentre(Game windowData, InGame game, int zIndex = -1) : Enti
 
     public void ChooseSkills(bool remove = false, Skill? skill = null)
     {
-        if (remove)
-            _skills.Remove(skill!);
+        if (remove) _skills.Remove(skill!);
 
         _controller.QueueRemoveAll();
 
@@ -156,19 +155,13 @@ public class ControlCentre(Game windowData, InGame game, int zIndex = -1) : Enti
     {
         if (CanInteract)
         {
-            if (_questionOpacity < 1f)
-            {
-                _questionOpacity += 0.4f;
-            }
+            if (_questionOpacity < 1f) _questionOpacity += 0.4f;
 
             if ((InputManager.IsGamePadPressed(GBGame.ControllerAction) || InputManager.IsKeyPressed(GBGame.KeyboardAction)) && !Interacting)
             {
                 Interacting = true;
 
-                if (SkillPoints > 0)
-                {
-                    _picking = true;
-                }
+                if (SkillPoints > 0) _picking = true;
             }
 
             if ((InputManager.IsGamePadPressed(GBGame.ControllerJump) || InputManager.IsKeyPressed(GBGame.KeyboardJump)) && Interacting)
@@ -181,16 +174,10 @@ public class ControlCentre(Game windowData, InGame game, int zIndex = -1) : Enti
         }
         else
         {
-            if (_questionOpacity > 0)
-            {
-                _questionOpacity -= 0.4f;
-            }
+            if (_questionOpacity > 0) _questionOpacity -= 0.4f;
         }
 
-        if (_picking && _canPick)
-        {
-            _controller.Update(_window.MousePosition);
-        }
+        if (_picking && _canPick) _controller.Update(_window.MousePosition);
     }
   
     public override void Draw(SpriteBatch batch, GameTime time)
