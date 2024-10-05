@@ -33,7 +33,10 @@ public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(w
     private Jump _jump = null!;
 
     public int Level = 1;
-    public int XP = 13;
+    public int XP = 0;
+
+    private Texture2D _healthSheet = null!;
+    private int _basePosition = 1;
 
     public void ApplyKnockBack(RectCollider other)
     {
@@ -51,6 +54,30 @@ public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(w
 
         Collider.Enabled = false;
         _immunityTimer.Start();
+    }
+
+    public void AddHealth()
+    { 
+        Health.HealthPoints++;
+
+        SpriteSheet sheet = new SpriteSheet(_healthSheet, new Vector2(1, 2), new Vector2(_basePosition, 20));
+        sheet.IncrementY();
+
+        _health.Add(sheet);
+        if (Health.HealthPoints <= Health.OriginalHealthPoints)
+        {
+            sheet.DecrementY();
+            foreach (SpriteSheet health in _health)
+            {
+                if (health.Y == 0)
+                {
+                    health.IncrementY();
+                    break;
+                }
+            }
+        }
+
+        _basePosition += 17;
     }
 
     public override void LoadContent()
@@ -75,16 +102,15 @@ public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(w
         Components.AddComponent(new Health(3));
         Health = Components.GetComponent<Health>()!;
 
-        int basePosition = 1;
-        Texture2D healthSheet = WindowData.Content.Load<Texture2D>("Sprites/UI/Health");
+        _healthSheet = WindowData.Content.Load<Texture2D>("Sprites/UI/Health");
         for (int i = 0; i < Health.HealthPoints; i++)
-        {
-            SpriteSheet sheet = new SpriteSheet(healthSheet, new Vector2(1, 2), new Vector2(basePosition, 20));
+        { 
+            SpriteSheet sheet = new SpriteSheet(_healthSheet, new Vector2(1, 2), new Vector2(_basePosition, 20));
             sheet.IncrementY();
 
             _health.Add(sheet);
 
-            basePosition += 17;
+            _basePosition += 17;
         }
     }
 

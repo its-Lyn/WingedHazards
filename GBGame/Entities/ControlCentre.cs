@@ -25,7 +25,7 @@ public class ControlCentre(Game windowData, InGame game, int zIndex = -1) : Enti
 
     private RectCollider _collider = null!;
 
-    public int SkillPoints = 4;
+    public int SkillPoints = 0;
 
     public bool CanInteract = false;
     public bool Interacting = false;
@@ -154,7 +154,8 @@ public class ControlCentre(Game windowData, InGame game, int zIndex = -1) : Enti
 
         _skills = [
             new DoubleJump(game.Controller.GetFirst<Player>()!),
-            new MultiplyXP(_window)
+            new MultiplyXP(_window),
+            new MoreHP(game.Controller.GetFirst<Player>()!)
         ];
 
         _controller.OnActiveUpdating = (btn) => {

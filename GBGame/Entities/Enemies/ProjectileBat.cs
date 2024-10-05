@@ -67,7 +67,7 @@ public class ProjectileBat(Game windowData, Vector2 pos, int zIndex = 0) : Entit
         Components.AddComponent(new EntityController());
         Components.AddComponent(new RectCollider("PlayerStriker"));
         Components.AddComponent(new RectCollider("PlayerHitter"));
-        Components.AddComponent(new XPDropper(2));
+        Components.AddComponent(new XPDropper(3));
         Components.AddComponent(new Health(3));
 
         _collider = Components.GetComponent<RectCollider>("PlayerStriker")!;

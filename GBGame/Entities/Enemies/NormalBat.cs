@@ -38,7 +38,7 @@ public class NormalBat(Game windowData, Vector2 pos, int zIndex = 0) : Entity(wi
         Components.AddComponent(new RectCollider("PlayerStriker"));
         Components.AddComponent(new RectCollider("PlayerHitter"));
         Components.AddComponent(new Timer(0.5f, true, true, "ImmunityTimer"));
-        Components.AddComponent(new XPDropper(1));
+        Components.AddComponent(new XPDropper(2));
         Components.AddComponent(new Health(2));
 
         _rectCollider = Components.GetComponent<RectCollider>("PlayerStriker")!;

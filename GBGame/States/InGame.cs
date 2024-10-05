@@ -74,6 +74,11 @@ public class InGame(GameWindow windowData) : State(windowData)
 
     private Timer _batTimer = new Timer(5, true, false);
 
+    private Timer _difficultyTimer = new Timer(30, true, false);
+    private readonly float _maxDecrease = 3f;
+    private bool _canTry = false;
+    private bool _canSpawn = false;
+
     private ControlCentre _centre = null!;
     private RectCollider _centreCollider = null!;
 
@@ -310,6 +315,10 @@ public class InGame(GameWindow windowData) : State(windowData)
         };
 
         _batTimer.OnTimeOut = () => {
+            // 1/7 chance to be able to START trying to spawn 3 bats at once.
+            if (_canTry && Random.Shared.Next(0, 7) == 1)
+                _canSpawn = true;
+
             int minPosition = (int)(_player.Position.X - BatSpawnerWidth);
             int width = minPosition + (BatSpawnerWidth * 2);
             Vector2 batPosition = new Vector2(Random.Shared.Next(minPosition, width), BatSpawnerHeight);
@@ -319,7 +328,24 @@ public class InGame(GameWindow windowData) : State(windowData)
             // 1/4 chance to spawn two bats with one on the opposite side
             if (Random.Shared.Next(0, 4) == 1)
             {
-                AddBat(batPosition with { X = 2 * _player.Position.X - batPosition.X });
+                Vector2 secondBatPosition = batPosition with { X = 2 * _player.Position.X - batPosition. X }; 
+                AddBat(secondBatPosition);
+
+                // 1/5 chance to spawn 3 bats
+                if (_canSpawn && Random.Shared.Next(0, 5) == 1)
+                {
+                    AddBat(secondBatPosition with { X = 2 * _player.Position.X - secondBatPosition.X });
+                }
+            }
+        };
+
+        _difficultyTimer.OnTimeOut = () => {
+            _batTimer.Time -= 0.5f;
+
+            if (_batTimer.Time <= _maxDecrease)
+            {
+                _difficultyTimer.Stop();
+                _canTry = true;
             }
         };
 
@@ -384,6 +410,7 @@ public class InGame(GameWindow windowData) : State(windowData)
         ShakeCamera(time);
 
         _batTimer.Cycle(time);
+        _difficultyTimer.Cycle(time);
     }
    
     public override void Draw(GameTime time, SpriteBatch batch)
