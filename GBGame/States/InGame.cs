@@ -20,6 +20,8 @@ public class InGame(GameWindow windowData) : State(windowData)
 {
     public int ScoreMultiplier = 1;
 
+    public bool SkipFrame = false;
+
     const int BatSpawnerHeight = -8;
     const int BatSpawnerWidth = 40;
 
@@ -327,6 +329,12 @@ public class InGame(GameWindow windowData) : State(windowData)
 
     public override void Update(GameTime time)
     {
+        if (SkipFrame)
+        {
+            SkipFrame = false;
+            return;
+        }
+
         if (!_centre.Interacting && (InputManager.IsGamePadPressed(Buttons.Start) || InputManager.IsKeyPressed(Keys.Escape)))
             _pause.Paused = !_pause.Paused;
 
@@ -367,7 +375,8 @@ public class InGame(GameWindow windowData) : State(windowData)
         _camera.X = Math.Clamp(MathF.Floor(_player.Position.X - _cameraOffset + _shakeOffset.X), 0, _gameWidth - window.GameSize.X);
         _camera.Y = _shakeOffset.Y; 
 
-        HandleInventoryInput();
+        if (!SkipFrame)
+            HandleInventoryInput();
 
         if (!_sheet.Finished) _sheet.CycleAnimation(time);
         if (!Bomb.Sheet.Finished) Bomb.Sheet.CycleAnimation(time);

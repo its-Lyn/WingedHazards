@@ -25,7 +25,7 @@ public class ControlCentre(Game windowData, InGame game, int zIndex = -1) : Enti
 
     private RectCollider _collider = null!;
 
-    public int SkillPoints = 0;
+    public int SkillPoints = 4;
 
     public bool CanInteract = false;
     public bool Interacting = false;
@@ -40,6 +40,10 @@ public class ControlCentre(Game windowData, InGame game, int zIndex = -1) : Enti
 
     private readonly string _noSP = "No skill points!";
     private Vector2 _noSPMeasuremets;
+
+    private readonly string _return = "Return";
+    private Vector2 _returnMeasurements;
+    private TextButton _returnButton = null!;
 
     private List<Skill> _skills = [];
     private ButtonController _controller = new ButtonController(true);
@@ -61,7 +65,7 @@ public class ControlCentre(Game windowData, InGame game, int zIndex = -1) : Enti
             position.Y += 6;
         }
 
-        TextButton btn = new TextButton(_font, skill.Name, position, Color.White);
+        TextButton btn = new TextButton(_font, skill.Name, position, _textColour);
         btn.OnClick = () => {
             skill.OnActivate();
 
@@ -95,18 +99,25 @@ public class ControlCentre(Game windowData, InGame game, int zIndex = -1) : Enti
 
             _controller.Add(CreateButton(_skills[firstIndex], true));
             _controller.Add(CreateButton(_skills[secondIndex], false));
-
-            return;
         }
 
         if (_skills.Count == 1)
-        {
             _controller.Add(CreateButton(_skills[0], true));
-            return;
-        }
 
         if (_skills.Count == 0)
-            _controller.Add(CreateButton(new PlusBomb(game.Bomb), false));
+            _controller.Add(CreateButton(new PlusBomb(game.Bomb), true));
+
+        _returnButton = new TextButton(_font, _return, _returnMeasurements, _textColour);
+        _returnButton.OnClick = () => {
+            Interacting = false;
+
+            _canPick = false;
+            _picking = false;
+
+            game.SkipFrame = true;
+        };
+
+        _controller.Add(_returnButton);
     }
 
     public override void LoadContent()
@@ -131,8 +142,12 @@ public class ControlCentre(Game windowData, InGame game, int zIndex = -1) : Enti
         );
 
         _font = WindowData.Content.Load<SpriteFont>("Sprites/Fonts/File");
+
         Vector2 noSP = _font.MeasureString(_noSP);
         _noSPMeasuremets = new Vector2((_window.GameSize.X - noSP.X) / 2, (_window.GameSize.Y - noSP.Y) / 2);
+
+        Vector2 ret = _font.MeasureString(_return);
+        _returnMeasurements = new Vector2((_window.GameSize.X - ret.X) / 2, _window.GameSize.Y - ret.Y - 1);
 
         _controller.SetControllerButtons(GBGame.ControllerInventoryUp, GBGame.ControllerInventoryDown, GBGame.ControllerAction);
         _controller.SetKeyboardButtons(GBGame.KeyboardInventoryUp, GBGame.KeyboardInventoryDown, GBGame.KeyboardAction);
@@ -157,19 +172,21 @@ public class ControlCentre(Game windowData, InGame game, int zIndex = -1) : Enti
         {
             if (_questionOpacity < 1f) _questionOpacity += 0.4f;
 
+            if (Interacting && SkillPoints == 0)
+            { 
+                if (InputManager.IsGamePadPressed(GBGame.ControllerAction) || InputManager.IsKeyPressed(GBGame.KeyboardAction))
+                {
+                    Interacting = false;
+                    game.SkipFrame = true;
+                    return;
+                }
+            }
+
             if ((InputManager.IsGamePadPressed(GBGame.ControllerAction) || InputManager.IsKeyPressed(GBGame.KeyboardAction)) && !Interacting)
             {
                 Interacting = true;
 
                 if (SkillPoints > 0) _picking = true;
-            }
-
-            if ((InputManager.IsGamePadPressed(GBGame.ControllerJump) || InputManager.IsKeyPressed(GBGame.KeyboardJump)) && Interacting)
-            {
-                Interacting = false;
-
-                _picking = false;
-                _canPick = false;
             }
         }
         else
@@ -192,6 +209,8 @@ public class ControlCentre(Game windowData, InGame game, int zIndex = -1) : Enti
             if (SkillPoints == 0)
             {
                 batch.DrawString(_font, _noSP, _noSPMeasuremets, _textColour);
+
+                batch.DrawString(_font, _return, _returnMeasurements, _activeTextColour); 
             }
             else
             {

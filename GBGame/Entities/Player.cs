@@ -33,7 +33,7 @@ public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(w
     private Jump _jump = null!;
 
     public int Level = 1;
-    public int XP = 0;
+    public int XP = 13;
 
     public void ApplyKnockBack(RectCollider other)
     {
