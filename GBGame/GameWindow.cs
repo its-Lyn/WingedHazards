@@ -15,6 +15,7 @@ public class GameWindow : Game
 
     private Renderer _renderer;
 
+    public int XPMultiplier { get; set; } = 1;
     public Vector2 GameSize { get; private set; }
     public Vector2 MousePosition { get; private set; }
     public StateContext Context { get; private set; }

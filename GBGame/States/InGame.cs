@@ -18,6 +18,8 @@ namespace GBGame.States;
 
 public class InGame(GameWindow windowData) : State(windowData)
 {
+    public int ScoreMultiplier = 1;
+
     const int BatSpawnerHeight = -8;
     const int BatSpawnerWidth = 40;
 
@@ -33,10 +35,10 @@ public class InGame(GameWindow windowData) : State(windowData)
     private Camera2D _camera = new Camera2D(Vector2.Zero);
     private float _cameraOffset = 40;
 
-    private EntityController _controller = new EntityController();
+    public EntityController Controller = new EntityController();
     private EntityController _enemyController = new EntityController();
 
-    private int _groundLine;
+    public int GroundLine;
     private int _gameWidth;
 
     private Texture2D _island = null!;
@@ -45,7 +47,7 @@ public class InGame(GameWindow windowData) : State(windowData)
     private Pause _pause = null!;
     private AnimatedSpriteSheet _sheet = null!;
 
-    private Bomb _bomb = null!;
+    public Bomb Bomb = null!;
 
     private Vector2 _shakeOffset;
     private bool _shaking = false;
@@ -60,6 +62,7 @@ public class InGame(GameWindow windowData) : State(windowData)
 
     private Player _player = null!;
     private RectCollider _playerCollider = null!;
+    private Jump _playerJump = null!;
 
     private readonly Color _levelColour = new Color(176, 192, 160);
     private readonly Color _xpColour = new Color(96, 112, 80);
@@ -117,8 +120,8 @@ public class InGame(GameWindow windowData) : State(windowData)
                 _shaking = false;
                 _shakeOffset = Vector2.Zero;
 
-                if(_bomb.Exploded)
-                    _bomb.Exploded = false;
+                if(Bomb.Exploded)
+                    Bomb.Exploded = false;
 
                 return;
             }
@@ -172,7 +175,8 @@ public class InGame(GameWindow windowData) : State(windowData)
         XPDropper? dropper = entity.Components.GetComponent<XPDropper>();
         if (dropper is null) return;
 
-        _player.XP += dropper.XP;
+        GameWindow window = (GameWindow)WindowData;
+        _player.XP += dropper.XP * window.XPMultiplier;
         if (_player.XP >= _toLevelUp)
         {
             _player.Level++;
@@ -186,6 +190,7 @@ public class InGame(GameWindow windowData) : State(windowData)
             _toLevelUp *= 2;
 
             _centre.SkillPoints++;
+            _centre.ChooseSkills();
         }
     }
 
@@ -211,17 +216,18 @@ public class InGame(GameWindow windowData) : State(windowData)
         SetupGround(tileCountX, tileCountY);
 
         // TileSize / 2 is the player width origin.
-        _groundLine = tileCountY - TileSize - TileSize / 2;
+        GroundLine = tileCountY - TileSize - TileSize / 2;
 
         _player = new Player(WindowData, _camera);
-        _player.Position.Y = _groundLine;
-        _controller.AddEntity(_player);
+        _player.Position.Y = GroundLine;
+        Controller.AddEntity(_player);
 
-        _centre = new ControlCentre(window, _groundLine);
+        _centre = new ControlCentre(window, this);
         _centre.LoadContent();
         _centreCollider = _centre.Components.GetComponent<RectCollider>()!;
 
         _playerCollider = _player.Components.GetComponent<RectCollider>()!;
+        _playerJump = _player.Components.GetComponent<Jump>()!;
 
         _island = WindowData.Content.Load<Texture2D>("Sprites/BackGround/Island");
 
@@ -233,12 +239,12 @@ public class InGame(GameWindow windowData) : State(windowData)
         _inventory.LoadContent(WindowData);
         _inventory.AddItem(new Sword(WindowData, _sheet, _player));
 
-        _bomb = new Bomb(WindowData, _player);
-        _inventory.AddItem(_bomb);
+        Bomb = new Bomb(WindowData, _player);
+        _inventory.AddItem(Bomb);
 
-        _bomb.Sheet.OnSheetFinished = () => { 
-            _bomb.CanPlace = true;
-            _bomb.Exploded = true;
+        Bomb.Sheet.OnSheetFinished = () => { 
+            Bomb.CanPlace = true;
+            Bomb.Exploded = true;
 
             StartShake(1, 3);
             _shakeOffset = Vector2.Zero;
@@ -292,7 +298,7 @@ public class InGame(GameWindow windowData) : State(windowData)
                 return;
             }
 
-            if (_bomb.Exploded && rect.Collides(_bomb.KillRadius))
+            if (Bomb.Exploded && rect.Collides(Bomb.KillRadius))
             {
                 CalculateXP(entity);
                 _enemyController.QueueRemove(entity);
@@ -337,19 +343,21 @@ public class InGame(GameWindow windowData) : State(windowData)
         if (_centre.Interacting) return;
 
         // Update controllers.
-        _controller.UpdateEntities(WindowData.GraphicsDevice, time);
+        Controller.UpdateEntities(WindowData.GraphicsDevice, time);
         _enemyController.UpdateEntities(WindowData.GraphicsDevice, time);
 
         // Hardcoded ground checking (we don't need anything more complicated.)
-        if (_player.Position.Y > _groundLine) 
+        if (_player.Position.Y > GroundLine) 
         {
             _player.Velocity.Y = 0;
-            _player.Position.Y = _groundLine;
+            _player.Position.Y = GroundLine;
+
+            _playerJump.Count = _playerJump.BaseCount;
 
             _player.IsOnFloor = true;
         }
 
-        if (_player.Position.Y < _groundLine && _player.IsOnFloor)
+        if (_player.Position.Y < GroundLine && _player.IsOnFloor)
         {
             _player.IsOnFloor = false;
         }
@@ -362,7 +370,7 @@ public class InGame(GameWindow windowData) : State(windowData)
         HandleInventoryInput();
 
         if (!_sheet.Finished) _sheet.CycleAnimation(time);
-        if (!_bomb.Sheet.Finished) _bomb.Sheet.CycleAnimation(time);
+        if (!Bomb.Sheet.Finished) Bomb.Sheet.CycleAnimation(time);
 
         ShakeCamera(time);
 
@@ -382,7 +390,7 @@ public class InGame(GameWindow windowData) : State(windowData)
                 batch.Draw(tile.Sprite, new Vector2(tile.X, tile.Y), Color.White);
 
             _enemyController.DrawEntities(batch, time);
-            _controller.DrawEntities(batch, time); 
+            Controller.DrawEntities(batch, time); 
 
             if (!_sheet.Finished)
             {
@@ -401,7 +409,7 @@ public class InGame(GameWindow windowData) : State(windowData)
                 _sheet.Draw(batch, strikePosition, !_player.FacingRight);
             }
 
-            if(!_bomb.Sheet.Finished) _bomb.Draw(batch);
+            if(!Bomb.Sheet.Finished) Bomb.Draw(batch);
 
             _inventory.Draw(batch, _camera);
 

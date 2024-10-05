@@ -30,6 +30,8 @@ public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(w
 
     private List<SpriteSheet> _health = [];
 
+    private Jump _jump = null!;
+
     public int Level = 1;
     public int XP = 0;
 
@@ -60,6 +62,9 @@ public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(w
 
         Components.AddComponent(new RectCollider());
         Collider = Components.GetComponent<RectCollider>()!;
+
+        Components.AddComponent(new Jump(1));
+        _jump = Components.GetComponent<Jump>()!;
 
         Components.AddComponent(new Timer(1, false, true, "ImmunityTimer"));
         _immunityTimer = Components.GetComponent<Timer>()!;
@@ -106,6 +111,12 @@ public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(w
         {
             Velocity.Y = -JumpVelocity;
             IsOnFloor = false;
+        }
+
+        if (!IsOnFloor && _jump.Count > 0 && (InputManager.IsKeyPressed(GBGame.KeyboardJump) || InputManager.IsGamePadPressed(GBGame.ControllerJump)))
+        {
+            Velocity.Y = -JumpVelocity;
+            _jump.Count--;
         }
 
         if (!IsOnFloor)
