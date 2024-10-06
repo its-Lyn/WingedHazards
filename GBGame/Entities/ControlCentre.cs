@@ -152,10 +152,12 @@ public class ControlCentre(Game windowData, InGame game, int zIndex = -1) : Enti
         _controller.SetControllerButtons(GBGame.ControllerInventoryUp, GBGame.ControllerInventoryDown, GBGame.ControllerAction);
         _controller.SetKeyboardButtons(GBGame.KeyboardInventoryUp, GBGame.KeyboardInventoryDown, GBGame.KeyboardAction);
 
+        Player player = game.Controller.GetFirst<Player>()!; 
         _skills = [
-            new DoubleJump(game.Controller.GetFirst<Player>()!),
+            new DoubleJump(player),
             new MultiplyXP(_window),
-            new MoreHP(game.Controller.GetFirst<Player>()!)
+            new MoreHP(player),
+            new BombRadius(game)
         ];
 
         _controller.OnActiveUpdating = (btn) => {
@@ -179,6 +181,7 @@ public class ControlCentre(Game windowData, InGame game, int zIndex = -1) : Enti
                 {
                     Interacting = false;
                     game.SkipFrame = true;
+                    _canPick = false;
                     return;
                 }
             }

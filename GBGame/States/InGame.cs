@@ -186,6 +186,9 @@ public class InGame(GameWindow windowData) : State(windowData)
         _player.XP += dropper.XP * window.XPMultiplier;
         if (_player.XP >= _toLevelUp)
         {
+            _centre.SkillPoints++;
+            _centre.ChooseSkills();
+            
             _player.Level++;
 
             if (_player.XP - _toLevelUp > 0)
@@ -195,9 +198,6 @@ public class InGame(GameWindow windowData) : State(windowData)
 
             // Double XP every level
             _toLevelUp *= 2;
-
-            _centre.SkillPoints++;
-            _centre.ChooseSkills();
         }
     }
 
@@ -457,6 +457,8 @@ public class InGame(GameWindow windowData) : State(windowData)
             batch.DrawString(_font, $"{_player.Level}", _camera.ScreenToWorld(new Vector2(10, 33)), _levelColour);
 
             _centre.Draw(batch, time);
+
+            batch.DrawString(_font, $"{_centre.SkillPoints}", Vector2.Zero, Color.Black);
 
             if (_pause.Paused) _pause.Draw(batch, _camera);
         } 
