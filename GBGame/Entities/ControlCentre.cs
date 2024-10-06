@@ -48,7 +48,7 @@ public class ControlCentre(Game windowData, InGame game, int zIndex = -1) : Enti
     private List<Skill> _skills = [];
     private ButtonController _controller = new ButtonController(true);
 
-    private TextButton CreateButton(Skill skill, bool first)
+    private SkillButton CreateButton(Skill skill, bool first)
     {
         Vector2 measurements = _font.MeasureString(skill.Name);
         Vector2 position = new Vector2(
@@ -65,28 +65,27 @@ public class ControlCentre(Game windowData, InGame game, int zIndex = -1) : Enti
             position.Y += 6;
         }
 
-        TextButton btn = new TextButton(_font, skill.Name, position, _textColour);
+        SkillButton btn = new SkillButton(_font, skill.Name, position, _textColour, skill);
         btn.OnClick = () => {
             skill.OnActivate();
 
             SkillPoints--;
+            _skills.Remove(btn.Skill);
             if (SkillPoints <= 0)
             {
                 _picking = false;
             }
             else
             {
-                ChooseSkills(true, skill);
+                ChooseSkills();
             }
         };
 
         return btn;
     }
 
-    public void ChooseSkills(bool remove = false, Skill? skill = null)
+    public void ChooseSkills()
     {
-        if (remove) _skills.Remove(skill!);
-
         _controller.QueueRemoveAll();
 
         int firstIndex, secondIndex;
@@ -220,6 +219,8 @@ public class ControlCentre(Game windowData, InGame game, int zIndex = -1) : Enti
             {
                 batch.DrawString(_font, $"SP: {SkillPoints}", new Vector2(2), _textColour);
                 _controller.Draw(batch);
+
+                batch.DrawString(_font, $"{_skills.Count}", new Vector2(10), Color.White);
 
                 if (!_canPick) _canPick = true;
             }

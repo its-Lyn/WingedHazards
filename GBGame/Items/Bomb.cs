@@ -9,6 +9,8 @@ namespace GBGame.Items;
 
 public class Bomb(Game windowData, Player player) : Item(windowData)
 {
+    private Color _overlayColour = new Color(40, 56, 24);
+
     private int _bombCount = 5;
     public bool CanPlace = true;
     public AnimatedSpriteSheet Sheet = null!;
@@ -66,6 +68,6 @@ public class Bomb(Game windowData, Player player) : Item(windowData)
     public void Draw(SpriteBatch batch)
     { 
         Sheet.Draw(batch, _pos, false);
-        _shapes.DrawRectangleLines(KillRadius, Color.White, batch);
+        _shapes.DrawRectangleMinimal(KillRadius, _overlayColour, 3, batch);
     }
 }
