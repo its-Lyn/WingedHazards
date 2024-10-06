@@ -27,7 +27,7 @@ public class GameWindow : Game
     {
         _graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
-        IsMouseVisible = true;
+        IsMouseVisible = false;
 
         GameSize = new Vector2(160, 144);
         _graphics.SetWindowSize(GameSize * 3);

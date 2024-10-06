@@ -220,8 +220,6 @@ public class ControlCentre(Game windowData, InGame game, int zIndex = -1) : Enti
                 batch.DrawString(_font, $"SP: {SkillPoints}", new Vector2(2), _textColour);
                 _controller.Draw(batch);
 
-                batch.DrawString(_font, $"{_skills.Count}", new Vector2(10), Color.White);
-
                 if (!_canPick) _canPick = true;
             }
         }
