@@ -417,6 +417,9 @@ public class InGame(GameWindow windowData) : State(windowData)
             _playerJump.Count = _playerJump.BaseCount;
 
             _player.IsOnFloor = true;
+            _player.IsJumping = false;
+            _player.FallDecrease = 0;
+            _player.GravityMultiplier = 0;
         }
 
         if (_player.Position.Y < GroundLine - 4 && _player.IsOnFloor)

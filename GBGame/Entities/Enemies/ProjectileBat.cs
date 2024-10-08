@@ -78,7 +78,7 @@ public class ProjectileBat(GameWindow windowData, Vector2 pos, int zIndex = 0) :
         _bulletController = Components.GetComponent<EntityController>()!;
         _bulletController.OnEntityUpdate = (device, time, entity) => {
             // Remove bullet if it does offscreen.
-            if (entity.Position.X > window.GameSize.X + 8 || entity.Position.X < -8)
+            if (entity.Position.X > window.GameSize.X * 2 + 8 || entity.Position.X < -8)
                 _bulletController.QueueRemove(entity);
             
             if (entity.Position.Y > window.GameSize.Y + 8 || entity.Position.Y < -8) 

@@ -15,16 +15,19 @@ public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(w
     private AnimatedSpriteSheet _walkSprite = null!;
     private AnimatedSpriteSheet _idleSprite = null!;
     private AnimatedSpriteSheet _jumpSprite = null!;
-    
+
     private Vector2 _origin = Vector2.Zero;
 
     private readonly float TerminalVelocity = 2f;
     private readonly float Acceleration = 0.5f;
+    public float FallDecrease = 0;
+    public float GravityMultiplier = 0;
 
     public bool IsOnFloor = false;
+    public bool IsJumping = false;
     public bool FacingRight = true;
 
-    public readonly float JumpVelocity = 6f;
+    public readonly float JumpVelocity = 7f;
 
     public RectCollider Collider = null!;
     private Timer _immunityTimer = null!;
@@ -46,10 +49,16 @@ public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(w
     private void CycleWalk(GameTime time)
     {
         if (IsOnFloor)
-        { 
-             if (_sprite != _walkSprite) _sprite = _walkSprite;
+        {
+            if (_sprite != _walkSprite) _sprite = _walkSprite;
             _sprite.CycleAnimation(time);
         }
+    }
+
+    private void HandleJump()
+    {
+        Velocity.Y = -JumpVelocity;
+        IsJumping = true;
     }
 
     public void ApplyKnockBack(RectCollider other)
@@ -160,19 +169,32 @@ public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(w
 
         if (IsOnFloor && (InputManager.IsKeyPressed(GBGame.KeyboardJump) || InputManager.IsGamePadPressed(GBGame.ControllerJump)))
         {
-            Velocity.Y = -JumpVelocity;
+            HandleJump();
             IsOnFloor = false;
         }
 
         if (!IsOnFloor && _jump.Count > 0 && (InputManager.IsKeyPressed(GBGame.KeyboardJump) || InputManager.IsGamePadPressed(GBGame.ControllerJump)))
         {
-            Velocity.Y = -JumpVelocity;
+            HandleJump();
+            if (FallDecrease != 0)
+                FallDecrease = 0;
+
             _jump.Count--;
         }
 
         if (!IsOnFloor)
         {
-            Velocity.Y = MathUtility.MoveTowards(Velocity.Y, TerminalVelocity, 0.8f);
+            if (IsJumping)
+            {
+
+                if (Velocity.Y > 0)
+                { 
+                    GravityMultiplier = 2f;
+                    FallDecrease = 0.5f;
+                }
+            }
+
+            Velocity.Y = MathUtility.MoveTowards(Velocity.Y, TerminalVelocity + GravityMultiplier, 0.8f - FallDecrease);
             if (_sprite != _jumpSprite) _sprite = _jumpSprite;
         }
 
