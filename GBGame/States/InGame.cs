@@ -87,6 +87,8 @@ public class InGame(GameWindow windowData) : State(windowData)
     private readonly int _baseXP = 14;
     private int _toLevelUp;
 
+    private GamePadVisualiser _gamepad = null!;
+
     private void SetupGround(int tileCountX, int tileCountY)
     {
         HashSet<int> usedGridPositions = new HashSet<int>();
@@ -373,6 +375,8 @@ public class InGame(GameWindow windowData) : State(windowData)
 
         _shapes = new Shapes(window.GraphicsDevice);
         _font = WindowData.Content.Load<SpriteFont>("Sprites/Fonts/File");
+
+        _gamepad = new GamePadVisualiser(window);
     }
 
     public override void Update(GameTime time)
@@ -382,6 +386,8 @@ public class InGame(GameWindow windowData) : State(windowData)
             SkipFrame = false;
             return;
         }
+
+        _gamepad.Update(time);
 
         if (!_centre.Interacting && (InputManager.IsGamePadPressed(Buttons.Start) || InputManager.IsKeyPressed(Keys.Escape)))
             _pause.Paused = !_pause.Paused;
@@ -488,6 +494,8 @@ public class InGame(GameWindow windowData) : State(windowData)
             _centre.Draw(batch, time);
 
             if (_pause.Paused) _pause.Draw(batch, _camera);
+
+            _gamepad.Draw(batch, _camera);
         } 
         batch.End();
     }
