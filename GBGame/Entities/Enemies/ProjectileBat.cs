@@ -10,7 +10,7 @@ using System;
 
 namespace GBGame.Entities.Enemies;
 
-public class ProjectileBat(Game windowData, Vector2 pos, int zIndex = 0) : Entity(windowData, zIndex)
+public class ProjectileBat(GameWindow windowData, Vector2 pos, int zIndex = 0) : Entity(windowData, zIndex)
 {
     private Entity? _lockedEntity;
     private bool _locked = false;
@@ -73,8 +73,17 @@ public class ProjectileBat(Game windowData, Vector2 pos, int zIndex = 0) : Entit
         _collider = Components.GetComponent<RectCollider>("PlayerStriker")!;
         _hitterCollider = Components.GetComponent<RectCollider>("PlayerHitter")!;
 
+        GameWindow window = (GameWindow)WindowData;
+
         _bulletController = Components.GetComponent<EntityController>()!;
         _bulletController.OnEntityUpdate = (device, time, entity) => {
+            // Remove bullet if it does offscreen.
+            if (entity.Position.X > window.GameSize.X + 8 || entity.Position.X < -8)
+                _bulletController.QueueRemove(entity);
+            
+            if (entity.Position.Y > window.GameSize.Y + 8 || entity.Position.Y < -8) 
+                _bulletController.QueueRemove(entity);
+
             if (_locked && _lockedEntity is not null)
             {
                 if (_lockedEntity is Player player)

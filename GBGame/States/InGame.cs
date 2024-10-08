@@ -183,7 +183,7 @@ public class InGame(GameWindow windowData) : State(windowData)
     {
         if (Random.Shared.Next(0, 3) == 1)
         {
-            ProjectileBat pbat = new ProjectileBat(WindowData, position); 
+            ProjectileBat pbat = new ProjectileBat((GameWindow)WindowData, position); 
             pbat.LockOn(_player);
 
             _enemyController.AddEntity(pbat);
