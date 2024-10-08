@@ -29,6 +29,7 @@ public class InGame(GameWindow windowData) : State(windowData)
 
     private List<Texture2D> _grass = [];
     private List<Texture2D> _ground = [];
+    private List<Texture2D> _bushes = [];
     private List<GroundTile> _groundTiles = [];
 
     private readonly int TileSize = 8;
@@ -48,6 +49,7 @@ public class InGame(GameWindow windowData) : State(windowData)
     private Inventory _inventory = new Inventory();
     private Pause _pause = null!;
     private AnimatedSpriteSheet _sheet = null!;
+    private AnimatedSpriteSheet _slash = null!;
 
     public Bomb Bomb = null!;
 
@@ -86,7 +88,25 @@ public class InGame(GameWindow windowData) : State(windowData)
     private int _toLevelUp;
 
     private void SetupGround(int tileCountX, int tileCountY)
-    { 
+    {
+        HashSet<int> usedGridPositions = new HashSet<int>();
+
+        int bushCount = Random.Shared.Next(3, 5);
+        for (int i = 0; i < bushCount; i++)
+        {
+            Texture2D bush = _bushes[Random.Shared.Next(0, 3)];
+
+            int gridX;
+            do gridX = Random.Shared.Next(2, tileCountX - 2);
+            while (usedGridPositions.Contains(gridX));
+
+            usedGridPositions.Add(gridX - 1);
+            usedGridPositions.Add(gridX);
+            usedGridPositions.Add(gridX + 1);
+
+            _groundTiles.Add(new GroundTile(bush, gridX * TileSize, tileCountY - TileSize * 2));
+        }
+
         int basePosition = 0;
         for (int i = 0; i < _gameWidth / TileSize; i++)
         {
@@ -101,7 +121,6 @@ public class InGame(GameWindow windowData) : State(windowData)
         }
 
         int grassCount = Random.Shared.Next(5, 10);
-        HashSet<int> usedGridPositions = new HashSet<int>();
         for (int i = 0; i < grassCount; i++) 
         {
             Texture2D tile = _grass[Random.Shared.Next(0, 2)];
@@ -214,6 +233,9 @@ public class InGame(GameWindow windowData) : State(windowData)
         for (int i = 1; i <= 2; i++)
             _grass.Add(WindowData.Content.Load<Texture2D>($"Sprites/Grass/Grass_{i}"));
 
+        for (int i = 1; i <= 3; i++)
+            _bushes.Add(WindowData.Content.Load<Texture2D>($"Sprites/Bushes/Bush_{i}"));
+
         GameWindow window = (GameWindow)WindowData;
 
         _gameWidth = (int)(window.GameSize.Y * 2);
@@ -222,7 +244,6 @@ public class InGame(GameWindow windowData) : State(windowData)
         int tileCountX = _gameWidth / TileSize; 
         SetupGround(tileCountX, tileCountY);
 
-        // TileSize / 2 is the player width origin.
         GroundLine = tileCountY - TileSize - TileSize / 2;
 
         _player = new Player(WindowData, _camera);
@@ -238,13 +259,14 @@ public class InGame(GameWindow windowData) : State(windowData)
 
         _island = WindowData.Content.Load<Texture2D>("Sprites/BackGround/Island");
 
+        _slash = new AnimatedSpriteSheet(WindowData.Content.Load<Texture2D>("Sprites/Entities/Player_Slash"), new Vector2(4, 1), 0.1f, false, new Vector2(0, 4));
         _sheet = new AnimatedSpriteSheet(WindowData.Content.Load<Texture2D>("Sprites/SpriteSheets/Strike"), new Vector2(6, 1), 0.02f);
         _sheet.OnSheetFinished = () => { 
             _striking = false;
         };
         
         _inventory.LoadContent(WindowData);
-        _inventory.AddItem(new Sword(WindowData, _sheet, _player));
+        _inventory.AddItem(new Sword(WindowData, _sheet, _slash, _player));
 
         Bomb = new Bomb(WindowData, _player);
         _inventory.AddItem(Bomb);
@@ -381,17 +403,17 @@ public class InGame(GameWindow windowData) : State(windowData)
         _enemyController.UpdateEntities(WindowData.GraphicsDevice, time);
 
         // Hardcoded ground checking (we don't need anything more complicated.)
-        if (_player.Position.Y > GroundLine) 
+        if (_player.Position.Y > GroundLine - 4) 
         {
             _player.Velocity.Y = 0;
-            _player.Position.Y = GroundLine;
+            _player.Position.Y = GroundLine - 4;
 
             _playerJump.Count = _playerJump.BaseCount;
 
             _player.IsOnFloor = true;
         }
 
-        if (_player.Position.Y < GroundLine && _player.IsOnFloor)
+        if (_player.Position.Y < GroundLine - 4 && _player.IsOnFloor)
         {
             _player.IsOnFloor = false;
         }
@@ -405,6 +427,7 @@ public class InGame(GameWindow windowData) : State(windowData)
             HandleInventoryInput();
 
         if (!_sheet.Finished) _sheet.CycleAnimation(time);
+        if (!_slash.Finished) _slash.CycleAnimation(time);
         if (!Bomb.Sheet.Finished) Bomb.Sheet.CycleAnimation(time);
 
         ShakeCamera(time);
@@ -432,7 +455,7 @@ public class InGame(GameWindow windowData) : State(windowData)
             {
                 Vector2 strikePosition = new Vector2(
                     _player.FacingRight ? _player.Position.X + 4 : _player.Position.X - 12,
-                    _player.Position.Y - 4
+                    _player.Position.Y - 2
                 );
 
                 _strikeCollider.Bounds.X = (int)strikePosition.X + 2;
@@ -445,6 +468,12 @@ public class InGame(GameWindow windowData) : State(windowData)
                 _sheet.Draw(batch, strikePosition, !_player.FacingRight);
             }
 
+            if (!_slash.Finished)
+            {
+                Vector2 handPosition = _player.Position with { X = _player.FacingRight ? _player.Position.X - 3 : _player.Position.X - 5, Y = _player.Position.Y + 4 };
+                _slash.Draw(batch, handPosition, !_player.FacingRight);
+            }
+            
             if(!Bomb.Sheet.Finished) Bomb.Draw(batch);
 
             _inventory.Draw(batch, _camera);

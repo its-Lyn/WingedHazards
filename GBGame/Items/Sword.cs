@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 using MonoGayme.Components;
 
 namespace GBGame.Items;
-public class Sword(Game windowData, AnimatedSpriteSheet sheet, Player player) : Item(windowData)
+public class Sword(Game windowData, AnimatedSpriteSheet sheet, AnimatedSpriteSheet slash, Player player) : Item(windowData)
 {
     public override void LoadContent()
     {
@@ -21,6 +21,9 @@ public class Sword(Game windowData, AnimatedSpriteSheet sheet, Player player) : 
         {
             Console.WriteLine("Using sword.");
             sheet.Finished = false;
+            if (!slash.Finished)
+                slash.Reset();
+            slash.Finished = false;
 
             if (player.IsOnFloor)
             {

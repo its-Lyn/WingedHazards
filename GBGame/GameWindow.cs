@@ -25,6 +25,7 @@ public class GameWindow : Game
 
     public GameWindow()
     {
+        
         _graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
         IsMouseVisible = false;
@@ -42,6 +43,8 @@ public class GameWindow : Game
     protected override void Initialize()
     {
         base.Initialize();
+
+        Window.Title = "Winged Hazzards";
     }
 
     protected override void LoadContent()

@@ -5,14 +5,17 @@ using MonoGayme.Components;
 using MonoGayme.Components.Colliders;
 using MonoGayme.Entities;
 using MonoGayme.Utilities;
-using System;
 using System.Collections.Generic;
 
 namespace GBGame.Entities;
 
 public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(windowData, zIndex)
 {
-    private Texture2D _sprite = null!;
+    private AnimatedSpriteSheet _sprite = null!;
+    private AnimatedSpriteSheet _walkSprite = null!;
+    private AnimatedSpriteSheet _idleSprite = null!;
+    private AnimatedSpriteSheet _jumpSprite = null!;
+    
     private Vector2 _origin = Vector2.Zero;
 
     private readonly float TerminalVelocity = 2f;
@@ -37,6 +40,17 @@ public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(w
 
     private Texture2D _healthSheet = null!;
     private int _basePosition = 1;
+
+    private Shapes _shapes = null!;
+
+    private void CycleWalk(GameTime time)
+    {
+        if (IsOnFloor)
+        { 
+             if (_sprite != _walkSprite) _sprite = _walkSprite;
+            _sprite.CycleAnimation(time);
+        }
+    }
 
     public void ApplyKnockBack(RectCollider other)
     {
@@ -83,9 +97,13 @@ public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(w
     public override void LoadContent()
     {
         Position.X = 40;
-        
-        _sprite = WindowData.Content.Load<Texture2D>("Sprites/Ground/Ground_4");
-        _origin = new Vector2(_sprite.Width / 2, _sprite.Height / 2);
+
+        _origin = new Vector2(4, 8);
+        _walkSprite = new AnimatedSpriteSheet(WindowData.Content.Load<Texture2D>("Sprites/Entities/Player_Walk"), new Vector2(4, 1), 0.2f, false, _origin);
+        _idleSprite = new AnimatedSpriteSheet(WindowData.Content.Load<Texture2D>("Sprites/Entities/Player_Idle"), Vector2.One, 0.2f, false, _origin);
+        _jumpSprite = new AnimatedSpriteSheet(WindowData.Content.Load<Texture2D>("Sprites/Entities/Player_Jump"), Vector2.One, 0.2f, false, _origin);
+
+        _sprite = _idleSprite;
 
         Components.AddComponent(new RectCollider());
         Collider = Components.GetComponent<RectCollider>()!;
@@ -112,6 +130,8 @@ public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(w
 
             _basePosition += 17;
         }
+
+        _shapes = new Shapes(WindowData.GraphicsDevice);
     }
 
     public override void Update(GameTime time)
@@ -122,14 +142,19 @@ public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(w
         {
             Velocity.X = MathUtility.MoveTowards(Velocity.X, -TerminalVelocity, Acceleration);
             FacingRight = false;
+
+            CycleWalk(time);
         } 
         else if (InputManager.IsKeyDown(GBGame.KeyboardRight) || InputManager.IsGamePadDown(GBGame.ControllerRight))
         {
             Velocity.X = MathUtility.MoveTowards(Velocity.X, TerminalVelocity, Acceleration);
             FacingRight = true;
+
+            CycleWalk(time);
         }
         else 
         {
+            if (_sprite != _idleSprite) _sprite = _idleSprite;
             Velocity.X = MathUtility.MoveTowards(Velocity.X, 0, Acceleration);
         }
 
@@ -148,18 +173,18 @@ public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(w
         if (!IsOnFloor)
         {
             Velocity.Y = MathUtility.MoveTowards(Velocity.Y, TerminalVelocity, 0.8f);
+            if (_sprite != _jumpSprite) _sprite = _jumpSprite;
         }
 
         Position += Velocity;
         Position.X = float.Round(Position.X);
 
-        Collider.Bounds = new Rectangle((int)Position.X - 2, (int)Position.Y - 2, 4, 4);
+        Collider.Bounds = new Rectangle((int)Position.X - 2, (int)Position.Y - 4, 4, 10);
     }
 
     public override void Draw(SpriteBatch batch, GameTime time)
     {
-        batch.Draw(_sprite, Position, null, Color.White, 0, _origin, 1, SpriteEffects.None, 0);
-
+        _sprite.Draw(batch, Position, !FacingRight);
         foreach (SpriteSheet health in _health)
         {
             health.Draw(batch, camera);
