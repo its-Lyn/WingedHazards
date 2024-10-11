@@ -12,12 +12,12 @@ namespace GBGame.Entities.Enemies;
 public class NormalBat(Game windowData, Vector2 pos, int zIndex = 0) : Entity(windowData, zIndex)
 {
     private AnimatedSpriteSheet _sprite = null!;
-    private bool _flipped = false;
+    private bool _flipped;
     
-    private bool _locked = false;
+    private bool _locked;
     private Entity? _lockedEntity;
 
-    private readonly float _speed = 0.6f;
+    private const float Speed = 0.6f;
 
     private RectCollider _rectCollider = null!;
     private RectCollider _playerHitter = null!;
@@ -61,17 +61,10 @@ public class NormalBat(Game windowData, Vector2 pos, int zIndex = 0) : Entity(wi
             Vector2 dir = _lockedEntity.Position with { Y = _lockedEntity.Position.Y - 4 } - Position;
             dir.Normalize();
 
-            Vector2 target = dir * _speed;
+            Vector2 target = dir * Speed;
             Velocity = MathUtility.MoveTowards(Velocity, target, 0.05f);
 
-            if (Position.X - _lockedEntity.Position.X < 0)
-            {
-                _flipped = false;
-            }
-            else
-            {
-                _flipped = true;
-            }
+            _flipped = !(Position.X - _lockedEntity.Position.X < 0);
         }
 
         Position += Velocity;

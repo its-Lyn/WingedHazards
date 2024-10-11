@@ -11,7 +11,7 @@ public class Bullet(Game windowData, Vector2 pos, Vector2 target, int zIndex = 0
     private Texture2D _sprite = null!;
 
     private Vector2 _direction;
-    private float _accel = 1f;
+    private const float Accel = 1f;
 
     private RectCollider _collider = null!;
 
@@ -28,7 +28,7 @@ public class Bullet(Game windowData, Vector2 pos, Vector2 target, int zIndex = 0
 
     public override void Update(GameTime time)
     {
-        Velocity = MathUtility.MoveTowards(Velocity, _direction * 2, _accel);
+        Velocity = MathUtility.MoveTowards(Velocity, _direction * 2, Accel);
         Position += Velocity;
 
         _collider.Bounds = new Rectangle((int)Position.X + 2, (int)Position.Y + 2, 4, 4);

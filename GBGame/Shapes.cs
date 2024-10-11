@@ -10,7 +10,7 @@ public class Shapes
     public Shapes(GraphicsDevice device)
     {
         _pixel = new Texture2D(device, 1, 1);
-        _pixel.SetData(new[] { Color.White });
+        _pixel.SetData([Color.White]);
     }
 
     public void DrawRectangleLines(float x, float y, float width, float height, Color colour, SpriteBatch batch)

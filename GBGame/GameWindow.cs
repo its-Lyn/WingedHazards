@@ -3,6 +3,7 @@ using GBGame.States;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGayme.Extensions;
 using MonoGayme.States;
 using MonoGayme.Utilities;
 
@@ -10,18 +11,18 @@ namespace GBGame;
 
 public class GameWindow : Game
 {
-    private GraphicsDeviceManager _graphics = null!;
+    private readonly GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch = null!;
 
-    private Renderer _renderer;
+    private readonly Renderer _renderer;
 
     public int XPMultiplier { get; set; } = 1;
-    public Vector2 GameSize { get; private set; }
+    public Vector2 GameSize { get; }
     public Vector2 MousePosition { get; private set; }
-    public StateContext Context { get; private set; }
+    public StateContext Context { get; }
 
     private Vector2 _sizeBeforeResize;
-    private bool _isFullScreen = false;
+    private bool _isFullScreen;
 
     public GameWindow()
     {
@@ -44,7 +45,7 @@ public class GameWindow : Game
     {
         base.Initialize();
 
-        Window.Title = "Winged Hazzards";
+        Window.Title = "Winged Hazards";
     }
 
     protected override void LoadContent()

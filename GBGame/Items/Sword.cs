@@ -15,27 +15,25 @@ public class Sword(Game windowData, AnimatedSpriteSheet sheet, AnimatedSpriteShe
         Description = "Ol' reliable.";
     }
 
-    public override void Use() 
+    public override void Use()
     {
-        if (sheet.Finished)
-        {
-            Console.WriteLine("Using sword.");
-            sheet.Finished = false;
-            if (!slash.Finished)
-                slash.Reset();
-            slash.Finished = false;
+        if (!sheet.Finished) return;
+        
+        Console.WriteLine("Using sword.");
+        sheet.Finished = false;
+        if (!slash.Finished)
+            slash.Reset();
+        slash.Finished = false;
 
-            if (player.IsOnFloor)
-            {
-                if (player.FacingRight)
-                {
-                    player.Position.X += 1f;
-                }
-                else
-                {
-                    player.Position.X -= 1f;
-                }
-            }
+        if (!player.IsOnFloor) return;
+            
+        if (player.FacingRight)
+        {
+            player.Position.X += 1f;
+        }
+        else
+        {
+            player.Position.X -= 1f;
         }
     }
 }

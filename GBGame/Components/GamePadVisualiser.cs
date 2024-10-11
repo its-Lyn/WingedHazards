@@ -27,13 +27,13 @@ public class GamePadVisualiser : Component
     public GamePadVisualiser(GameWindow window)
     {
         _pixel = new Texture2D(window.GraphicsDevice, 1, 1);
-        _pixel.SetData(new[] { Color.White });
+        _pixel.SetData([Color.White]);
 
-        int width = 6;
-        int height = 7;
-        int offset = 2;
+        const int width = 6;
+        const int height = 7;
+        const int offset = 2;
 
-        int btnSize = 6;
+        const int btnSize = 6;
 
         _dpadUp = new DPadButton(new Rectangle((int)window.GameSize.X - (height * 2) - offset, offset - 1, width, height - 2), _dpadNormal);
         _dpadDown = new DPadButton(new Rectangle((int)window.GameSize.X - (height * 2) - offset, offset + height + 3, width, height - 2), _dpadNormal);

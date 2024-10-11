@@ -5,7 +5,7 @@ namespace GBGame.Skills;
 
 public class MoreHP : Skill
 {
-    private Player _player;
+    private readonly Player _player;
 
     public MoreHP(Player player)
     { 

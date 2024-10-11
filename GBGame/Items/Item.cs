@@ -1,4 +1,3 @@
-using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -6,7 +5,7 @@ namespace GBGame.Items;
 
 public abstract class Item(Game windowData)
 {
-    protected Game WindowData = windowData;
+    protected readonly Game WindowData = windowData;
     
     public Texture2D? InventorySprite;
     

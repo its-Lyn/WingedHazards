@@ -5,7 +5,7 @@ namespace GBGame.Skills;
 
 public class BombRadius : Skill
 {
-    private InGame _game;
+    private readonly InGame _game;
 
     public BombRadius(InGame game)
     {

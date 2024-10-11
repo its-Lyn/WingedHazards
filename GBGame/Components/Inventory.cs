@@ -8,14 +8,14 @@ namespace GBGame.Components;
 
 public class Inventory
 {
-    private int _activeItemIndex = 0;
+    private int _activeItemIndex;
     public List<Item> Items { get; } = []; 
 
     private Texture2D _inventorySprite = null!;
 
     private SpriteFont _font = null!;
-    private Color _nameColour = new Color(40, 56, 24);
-    private Color _descColour = new Color(96, 112, 80);
+    private readonly Color _nameColour = new Color(40, 56, 24);
+    private readonly Color _descColour = new Color(96, 112, 80);
 
     public void AddItem(Item item) 
     {

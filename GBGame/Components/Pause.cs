@@ -9,30 +9,29 @@ namespace GBGame.Components;
 
 public class Pause
 {
-    public bool Paused = false;
+    public bool Paused;
 
-    private Texture2D _overlay;
+    private readonly Texture2D _overlay;
     private Rectangle _size;
-    private Color _overlayColour = new Color(40, 56, 24);
-    private Color _textColour = new Color(176, 192, 160);
+    private readonly Color _overlayColour = new Color(40, 56, 24);
+    private readonly Color _textColour = new Color(176, 192, 160);
 
-    private Vector2 _titlePos;
+    private readonly Vector2 _titlePos;
 
-    private SpriteFont _fontBig;
-    private SpriteFont _font;
+    private readonly SpriteFont _fontBig;
 
-    private GameWindow _window;
+    private readonly GameWindow _window;
 
-    private ButtonController _controller = new ButtonController(true);
+    private readonly ButtonController _controller = new ButtonController(true);
 
     public Pause(GameWindow window)
     {
         _overlay = new Texture2D(window.GraphicsDevice, 1, 1);
-        _overlay.SetData(new[] { _overlayColour });
+        _overlay.SetData([_overlayColour]);
         _size = new Rectangle(0, 0, (int)window.GameSize.X, (int)window.GameSize.Y);
 
         _fontBig = window.Content.Load<SpriteFont>("Sprites/Fonts/FontBig");
-        _font = window.Content.Load<SpriteFont>("Sprites/Fonts/File");
+        SpriteFont font = window.Content.Load<SpriteFont>("Sprites/Fonts/File");
 
         Vector2 titleSize = _fontBig.MeasureString("PAUSED");
         _titlePos = new Vector2(
@@ -42,30 +41,30 @@ public class Pause
 
         _window = window;
 
-        TextButton resume = new TextButton(_font, "resume", new Vector2((window.GameSize.X - _font.MeasureString("resume").X) / 2, 40), _textColour) {
+        TextButton resume = new TextButton(font, "resume", new Vector2((window.GameSize.X - font.MeasureString("resume").X) / 2, 40), _textColour) {
             OnClick = () => { 
                 Paused = !Paused;
             }
         };
 
-        TextButton mainMenu = new TextButton(_font, "main menu", new Vector2((window.GameSize.X - _font.MeasureString("main menu").X) / 2, 50), _textColour) {
+        TextButton mainMenu = new TextButton(font, "main menu", new Vector2((window.GameSize.X - font.MeasureString("main menu").X) / 2, 50), _textColour) {
             OnClick = () => {
                 Console.WriteLine("Meow meow");
             }
         };
 
-        TextButton quit = new TextButton(_font, "quit game", new Vector2((window.GameSize.X - _font.MeasureString("quit game").X) / 2, 60), _textColour) {
+        TextButton quit = new TextButton(font, "quit game", new Vector2((window.GameSize.X - font.MeasureString("quit game").X) / 2, 60), _textColour) {
             OnClick = window.Exit
         };
 
         _controller.SetControllerButtons(GBGame.ControllerInventoryUp, GBGame.ControllerInventoryDown, GBGame.ControllerAction);
         _controller.SetKeyboardButtons(GBGame.KeyboardInventoryUp, GBGame.KeyboardInventoryDown, GBGame.KeyboardAction);
 
-        _controller.OnActiveUpdating = (btn) => {
+        _controller.OnActiveUpdating = btn => {
             btn.Colour = _textColour;
         };
 
-        _controller.OnActiveUpdated = (btn) => {
+        _controller.OnActiveUpdated = btn => {
             btn.Colour = _overlayColour;
         };
 

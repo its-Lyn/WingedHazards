@@ -1,6 +1,5 @@
 using System;
 using GBGame.Entities;
-using GBGame.States;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGayme.Components;
@@ -9,7 +8,7 @@ namespace GBGame.Items;
 
 public class Bomb(Game windowData, Player player) : Item(windowData)
 {
-    private Color _overlayColour = new Color(40, 56, 24);
+    private readonly Color _overlayColour = new Color(40, 56, 24);
 
     private int _bombCount = 5;
     public bool CanPlace = true;
@@ -67,7 +66,7 @@ public class Bomb(Game windowData, Player player) : Item(windowData)
 
     public void Draw(SpriteBatch batch)
     { 
-        Sheet.Draw(batch, _pos, false);
+        Sheet.Draw(batch, _pos);
         _shapes.DrawRectangleMinimal(KillRadius, _overlayColour, 3, batch);
     }
 }

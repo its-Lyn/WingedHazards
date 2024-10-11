@@ -20,7 +20,7 @@ public class InGame(GameWindow windowData) : State(windowData)
 {
     public int ScoreMultiplier = 1;
 
-    public bool SkipFrame = false;
+    public bool SkipFrame;
 
     const int BatSpawnerHeight = -8;
     const int BatSpawnerWidth = 40;
@@ -139,24 +139,22 @@ public class InGame(GameWindow windowData) : State(windowData)
     }
 
     private void ShakeCamera(GameTime time)
-    { 
-        if (_shaking)
+    {
+        if (!_shaking) return;
+        _intensity -= (float)time.ElapsedGameTime.TotalSeconds / _shakeDuration;
+        if (_intensity <= 0) 
         {
-            _intensity -= (float)time.ElapsedGameTime.TotalSeconds / _shakeDuration;
-            if (_intensity <= 0) 
-            {
-                _shaking = false;
-                _shakeOffset = Vector2.Zero;
+            _shaking = false;
+            _shakeOffset = Vector2.Zero;
 
-                if(Bomb.Exploded)
-                    Bomb.Exploded = false;
+            if(Bomb.Exploded)
+                Bomb.Exploded = false;
 
-                return;
-            }
-
-            float rot = Random.Shared.NextSingle() * MathF.Tau;
-            _shakeOffset = new Vector2(MathF.Cos(rot), MathF.Sin(rot)) * _shakeMagnitude * _intensity;
+            return;
         }
+
+        float rot = Random.Shared.NextSingle() * MathF.Tau;
+        _shakeOffset = new Vector2(MathF.Cos(rot), MathF.Sin(rot)) * _shakeMagnitude * _intensity;
     }
     
     private void StartShake(float intensity, float magnitude)
@@ -205,21 +203,21 @@ public class InGame(GameWindow windowData) : State(windowData)
 
         GameWindow window = (GameWindow)WindowData;
         _player.XP += dropper.XP * window.XPMultiplier;
-        if (_player.XP >= _toLevelUp)
-        {     
-            _player.Level++;
-
-            if (_player.XP - _toLevelUp > 0)
-                _player.XP -= _toLevelUp;
-            else
-                _player.XP = 0;
-
-            // Double XP every level
-            _toLevelUp *= 2;
         
-            _centre.SkillPoints++;
-            _centre.ChooseSkills();
-        }
+        if (_player.XP < _toLevelUp) return;
+        
+        _player.Level++;
+
+        if (_player.XP - _toLevelUp > 0)
+            _player.XP -= _toLevelUp;
+        else
+            _player.XP = 0;
+
+        // Double XP every level
+        _toLevelUp *= 2;
+        
+        _centre.SkillPoints++;
+        _centre.ChooseSkills();
     }
 
     public override void LoadContent()
@@ -283,7 +281,7 @@ public class InGame(GameWindow windowData) : State(windowData)
 
         _pause = new Pause(window);
 
-        _enemyController.OnEntityUpdate = (device, time, entity) => {
+        _enemyController.OnEntityUpdate = (_, _, entity) => {
             RectCollider? rect = entity.Components.GetComponent<RectCollider>("PlayerStriker");
             if (rect is null) return;
 
@@ -298,7 +296,6 @@ public class InGame(GameWindow windowData) : State(windowData)
             }
 
             if (_striking && rect.Collides(_strikeCollider))
-
             {
                 Vector2 distance = rect.GetCentre() - _strikeCollider.GetCentre();
 
@@ -320,22 +317,16 @@ public class InGame(GameWindow windowData) : State(windowData)
                 if (health is null) return;
 
                 health.HealthPoints--;
-                if (health.HealthPoints <= 0) 
-                { 
-                    CalculateXP(entity);
-                    _enemyController.QueueRemove(entity);
-                }
-
-                return;
-            }
-
-            if (Bomb.Exploded && rect.Collides(Bomb.KillRadius))
-            {
+                if (health.HealthPoints > 0) return;
                 CalculateXP(entity);
                 _enemyController.QueueRemove(entity);
 
                 return;
             }
+
+            if (!Bomb.Exploded || !rect.Collides(Bomb.KillRadius)) return;
+            CalculateXP(entity);
+            _enemyController.QueueRemove(entity);
         };
 
         _batTimer.OnTimeOut = () => {
@@ -350,27 +341,25 @@ public class InGame(GameWindow windowData) : State(windowData)
             AddBat(batPosition);
 
             // 1/4 chance to spawn two bats with one on the opposite side
-            if (Random.Shared.Next(0, 4) == 1)
-            {
-                Vector2 secondBatPosition = batPosition with { X = 2 * _player.Position.X - batPosition. X }; 
-                AddBat(secondBatPosition);
+            if (Random.Shared.Next(0, 4) != 1) return;
+            
+            Vector2 secondBatPosition = batPosition with { X = 2 * _player.Position.X - batPosition. X }; 
+            AddBat(secondBatPosition);
 
-                // 1/5 chance to spawn 3 bats
-                if (_canSpawn && Random.Shared.Next(0, 5) == 1)
-                {
-                    AddBat(secondBatPosition with { X = 2 * _player.Position.X - secondBatPosition.X });
-                }
+            // 1/5 chance to spawn 3 bats
+            if (_canSpawn && Random.Shared.Next(0, 5) == 1)
+            {
+                AddBat(secondBatPosition with { X = 2 * _player.Position.X - secondBatPosition.X });
             }
         };
 
         _difficultyTimer.OnTimeOut = () => {
             _batTimer.Time -= 0.5f;
 
-            if (_batTimer.Time <= _maxDecrease)
-            {
-                _difficultyTimer.Stop();
-                _canTry = true;
-            }
+            if (!(_batTimer.Time <= _maxDecrease)) return;
+            
+            _difficultyTimer.Stop();
+            _canTry = true;
         };
 
         _shapes = new Shapes(window.GraphicsDevice);
@@ -398,7 +387,6 @@ public class InGame(GameWindow windowData) : State(windowData)
             return;
         }
 
-        // idek
         _centre.CanInteract = _centreCollider.Collides(_playerCollider);
         _centre.Update(time);
 

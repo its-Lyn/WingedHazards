@@ -6,6 +6,7 @@ using MonoGayme.Components.Colliders;
 using MonoGayme.Entities;
 using MonoGayme.Utilities;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace GBGame.Entities;
 
@@ -18,23 +19,23 @@ public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(w
 
     private Vector2 _origin = Vector2.Zero;
 
-    private readonly float TerminalVelocity = 2f;
-    private readonly float Acceleration = 0.5f;
-    public float FallDecrease = 0;
-    public float GravityMultiplier = 0;
+    private const float TerminalVelocity = 2f;
+    private const float Acceleration = 0.5f;
+    public float FallDecrease;
+    public float GravityMultiplier;
 
-    public bool IsOnFloor = false;
-    public bool IsJumping = false;
+    public bool IsOnFloor;
+    public bool IsJumping;
     public bool FacingRight = true;
 
-    public readonly float JumpVelocity = 7f;
+    private const float JumpVelocity = 7f;
 
     public RectCollider Collider = null!;
     private Timer _immunityTimer = null!;
 
     public Health Health = null!;
 
-    private List<SpriteSheet> _health = [];
+    private readonly List<SpriteSheet> _health = [];
 
     private Jump _jump = null!;
 
@@ -44,15 +45,12 @@ public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(w
     private Texture2D _healthSheet = null!;
     private int _basePosition = 1;
 
-    private Shapes _shapes = null!;
-
     private void CycleWalk(GameTime time)
     {
-        if (IsOnFloor)
-        {
-            if (_sprite != _walkSprite) _sprite = _walkSprite;
-            _sprite.CycleAnimation(time);
-        }
+        if (!IsOnFloor) return;
+        
+        _sprite = _walkSprite;
+        _sprite.CycleAnimation(time);
     }
 
     private void HandleJump()
@@ -90,13 +88,10 @@ public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(w
         if (Health.HealthPoints <= Health.OriginalHealthPoints)
         {
             sheet.DecrementY();
-            foreach (SpriteSheet health in _health)
+            foreach (SpriteSheet health in _health.Where(health => health.Y == 0))
             {
-                if (health.Y == 0)
-                {
-                    health.IncrementY();
-                    break;
-                }
+                health.IncrementY();
+                break;
             }
         }
 
@@ -139,8 +134,6 @@ public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(w
 
             _basePosition += 17;
         }
-
-        _shapes = new Shapes(WindowData.GraphicsDevice);
     }
 
     public override void Update(GameTime time)
@@ -163,7 +156,7 @@ public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(w
         }
         else 
         {
-            if (_sprite != _idleSprite) _sprite = _idleSprite;
+            _sprite = _idleSprite;
             Velocity.X = MathUtility.MoveTowards(Velocity.X, 0, Acceleration);
         }
 
@@ -176,8 +169,7 @@ public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(w
         if (!IsOnFloor && _jump.Count > 0 && (InputManager.IsKeyPressed(GBGame.KeyboardJump) || InputManager.IsGamePadPressed(GBGame.ControllerJump)))
         {
             HandleJump();
-            if (FallDecrease != 0)
-                FallDecrease = 0;
+            FallDecrease = 0;
 
             _jump.Count--;
         }
@@ -195,7 +187,7 @@ public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(w
             }
 
             Velocity.Y = MathUtility.MoveTowards(Velocity.Y, TerminalVelocity + GravityMultiplier, 0.8f - FallDecrease);
-            if (_sprite != _jumpSprite) _sprite = _jumpSprite;
+            _sprite = _jumpSprite;
         }
 
         Position += Velocity;

@@ -4,7 +4,7 @@ namespace GBGame.Skills;
 
 public class PlusBomb : Skill
 {
-    private Bomb _bomb;
+    private readonly Bomb _bomb;
 
     public PlusBomb(Bomb bomb)
     {

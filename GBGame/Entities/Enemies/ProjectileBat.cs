@@ -13,9 +13,9 @@ namespace GBGame.Entities.Enemies;
 public class ProjectileBat(GameWindow windowData, Vector2 pos, int zIndex = 0) : Entity(windowData, zIndex)
 {
     private Entity? _lockedEntity;
-    private bool _locked = false;
+    private bool _locked;
 
-    private readonly float _speed = 0.75f;
+    private const float Speed = 0.75f;
 
     private Timer _stateTimer = null!;
     private Timer _waitTimer = null!;
@@ -26,20 +26,20 @@ public class ProjectileBat(GameWindow windowData, Vector2 pos, int zIndex = 0) :
     private RectCollider _collider = null!;
     private RectCollider _hitterCollider = null!;
 
-    private bool _hasShot = false;
+    private bool _hasShot;
 
     private AnimatedSpriteSheet _activeSprite = null!;
 
     private AnimatedSpriteSheet _walkSprite = null!;
     private AnimatedSpriteSheet _shootSprite = null!;
 
-    private bool _flipped = false;
+    private bool _flipped;
 
     private enum AIState
     {
         Moving,
         Shooting
-    };
+    }
 
     private AIState _state = AIState.Moving;
 
@@ -76,7 +76,7 @@ public class ProjectileBat(GameWindow windowData, Vector2 pos, int zIndex = 0) :
         GameWindow window = (GameWindow)WindowData;
 
         _bulletController = Components.GetComponent<EntityController>()!;
-        _bulletController.OnEntityUpdate = (device, time, entity) => {
+        _bulletController.OnEntityUpdate = (_, _, entity) => {
             // Remove bullet if it does offscreen.
             if (entity.Position.X > window.GameSize.X * 2 + 8 || entity.Position.X < -8)
                 _bulletController.QueueRemove(entity);
@@ -84,32 +84,27 @@ public class ProjectileBat(GameWindow windowData, Vector2 pos, int zIndex = 0) :
             if (entity.Position.Y > window.GameSize.Y + 8 || entity.Position.Y < -8) 
                 _bulletController.QueueRemove(entity);
 
-            if (_locked && _lockedEntity is not null)
-            {
-                if (_lockedEntity is Player player)
-                {
-                    RectCollider? collider = entity.Components.GetComponent<RectCollider>();
-                    if (collider is null) return;
+            if (!_locked || _lockedEntity is null) return;
+            
+            if (_lockedEntity is not Player player) return;
+            RectCollider? collider = entity.Components.GetComponent<RectCollider>();
+            if (collider is null) return;
 
-                    if (player.Collider.Collides(collider))
-                    {
-                        player.ApplyKnockBack(collider);
-                        _bulletController.QueueRemove(entity);
-                    }
-                }
-            }
+            if (!player.Collider.Collides(collider)) return;
+            player.ApplyKnockBack(collider);
+            _bulletController.QueueRemove(entity);
         };
 
         _stateTimer = Components.GetComponent<Timer>("StateTimer")!;
-        _stateTimer.OnTimeOut = () => {
+        _stateTimer.OnTimeOut = () =>
+        {
             // 1/3 chance to switch states every second
-            if (Random.Shared.Next(0, 3) == 1)
+            if (Random.Shared.Next(0, 3) != 1) return;
+            
+            if (_state == AIState.Moving)
             {
-                if (_state == AIState.Moving)
-                {
-                    _state = AIState.Shooting;
-                }
-            } 
+                _state = AIState.Shooting;
+            }
         };
 
         _waitTimer = Components.GetComponent<Timer>("WaitTimer")!;
@@ -155,28 +150,19 @@ public class ProjectileBat(GameWindow windowData, Vector2 pos, int zIndex = 0) :
                     Vector2 dir = _lockedEntity.Position with { Y = _lockedEntity.Position.Y - 4 } - Position;
                     dir.Normalize();
 
-                    Vector2 target = dir * _speed;
+                    Vector2 target = dir * Speed;
                     Velocity = MathUtility.MoveTowards(Velocity, target, 0.05f);
                 }
-            break;
+                break;
             
             case AIState.Shooting:
                 Velocity = MathUtility.MoveTowards(Velocity, Vector2.Zero, 0.05f);
                 if (Velocity == Vector2.Zero) _waitTimer.Start();
-            break;
+                break;
         }
 
         if (_lockedEntity is not null)
-        { 
-            if (Position.X - _lockedEntity.Position.X < 0)
-            {
-                _flipped = false;
-            }
-            else
-            {
-                _flipped = true;
-            }
-        } 
+            _flipped = !(Position.X - _lockedEntity.Position.X < 0);
 
         Position += Velocity;
         _collider.Bounds = new Rectangle((int)Position.X, (int)Position.Y, 8, 8);
@@ -185,9 +171,7 @@ public class ProjectileBat(GameWindow windowData, Vector2 pos, int zIndex = 0) :
         _activeSprite.CycleAnimation(time);
 
         if (_activeSprite == _shootSprite && _activeSprite.Finished)
-        {
             _activeSprite = _walkSprite;
-        }
     }
     
     public override void Draw(SpriteBatch batch, GameTime time)
