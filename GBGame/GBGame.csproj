@@ -12,6 +12,11 @@
     <ApplicationIcon>Content/Icons/Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="Data/**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
     <EmbeddedResource Include="Content/Icons/Icon.ico">
       <LogicalName>Icon.ico</LogicalName>
     </EmbeddedResource>

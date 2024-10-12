@@ -13,20 +13,23 @@ public class Shapes
         _pixel.SetData([Color.White]);
     }
 
-    public void DrawRectangleLines(float x, float y, float width, float height, Color colour, SpriteBatch batch)
+    public void DrawRectangleLines(float x, float y, float width, float height, Color colour, SpriteBatch batch, float alpha = 1)
     {
         // Top
-        batch.Draw(_pixel, new Rectangle((int)x, (int)y, (int)width, 1), colour);
+        batch.Draw(_pixel, new Rectangle((int)x, (int)y, (int)width, 1), colour * alpha);
 
         // Left
-        batch.Draw(_pixel, new Rectangle((int)x, (int)y, 1, (int)height), colour);
+        batch.Draw(_pixel, new Rectangle((int)x, (int)y, 1, (int)height), colour * alpha);
 
         // Right
-        batch.Draw(_pixel, new Rectangle((int)(x + width - 1), (int)y, 1, (int)height), colour);
+        batch.Draw(_pixel, new Rectangle((int)(x + width - 1), (int)y, 1, (int)height), colour * alpha);
 
         // Bottom
-        batch.Draw(_pixel, new Rectangle((int)x, (int)(y + height - 1), (int)width, 1), colour);
+        batch.Draw(_pixel, new Rectangle((int)x, (int)(y + height - 1), (int)width, 1), colour * alpha);
     }
+
+    public void DrawRectangle(Rectangle rect, Color colour, SpriteBatch batch, float alpha = 1)
+        => batch.Draw(_pixel, rect, colour * alpha);
 
     public void DrawRectangleMinimal(Rectangle rect, Color colour, int size, SpriteBatch batch)
     {
@@ -47,6 +50,6 @@ public class Shapes
         batch.Draw(_pixel, new Rectangle(rect.X + rect.Width - size, rect.Y + rect.Height - 1, size, 1), colour);
     }
 
-    public void DrawRectangleLines(Rectangle rect, Color colour, SpriteBatch batch)
-        => DrawRectangleLines(rect.X, rect.Y, rect.Width, rect.Height, colour, batch);
+    public void DrawRectangleLines(Rectangle rect, Color colour, SpriteBatch batch, float alpha = 1)
+        => DrawRectangleLines(rect.X, rect.Y, rect.Width, rect.Height, colour, batch, alpha);
 }

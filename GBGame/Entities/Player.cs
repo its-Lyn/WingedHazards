@@ -6,7 +6,9 @@ using MonoGayme.Components.Colliders;
 using MonoGayme.Entities;
 using MonoGayme.Utilities;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using Microsoft.Xna.Framework.Input;
 
 namespace GBGame.Entities;
 
@@ -35,7 +37,8 @@ public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(w
 
     public Health Health = null!;
 
-    private readonly List<SpriteSheet> _health = [];
+    private record struct HealthData(SpriteSheet Sheet, Vector2 Position);
+    private readonly List<HealthData> _health = [];
 
     private Jump _jump = null!;
 
@@ -44,6 +47,12 @@ public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(w
 
     private Texture2D _healthSheet = null!;
     private int _basePosition = 1;
+    
+    private Flash _deathFlash = null!;
+    private GameWindow _window = null!;
+
+    public Stopwatch SurvivalWatch = new Stopwatch();
+    public bool AllowInput = true;
 
     private void CycleWalk(GameTime time)
     {
@@ -52,6 +61,12 @@ public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(w
         _sprite = _walkSprite;
         _sprite.CycleAnimation(time);
     }
+
+    private bool ButtonsPressed(Keys keyboard, Buttons controller)
+        => AllowInput && (InputManager.IsKeyPressed(keyboard) || InputManager.IsGamePadPressed(controller));
+    
+    private bool ButtonsDown(Keys keyboard, Buttons controller)
+        => AllowInput && (InputManager.IsKeyDown(keyboard) || InputManager.IsGamePadDown(controller));
 
     private void HandleJump()
     {
@@ -64,13 +79,17 @@ public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(w
         Vector2 dir = Vector2.Normalize(Collider.GetCentre() - other.GetCentre());
         Velocity += 5 * dir;
 
-        _health[Health.HealthPoints - 1].DecrementY();
+        _health[Health.HealthPoints - 1].Sheet.DecrementY();
 
         Health.HealthPoints--;
         if (Health.HealthPoints <= 0)
         {
-            // :trollface:
-            WindowData.Exit();
+            _window.GameEnding = true;
+            Collider.Enabled = false;
+            AllowInput = false; 
+            _deathFlash.Begin();
+            
+            SurvivalWatch.Stop();
         }
 
         Collider.Enabled = false;
@@ -81,16 +100,16 @@ public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(w
     { 
         Health.HealthPoints++;
 
-        SpriteSheet sheet = new SpriteSheet(_healthSheet, new Vector2(1, 2), new Vector2(_basePosition, 20));
+        SpriteSheet sheet = new SpriteSheet(_healthSheet, new Vector2(1, 2));
         sheet.IncrementY();
 
-        _health.Add(sheet);
+        _health.Add(new HealthData(sheet, new Vector2(_basePosition, 20)));
         if (Health.HealthPoints <= Health.OriginalHealthPoints)
         {
             sheet.DecrementY();
-            foreach (SpriteSheet health in _health.Where(health => health.Y == 0))
+            foreach (HealthData health in _health.Where(health => health.Sheet.Y == 0))
             {
-                health.IncrementY();
+                health.Sheet.IncrementY();
                 break;
             }
         }
@@ -127,46 +146,56 @@ public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(w
         _healthSheet = WindowData.Content.Load<Texture2D>("Sprites/UI/Health");
         for (int i = 0; i < Health.HealthPoints; i++)
         { 
-            SpriteSheet sheet = new SpriteSheet(_healthSheet, new Vector2(1, 2), new Vector2(_basePosition, 20));
+            SpriteSheet sheet = new SpriteSheet(_healthSheet, new Vector2(1, 2));
             sheet.IncrementY();
 
-            _health.Add(sheet);
+            _health.Add(new HealthData(sheet, new Vector2(_basePosition, 20)));
 
             _basePosition += 17;
         }
+
+        _window = (GameWindow)WindowData;
+        Components.AddComponent(new Flash(WindowData, Color.Wheat, new Rectangle(0, 0, (int)_window.GameSize.X, (int)_window.GameSize.Y), 0.05f, "DeathFlash"));
+        _deathFlash = Components.GetComponent<Flash>("DeathFlash")!;
+        _deathFlash.OnFlashFinished = () =>
+        {
+            _window.GameEnded = true;
+        };
+        
+        SurvivalWatch.Start();
     }
 
     public override void Update(GameTime time)
     {
         _immunityTimer.Cycle(time);
 
-        if (InputManager.IsKeyDown(GBGame.KeyboardLeft) || InputManager.IsGamePadDown(GBGame.ControllerLeft))
+        if (ButtonsDown(GBGame.KeyboardLeft, GBGame.ControllerLeft))
         {
             Velocity.X = MathUtility.MoveTowards(Velocity.X, -TerminalVelocity, Acceleration);
             FacingRight = false;
 
             CycleWalk(time);
-        } 
-        else if (InputManager.IsKeyDown(GBGame.KeyboardRight) || InputManager.IsGamePadDown(GBGame.ControllerRight))
+        }
+        else if (ButtonsDown(GBGame.KeyboardRight, GBGame.ControllerRight))
         {
             Velocity.X = MathUtility.MoveTowards(Velocity.X, TerminalVelocity, Acceleration);
             FacingRight = true;
 
             CycleWalk(time);
         }
-        else 
+        else
         {
             _sprite = _idleSprite;
             Velocity.X = MathUtility.MoveTowards(Velocity.X, 0, Acceleration);
         }
 
-        if (IsOnFloor && (InputManager.IsKeyPressed(GBGame.KeyboardJump) || InputManager.IsGamePadPressed(GBGame.ControllerJump)))
+        if (IsOnFloor && ButtonsPressed(GBGame.KeyboardJump, GBGame.ControllerJump))
         {
             HandleJump();
             IsOnFloor = false;
         }
 
-        if (!IsOnFloor && _jump.Count > 0 && (InputManager.IsKeyPressed(GBGame.KeyboardJump) || InputManager.IsGamePadPressed(GBGame.ControllerJump)))
+        if (!IsOnFloor && _jump.Count > 0 && ButtonsPressed(GBGame.KeyboardJump, GBGame.ControllerJump))
         {
             HandleJump();
             FallDecrease = 0;
@@ -178,7 +207,6 @@ public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(w
         {
             if (IsJumping)
             {
-
                 if (Velocity.Y > 0)
                 { 
                     GravityMultiplier = 2f;
@@ -189,7 +217,12 @@ public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(w
             Velocity.Y = MathUtility.MoveTowards(Velocity.Y, TerminalVelocity + GravityMultiplier, 0.8f - FallDecrease);
             _sprite = _jumpSprite;
         }
+        
+        if (_deathFlash.Flashing)
+            _deathFlash.Update(time);
 
+        if (_window.GameEnding) return;
+        
         Position += Velocity;
         Position.X = float.Round(Position.X);
 
@@ -199,9 +232,9 @@ public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(w
     public override void Draw(SpriteBatch batch, GameTime time)
     {
         _sprite.Draw(batch, Position, !FacingRight);
-        foreach (SpriteSheet health in _health)
+        foreach (HealthData health in _health)
         {
-            health.Draw(batch, camera);
+            health.Sheet.Draw(batch, health.Position, camera);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Diagnostics;
+using System.Threading;
 using GBGame.States;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -20,6 +21,9 @@ public class GameWindow : Game
     public Vector2 GameSize { get; }
     public Vector2 MousePosition { get; private set; }
     public StateContext Context { get; }
+    
+    public bool GameEnding { get; set; }
+    public bool GameEnded { get; set; }
 
     private Vector2 _sizeBeforeResize;
     private bool _isFullScreen;
@@ -51,7 +55,8 @@ public class GameWindow : Game
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
-        Context.SwitchState(new InGame(this));
+        //Context.SwitchState(new InGame(this));
+        Context.SwitchState(new GameFinish(this, 0, 0, 1, new Stopwatch()));
     }
 
     protected override void Update(GameTime gameTime)

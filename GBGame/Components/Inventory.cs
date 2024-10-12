@@ -56,7 +56,7 @@ public class Inventory
         batch.Draw(item.InventorySprite, pos, Color.White);
 
         batch.DrawString(_font, item.Name, namePos, _nameColour);
-        batch.DrawString(_font, item.Description, descPos, _descColour * 0.3f); 
+        batch.DrawString(_font, item.Description, descPos, _descColour); 
     }
 
     public int ActiveItemIndex {

@@ -16,37 +16,37 @@ using MonoGayme.Entities;
 
 namespace GBGame.States;
 
-public class InGame(GameWindow windowData) : State(windowData)
+public sealed class InGame(GameWindow windowData) : State(windowData)
 {
     public int ScoreMultiplier = 1;
 
     public bool SkipFrame;
 
-    const int BatSpawnerHeight = -8;
-    const int BatSpawnerWidth = 40;
+    private const int BatSpawnerHeight = -8;
+    private const int BatSpawnerWidth = 40;
 
     private record struct GroundTile(Texture2D Sprite, int X, int Y);
 
-    private List<Texture2D> _grass = [];
-    private List<Texture2D> _ground = [];
-    private List<Texture2D> _bushes = [];
-    private List<GroundTile> _groundTiles = [];
+    private readonly List<Texture2D> _grass = [];
+    private readonly List<Texture2D> _ground = [];
+    private readonly List<Texture2D> _bushes = [];
+    private readonly List<GroundTile> _groundTiles = [];
 
-    private readonly int TileSize = 8;
-    private readonly Color BackDrop = new Color(232, 240, 223);
+    private const int TileSize = 8;
+    private readonly Color _backDrop = new Color(232, 240, 223);
 
-    private Camera2D _camera = new Camera2D(Vector2.Zero);
-    private float _cameraOffset = 40;
+    private readonly Camera2D _camera = new Camera2D(Vector2.Zero);
+    private const float CameraOffset = 40;
 
-    public EntityController Controller = new EntityController();
-    private EntityController _enemyController = new EntityController();
+    public readonly EntityController Controller = new EntityController();
+    private readonly EntityController _enemyController = new EntityController();
 
     public int GroundLine;
     private int _gameWidth;
 
     private Texture2D _island = null!;
 
-    private Inventory _inventory = new Inventory();
+    private readonly Inventory _inventory = new Inventory();
     private Pause _pause = null!;
     private AnimatedSpriteSheet _sheet = null!;
     private AnimatedSpriteSheet _slash = null!;
@@ -54,19 +54,20 @@ public class InGame(GameWindow windowData) : State(windowData)
     public Bomb Bomb = null!;
 
     private Vector2 _shakeOffset;
-    private bool _shaking = false;
-    private float _intensity = 0;
-    private float _shakeDuration = 0.2f;
+    private bool _shaking;
+    private float _intensity;
+    private const float ShakeDuration = 0.2f;
     private float _shakeMagnitude = 3f;
 
     private Shapes _shapes = null!;
 
-    private bool _striking = false;
-    private RectCollider _strikeCollider = new RectCollider();
+    private bool _striking;
+    private readonly RectCollider _strikeCollider = new RectCollider();
 
     private Player _player = null!;
     private RectCollider _playerCollider = null!;
     private Jump _playerJump = null!;
+    private Flash _playerDeathFlash = null!;
 
     private readonly Color _levelColour = new Color(176, 192, 160);
     private readonly Color _xpColour = new Color(96, 112, 80);
@@ -74,20 +75,25 @@ public class InGame(GameWindow windowData) : State(windowData)
 
     private Texture2D _starSprite = null!;
 
-    private Timer _batTimer = new Timer(5, true, false);
+    private readonly Timer _batTimer = new Timer(5, true, false);
 
-    private Timer _difficultyTimer = new Timer(30, true, false);
-    private readonly float _maxDecrease = 3f;
-    private bool _canTry = false;
-    private bool _canSpawn = false;
+    private readonly Timer _difficultyTimer = new Timer(30, true, false);
+    private const float MaxDecrease = 3f;
+    private bool _canTry;
+    private bool _canSpawn;
 
     private ControlCentre _centre = null!;
     private RectCollider _centreCollider = null!;
 
-    private readonly int _baseXP = 14;
+    private const int BaseXP = 14;
     private int _toLevelUp;
 
     private GamePadVisualiser _gamepad = null!;
+    
+    private Flash _fadeIn = null!;
+
+    private int _normalSlain = 0;
+    private int _projectileSlain = 0;
 
     private void SetupGround(int tileCountX, int tileCountY)
     {
@@ -141,7 +147,7 @@ public class InGame(GameWindow windowData) : State(windowData)
     private void ShakeCamera(GameTime time)
     {
         if (!_shaking) return;
-        _intensity -= (float)time.ElapsedGameTime.TotalSeconds / _shakeDuration;
+        _intensity -= (float)time.ElapsedGameTime.TotalSeconds / ShakeDuration;
         if (_intensity <= 0) 
         {
             _shaking = false;
@@ -222,7 +228,7 @@ public class InGame(GameWindow windowData) : State(windowData)
 
     public override void LoadContent()
     {
-        _toLevelUp = _baseXP;
+        _toLevelUp = BaseXP;
         _starSprite = WindowData.Content.Load<Texture2D>("Sprites/UI/LevelStar");
 
         _strikeCollider.Bounds = new Rectangle();
@@ -246,7 +252,7 @@ public class InGame(GameWindow windowData) : State(windowData)
 
         GroundLine = tileCountY - TileSize - TileSize / 2;
 
-        _player = new Player(WindowData, _camera);
+        _player = new Player(window, _camera);
         _player.Position.Y = GroundLine;
         Controller.AddEntity(_player);
 
@@ -256,6 +262,7 @@ public class InGame(GameWindow windowData) : State(windowData)
 
         _playerCollider = _player.Components.GetComponent<RectCollider>()!;
         _playerJump = _player.Components.GetComponent<Jump>()!;
+        _playerDeathFlash = _player.Components.GetComponent<Flash>("DeathFlash")!;
 
         _island = WindowData.Content.Load<Texture2D>("Sprites/BackGround/Island");
 
@@ -318,6 +325,17 @@ public class InGame(GameWindow windowData) : State(windowData)
 
                 health.HealthPoints--;
                 if (health.HealthPoints > 0) return;
+
+                switch (entity)
+                {
+                    case NormalBat:
+                        _normalSlain++;
+                        break;
+                    case ProjectileBat:
+                        _projectileSlain++;
+                        break;
+                }
+                
                 CalculateXP(entity);
                 _enemyController.QueueRemove(entity);
 
@@ -325,6 +343,17 @@ public class InGame(GameWindow windowData) : State(windowData)
             }
 
             if (!Bomb.Exploded || !rect.Collides(Bomb.KillRadius)) return;
+            
+            switch (entity)
+            {
+                case NormalBat:
+                    _normalSlain++;
+                    break;
+                case ProjectileBat:
+                    _projectileSlain++;
+                    break;
+            }
+            
             CalculateXP(entity);
             _enemyController.QueueRemove(entity);
         };
@@ -356,7 +385,7 @@ public class InGame(GameWindow windowData) : State(windowData)
         _difficultyTimer.OnTimeOut = () => {
             _batTimer.Time -= 0.5f;
 
-            if (!(_batTimer.Time <= _maxDecrease)) return;
+            if (!(_batTimer.Time <= MaxDecrease)) return;
             
             _difficultyTimer.Stop();
             _canTry = true;
@@ -366,6 +395,12 @@ public class InGame(GameWindow windowData) : State(windowData)
         _font = WindowData.Content.Load<SpriteFont>("Sprites/Fonts/File");
 
         _gamepad = new GamePadVisualiser(window);
+
+        _fadeIn = new Flash(window, Color.Black, new Rectangle(0, 0, (int)window.GameSize.X, (int)window.GameSize.Y), 0.02f, null, true);
+        _fadeIn.OnFlashFinished = () =>
+        {
+            window.Context.SwitchState(new GameFinish(window, _normalSlain, _projectileSlain, _player.Level, _player.SurvivalWatch));
+        };
     }
 
     public override void Update(GameTime time)
@@ -377,6 +412,17 @@ public class InGame(GameWindow windowData) : State(windowData)
         }
 
         _gamepad.Update(time);
+        
+        GameWindow window = (GameWindow)WindowData;
+        if (window.GameEnding)
+        {
+            _player.Update(time);
+
+            if (window.GameEnded && !_fadeIn.Flashing) _fadeIn.Begin();
+            if (_fadeIn.Flashing) _fadeIn.Update(time);
+            
+            return;
+        }
 
         if (!_centre.Interacting && (InputManager.IsGamePadPressed(Buttons.Start) || InputManager.IsKeyPressed(Keys.Escape)))
             _pause.Paused = !_pause.Paused;
@@ -395,7 +441,7 @@ public class InGame(GameWindow windowData) : State(windowData)
         // Update controllers.
         Controller.UpdateEntities(WindowData.GraphicsDevice, time);
         _enemyController.UpdateEntities(WindowData.GraphicsDevice, time);
-
+        
         // Hardcoded ground checking (we don't need anything more complicated.)
         if (_player.Position.Y > GroundLine - 4) 
         {
@@ -409,6 +455,11 @@ public class InGame(GameWindow windowData) : State(windowData)
             _player.FallDecrease = 0;
             _player.GravityMultiplier = 0;
         }
+        
+        if (_player.Position.Y < GroundLine - 4 && _player.IsOnFloor)
+        {
+            _player.IsOnFloor = false;
+        }
 
         if (_player.Position.Y < GroundLine - 4 && _player.IsOnFloor)
         {
@@ -416,8 +467,7 @@ public class InGame(GameWindow windowData) : State(windowData)
         }
 
         // Keep the camera position between the game sizes, so the _player doesn't see outside the map.
-        GameWindow window = (GameWindow)WindowData;
-        _camera.X = Math.Clamp(MathF.Floor(_player.Position.X - _cameraOffset + _shakeOffset.X), 0, _gameWidth - window.GameSize.X);
+        _camera.X = Math.Clamp(MathF.Floor(_player.Position.X - CameraOffset + _shakeOffset.X), 0, _gameWidth - window.GameSize.X);
         _camera.Y = _shakeOffset.Y; 
 
         if (!SkipFrame)
@@ -435,7 +485,7 @@ public class InGame(GameWindow windowData) : State(windowData)
    
     public override void Draw(GameTime time, SpriteBatch batch)
     {
-        WindowData.GraphicsDevice.Clear(BackDrop);
+        WindowData.GraphicsDevice.Clear(_backDrop);
 
         batch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: _camera.Transform);
         { 
@@ -487,7 +537,13 @@ public class InGame(GameWindow windowData) : State(windowData)
             if (_pause.Paused) _pause.Draw(batch, _camera);
 
             _gamepad.Draw(batch, _camera);
+            
+            _fadeIn.Draw(batch, _camera);
         } 
+        batch.End();
+
+        batch.Begin(blendState: BlendState.Additive, transformMatrix: _camera.Transform);
+            if (_playerDeathFlash.Flashing) _playerDeathFlash.Draw(batch, _camera);
         batch.End();
     }
 }
