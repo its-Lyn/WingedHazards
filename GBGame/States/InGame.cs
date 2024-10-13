@@ -267,18 +267,22 @@ public sealed class InGame(GameWindow windowData) : State(windowData)
         _island = WindowData.Content.Load<Texture2D>("Sprites/BackGround/Island");
 
         _slash = new AnimatedSpriteSheet(WindowData.Content.Load<Texture2D>("Sprites/Entities/Player_Slash"), new Vector2(4, 1), 0.1f, false, new Vector2(0, 4));
-        _sheet = new AnimatedSpriteSheet(WindowData.Content.Load<Texture2D>("Sprites/SpriteSheets/Strike"), new Vector2(6, 1), 0.02f);
-        _sheet.OnSheetFinished = () => { 
-            _striking = false;
+        _sheet = new AnimatedSpriteSheet(WindowData.Content.Load<Texture2D>("Sprites/SpriteSheets/Strike"), new Vector2(6, 1), 0.02f)
+        {
+            OnSheetFinished = () => 
+            { 
+                _striking = false;
+            }
         };
-        
+
         _inventory.LoadContent(WindowData);
         _inventory.AddItem(new Sword(WindowData, _sheet, _slash, _player));
 
         Bomb = new Bomb(WindowData, _player);
         _inventory.AddItem(Bomb);
 
-        Bomb.Sheet.OnSheetFinished = () => { 
+        Bomb.Sheet.OnSheetFinished = () => 
+        { 
             Bomb.CanPlace = true;
             Bomb.Exploded = true;
 
@@ -396,10 +400,12 @@ public sealed class InGame(GameWindow windowData) : State(windowData)
 
         _gamepad = new GamePadVisualiser(window);
 
-        _fadeIn = new Flash(window, Color.Black, new Rectangle(0, 0, (int)window.GameSize.X, (int)window.GameSize.Y), 0.02f, null, true);
-        _fadeIn.OnFlashFinished = () =>
+        _fadeIn = new Flash(window, Color.Black, new Rectangle(0, 0, (int)window.GameSize.X, (int)window.GameSize.Y), 0.02f, null, true)
         {
-            window.Context.SwitchState(new GameFinish(window, _normalSlain, _projectileSlain, _player.Level, _player.SurvivalWatch));
+            OnFlashFinished = () =>
+            {
+                window.Context.SwitchState(new GameFinish(window, _normalSlain, _projectileSlain, _player.Level, _player.SurvivalWatch));
+            }
         };
     }
 

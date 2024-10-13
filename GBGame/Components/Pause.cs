@@ -1,4 +1,5 @@
 using System;
+using GBGame.States;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGayme.Components;
@@ -41,19 +42,24 @@ public class Pause
 
         _window = window;
 
-        TextButton resume = new TextButton(font, "resume", new Vector2((window.GameSize.X - font.MeasureString("resume").X) / 2, 40), _textColour) {
-            OnClick = () => { 
+        TextButton resume = new TextButton(font, "resume", new Vector2((window.GameSize.X - font.MeasureString("resume").X) / 2, 40), _textColour) 
+        {
+            OnClick = () =>
+            { 
                 Paused = !Paused;
             }
         };
 
-        TextButton mainMenu = new TextButton(font, "main menu", new Vector2((window.GameSize.X - font.MeasureString("main menu").X) / 2, 50), _textColour) {
-            OnClick = () => {
-                Console.WriteLine("Meow meow");
+        TextButton mainMenu = new TextButton(font, "main menu", new Vector2((window.GameSize.X - font.MeasureString("main menu").X) / 2, 50), _textColour) 
+        {
+            OnClick = () => 
+            {
+                window.Context.SwitchState(new MainMenu(window));
             }
         };
 
-        TextButton quit = new TextButton(font, "quit game", new Vector2((window.GameSize.X - font.MeasureString("quit game").X) / 2, 60), _textColour) {
+        TextButton quit = new TextButton(font, "quit game", new Vector2((window.GameSize.X - font.MeasureString("quit game").X) / 2, 60), _textColour) 
+        {
             OnClick = window.Exit
         };
 

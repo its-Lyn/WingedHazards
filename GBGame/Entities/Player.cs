@@ -1,3 +1,4 @@
+using System;
 using GBGame.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -224,6 +225,10 @@ public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(w
         if (_window.GameEnding) return;
         
         Position += Velocity;
+        
+        // Clamp The player position
+        Position.X = Math.Clamp(Position.X, 4, _window.GameSize.X * 2 - 36);
+        
         Position.X = float.Round(Position.X);
 
         Collider.Bounds = new Rectangle((int)Position.X - 2, (int)Position.Y - 4, 4, 10);

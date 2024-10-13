@@ -55,7 +55,7 @@ public class GameWindow : Game
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
-        Context.SwitchState(new InGame(this));
+        Context.SwitchState(new MainMenu(this));
     }
 
     protected override void Update(GameTime gameTime)

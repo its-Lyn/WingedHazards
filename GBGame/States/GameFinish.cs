@@ -93,18 +93,30 @@ public sealed class GameFinish(GameWindow window, int normal, int projectile, in
                 _bookEase = false;
 
                 _showButtons = true;
-                TextButton retry = new TextButton(_font, "Retry", new Vector2(15, 120), _fontColour);
-                retry.OnClick = () =>
+                TextButton retry = new TextButton(_font, "Retry", new Vector2(15, 120), _fontColour)
                 {
-                    window.GameEnded = false;
-                    window.GameEnding = false;
+                    OnClick = () =>
+                    {
+                        window.GameEnded = false;
+                        window.GameEnding = false;
                     
-                    window.Context.SwitchState(new InGame(window));
+                        window.Context.SwitchState(new InGame(window));
+                    }
                 };
-                
+
+                TextButton menu = new TextButton(_font, "Menu", new Vector2(115, 120), _fontColour)
+                {
+                    OnClick = () =>
+                    {
+                        window.GameEnded = false;
+                        window.GameEnding = false;
+                        
+                        window.Context.SwitchState(new MainMenu(window));
+                    }
+                };
+
                 _controller.Add(retry);
-                
-                _controller.Add(new TextButton(_font, "Menu", new Vector2(115, 120), _fontColour));
+                _controller.Add(menu);
             }
             
             float timerNormalised = _bookTimer / 0.8f;
