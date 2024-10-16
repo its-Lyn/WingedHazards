@@ -11,7 +11,7 @@ namespace GBGame.States;
 
 public class MainMenu(GameWindow window) : State(window)
 {
-    private ButtonController _controller = null!;
+    private UIController _controller = null!;
     private SpriteFont _font = null!;
     private readonly Color _overlayColour = new Color(40, 56, 24);
     private readonly Color _textColour = new Color(176, 192, 160);
@@ -27,7 +27,7 @@ public class MainMenu(GameWindow window) : State(window)
     public override void LoadContent()
     {
         _font = window.Content.Load<SpriteFont>("Sprites/Fonts/File");
-        _controller = new ButtonController(true)
+        _controller = new UIController(true)
         {
             OnActiveUpdating = btn =>
             {
@@ -41,6 +41,7 @@ public class MainMenu(GameWindow window) : State(window)
         };
         
         _controller.SetKeyboardButtons(GBGame.KeyboardInventoryUp, GBGame.KeyboardInventoryDown, GBGame.KeyboardAction);
+        _controller.SetControllerButtons(GBGame.ControllerLeft, GBGame.ControllerRight, GBGame.ControllerAction);
 
         TextButton quit = new TextButton(_font, "quit", new Vector2((window.GameSize.X - _font.MeasureString("quit").X) / 2, window.GameSize.Y - 30), _textColour)
         {

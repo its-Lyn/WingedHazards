@@ -25,7 +25,7 @@ public sealed class GameFinish(GameWindow window, int normal, int projectile, in
     private SpriteSheet _normal = null!;
     private SpriteSheet _projectile = null!;
 
-    private ButtonController _controller = null!;
+    private UIController _controller = null!;
     private bool _showButtons;
     
     private Texture2D _star = null!;
@@ -53,8 +53,9 @@ public sealed class GameFinish(GameWindow window, int normal, int projectile, in
         _skull = WindowData.Content.Load<Texture2D>("Sprites/UI/Skull");
         _watch = WindowData.Content.Load<Texture2D>("Sprites/UI/Watch");
 
-        _controller = new ButtonController(true);
+        _controller = new UIController(true);
         _controller.SetKeyboardButtons(GBGame.KeyboardLeft, GBGame.KeyboardRight, GBGame.KeyboardAction);
+        _controller.SetControllerButtons(GBGame.ControllerLeft, GBGame.ControllerRight, GBGame.ControllerAction);
         _controller.OnActiveUpdating = btn =>
         {
             btn.Colour = _fontColour;

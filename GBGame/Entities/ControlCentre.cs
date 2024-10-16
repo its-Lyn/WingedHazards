@@ -14,39 +14,39 @@ namespace GBGame.Entities;
 
 public class ControlCentre(Game windowData, InGame game, int zIndex = -1) : Entity(windowData, zIndex)
 {
-    private bool _picking = false;
-    private bool _canPick = false;
+    private bool _picking;
+    private bool _canPick;
 
     private GameWindow _window = null!;
 
     private Texture2D _sprite = null!;
     private Texture2D _questionSprite = null!;
-    private float _questionOpacity = 0;
+    private float _questionOpacity;
 
     private RectCollider _collider = null!;
 
-    public int SkillPoints = 0;
+    public int SkillPoints;
 
     public bool CanInteract = false;
-    public bool Interacting = false;
+    public bool Interacting;
 
     private Texture2D _overlay = null!;
     private Rectangle _size;
-    private Color _overlayColour = new Color(40, 56, 24);
-    private Color _textColour = new Color(176, 192, 160);
-    private Color _activeTextColour = new Color(136, 152, 120);
+    private readonly Color _overlayColour = new Color(40, 56, 24);
+    private readonly Color _textColour = new Color(176, 192, 160);
+    private readonly Color _activeTextColour = new Color(136, 152, 120);
 
     private SpriteFont _font = null!;
 
-    private readonly string _noSP = "No skill points!";
-    private Vector2 _noSPMeasuremets;
+    private const string NoSp = "No skill points!";
+    private Vector2 _noSpMeasurements;
 
-    private readonly string _return = "Return";
+    private const string Return = "Return";
     private Vector2 _returnMeasurements;
     private TextButton _returnButton = null!;
 
     private List<Skill> _skills = [];
-    private ButtonController _controller = new ButtonController(true);
+    private readonly UIController _controller = new UIController(true);
 
     private SkillButton CreateButton(Skill skill, bool first)
     {
@@ -88,11 +88,11 @@ public class ControlCentre(Game windowData, InGame game, int zIndex = -1) : Enti
     {
         _controller.QueueRemoveAll();
 
-        int firstIndex, secondIndex;
         if (_skills.Count >= 2)
         {
-            firstIndex = Random.Shared.Next(0, _skills.Count);
+            int firstIndex = Random.Shared.Next(0, _skills.Count);
 
+            int secondIndex;
             do secondIndex = Random.Shared.Next(0, _skills.Count);
             while (firstIndex == secondIndex);
 
@@ -106,14 +106,16 @@ public class ControlCentre(Game windowData, InGame game, int zIndex = -1) : Enti
         if (_skills.Count == 0)
             _controller.Add(CreateButton(new PlusBomb(game.Bomb), true));
 
-        _returnButton = new TextButton(_font, _return, _returnMeasurements, _textColour);
-        _returnButton.OnClick = () => {
-            Interacting = false;
+        _returnButton = new TextButton(_font, Return, _returnMeasurements, _textColour)
+        {
+            OnClick = () => {
+                Interacting = false;
 
-            _canPick = false;
-            _picking = false;
+                _canPick = false;
+                _picking = false;
 
-            game.SkipFrame = true;
+                game.SkipFrame = true;
+            }
         };
 
         _controller.Add(_returnButton);
@@ -123,7 +125,7 @@ public class ControlCentre(Game windowData, InGame game, int zIndex = -1) : Enti
     {
         _window = (GameWindow)WindowData;
         _overlay = new Texture2D(_window.GraphicsDevice, 1, 1);
-        _overlay.SetData(new[] { _overlayColour });
+        _overlay.SetData([_overlayColour]);
         _size = new Rectangle(0, 0, (int)_window.GameSize.X, (int)_window.GameSize.Y);
 
         _sprite = WindowData.Content.Load<Texture2D>("Sprites/Objects/CommandCentre");
@@ -142,10 +144,10 @@ public class ControlCentre(Game windowData, InGame game, int zIndex = -1) : Enti
 
         _font = WindowData.Content.Load<SpriteFont>("Sprites/Fonts/File");
 
-        Vector2 noSP = _font.MeasureString(_noSP);
-        _noSPMeasuremets = new Vector2((_window.GameSize.X - noSP.X) / 2, (_window.GameSize.Y - noSP.Y) / 2);
+        Vector2 noSp = _font.MeasureString(NoSp);
+        _noSpMeasurements = new Vector2((_window.GameSize.X - noSp.X) / 2, (_window.GameSize.Y - noSp.Y) / 2);
 
-        Vector2 ret = _font.MeasureString(_return);
+        Vector2 ret = _font.MeasureString(Return);
         _returnMeasurements = new Vector2((_window.GameSize.X - ret.X) / 2, _window.GameSize.Y - ret.Y - 1);
 
         _controller.SetControllerButtons(GBGame.ControllerInventoryUp, GBGame.ControllerInventoryDown, GBGame.ControllerAction);
@@ -211,9 +213,9 @@ public class ControlCentre(Game windowData, InGame game, int zIndex = -1) : Enti
 
             if (SkillPoints == 0)
             {
-                batch.DrawString(_font, _noSP, _noSPMeasuremets, _textColour);
+                batch.DrawString(_font, NoSp, _noSpMeasurements, _textColour);
 
-                batch.DrawString(_font, _return, _returnMeasurements, _activeTextColour); 
+                batch.DrawString(_font, Return, _returnMeasurements, _activeTextColour); 
             }
             else
             {

@@ -23,7 +23,7 @@ public class Pause
 
     private readonly GameWindow _window;
 
-    private readonly ButtonController _controller = new ButtonController(true);
+    private readonly UIController _controller = new UIController(true);
 
     public Pause(GameWindow window)
     {
