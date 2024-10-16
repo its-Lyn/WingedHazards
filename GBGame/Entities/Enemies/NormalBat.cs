@@ -9,7 +9,7 @@ using MonoGayme.Utilities;
 
 namespace GBGame.Entities.Enemies;
 
-public class NormalBat(Game windowData, Vector2 pos, int zIndex = 0) : Entity(windowData, zIndex)
+public class NormalBat(Game windowData, Vector2 pos, int zIndex = 0) : Entity(zIndex)
 {
     private AnimatedSpriteSheet _sprite = null!;
     private bool _flipped;
@@ -31,7 +31,7 @@ public class NormalBat(Game windowData, Vector2 pos, int zIndex = 0) : Entity(wi
 
     public override void LoadContent()
     {
-        Texture2D batSheet = WindowData.Content.Load<Texture2D>("Sprites/Entities/NormalBat");
+        Texture2D batSheet = windowData.Content.Load<Texture2D>("Sprites/Entities/NormalBat");
         _sprite = new AnimatedSpriteSheet(batSheet, new Vector2(3, 1), 0.25f, true);
         Position = pos;
 

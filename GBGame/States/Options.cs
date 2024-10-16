@@ -6,7 +6,7 @@ using MonoGayme.UI;
 
 namespace GBGame.States;
 
-public class Options(GameWindow window) : State(window)
+public class Options(GameWindow window) : State
 {
     private readonly UIController _controller = new UIController(true);
     
@@ -73,7 +73,8 @@ public class Options(GameWindow window) : State(window)
 
     public override void Update(GameTime time)
     {
-        _controller.Update(window.MousePosition);
+        if (!window.Updating)
+            _controller.Update(window.MousePosition);
     }
 
     public override void Draw(GameTime time, SpriteBatch batch)
@@ -82,6 +83,12 @@ public class Options(GameWindow window) : State(window)
         batch.Begin(samplerState: SamplerState.PointClamp);
             _shapes.DrawRectangle(new Rectangle(0, 0, (int)window.GameSize.X, (int)window.GameSize.Y), _overlayColour, batch, 0.6f);
             _controller.Draw(batch);
-        batch.End();
+
+            if (window.Updating)
+            {
+                _shapes.DrawRectangle(new Rectangle(0, 0, (int)window.GameSize.X, (int)window.GameSize.Y), _overlayColour, batch);
+            }
+
+            batch.End();
     }
 }

@@ -10,7 +10,7 @@ using System;
 
 namespace GBGame.Entities.Enemies;
 
-public class ProjectileBat(GameWindow windowData, Vector2 pos, int zIndex = 0) : Entity(windowData, zIndex)
+public class ProjectileBat(GameWindow windowData, Vector2 pos, int zIndex = 0) : Entity(zIndex)
 {
     private Entity? _lockedEntity;
     private bool _locked;
@@ -53,10 +53,10 @@ public class ProjectileBat(GameWindow windowData, Vector2 pos, int zIndex = 0) :
     {
         Position = pos;
 
-        Texture2D walk = WindowData.Content.Load<Texture2D>("Sprites/Entities/ProjectileBat_Walk");
+        Texture2D walk = windowData.Content.Load<Texture2D>("Sprites/Entities/ProjectileBat_Walk");
         _walkSprite = new AnimatedSpriteSheet(walk, new Vector2(3, 1), 0.15f, true);
 
-        Texture2D shoot = WindowData.Content.Load<Texture2D>("Sprites/Entities/ProjectileBat_Shoot");
+        Texture2D shoot = windowData.Content.Load<Texture2D>("Sprites/Entities/ProjectileBat_Shoot");
         _shootSprite = new AnimatedSpriteSheet(shoot, new Vector2(4, 1), 0.1f);
 
         _activeSprite = _walkSprite;
@@ -73,15 +73,13 @@ public class ProjectileBat(GameWindow windowData, Vector2 pos, int zIndex = 0) :
         _collider = Components.GetComponent<RectCollider>("PlayerStriker")!;
         _hitterCollider = Components.GetComponent<RectCollider>("PlayerHitter")!;
 
-        GameWindow window = (GameWindow)WindowData;
-
         _bulletController = Components.GetComponent<EntityController>()!;
         _bulletController.OnEntityUpdate = (_, _, entity) => {
             // Remove bullet if it does offscreen.
-            if (entity.Position.X > window.GameSize.X * 2 + 8 || entity.Position.X < -8)
+            if (entity.Position.X > windowData.GameSize.X * 2 + 8 || entity.Position.X < -8)
                 _bulletController.QueueRemove(entity);
             
-            if (entity.Position.Y > window.GameSize.Y + 8 || entity.Position.Y < -8) 
+            if (entity.Position.Y > windowData.GameSize.Y + 8 || entity.Position.Y < -8) 
                 _bulletController.QueueRemove(entity);
 
             if (!_locked || _lockedEntity is null) return;
@@ -125,7 +123,7 @@ public class ProjectileBat(GameWindow windowData, Vector2 pos, int zIndex = 0) :
                 _activeSprite.Finished = false;
                 
                 if (_lockedEntity is null || !_locked) return;
-                _bulletController.AddEntity(new Bullet(WindowData, Position, _lockedEntity.Position));
+                _bulletController.AddEntity(new Bullet(windowData, Position, _lockedEntity.Position));
             }
         };
 
@@ -140,7 +138,7 @@ public class ProjectileBat(GameWindow windowData, Vector2 pos, int zIndex = 0) :
         _waitTimer.Cycle(time);
         _immunityTimer.Cycle(time);
 
-        _bulletController.UpdateEntities(WindowData.GraphicsDevice, time);
+        _bulletController.UpdateEntities(windowData.GraphicsDevice, time);
 
         switch (_state)
         { 

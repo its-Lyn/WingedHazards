@@ -31,6 +31,7 @@ public class GameWindow : Game
     private bool _isFullScreen;
     
     public OptionData Options { get; private set; }
+    public bool Updating { get; private set; }
 
     public GameWindow()
     {
@@ -56,10 +57,16 @@ public class GameWindow : Game
     }
 
     public void UpdateOptions()
-        => Options = Xml.Deserialise<OptionData>(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "OptionData.xml"));
+    {
+        Options = Xml.Deserialise<OptionData>(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "OptionData.xml"));
+    }
 
     public void UpdateOptions(OptionData newOptions)
-        => Xml.Serialise(newOptions, Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "OptionData.xml"));
+    {
+        Updating = true;
+        Xml.Serialise(newOptions, Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "OptionData.xml"));
+        Updating = false;
+    }
 
     public void ToggleFullScreen()
     {

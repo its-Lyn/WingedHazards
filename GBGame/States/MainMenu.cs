@@ -10,7 +10,7 @@ using MonoGayme.UI;
 
 namespace GBGame.States;
 
-public class MainMenu(GameWindow window) : State(window)
+public class MainMenu(GameWindow window) : State
 {
     private UIController _controller = null!;
     private SpriteFont _font = null!;

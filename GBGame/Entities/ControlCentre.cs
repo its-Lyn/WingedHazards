@@ -12,12 +12,10 @@ using System.Collections.Generic;
 
 namespace GBGame.Entities;
 
-public class ControlCentre(Game windowData, InGame game, int zIndex = -1) : Entity(windowData, zIndex)
+public class ControlCentre(GameWindow windowData, InGame game, int zIndex = -1) : Entity(zIndex)
 {
     private bool _picking;
     private bool _canPick;
-
-    private GameWindow _window = null!;
 
     private Texture2D _sprite = null!;
     private Texture2D _questionSprite = null!;
@@ -52,8 +50,8 @@ public class ControlCentre(Game windowData, InGame game, int zIndex = -1) : Enti
     {
         Vector2 measurements = _font.MeasureString(skill.Name);
         Vector2 position = new Vector2(
-            (_window.GameSize.X - measurements.X) / 2,
-            (_window.GameSize.Y - measurements.Y) / 2
+            (windowData.GameSize.X - measurements.X) / 2,
+            (windowData.GameSize.Y - measurements.Y) / 2
         );
 
         if (first)
@@ -123,13 +121,12 @@ public class ControlCentre(Game windowData, InGame game, int zIndex = -1) : Enti
 
     public override void LoadContent()
     {
-        _window = (GameWindow)WindowData;
-        _overlay = new Texture2D(_window.GraphicsDevice, 1, 1);
+        _overlay = new Texture2D(windowData.GraphicsDevice, 1, 1);
         _overlay.SetData([_overlayColour]);
-        _size = new Rectangle(0, 0, (int)_window.GameSize.X, (int)_window.GameSize.Y);
+        _size = new Rectangle(0, 0, (int)windowData.GameSize.X, (int)windowData.GameSize.Y);
 
-        _sprite = WindowData.Content.Load<Texture2D>("Sprites/Objects/CommandCentre");
-        _questionSprite = WindowData.Content.Load<Texture2D>("Sprites/Objects/CommandCentre_Interact");
+        _sprite = windowData.Content.Load<Texture2D>("Sprites/Objects/CommandCentre");
+        _questionSprite = windowData.Content.Load<Texture2D>("Sprites/Objects/CommandCentre_Interact");
 
         Position = new Vector2(
             0,
@@ -142,13 +139,13 @@ public class ControlCentre(Game windowData, InGame game, int zIndex = -1) : Enti
             (int)Position.X, (int)Position.Y + 8, 16, 8
         );
 
-        _font = WindowData.Content.Load<SpriteFont>("Sprites/Fonts/File");
+        _font = windowData.Content.Load<SpriteFont>("Sprites/Fonts/File");
 
         Vector2 noSp = _font.MeasureString(NoSp);
-        _noSpMeasurements = new Vector2((_window.GameSize.X - noSp.X) / 2, (_window.GameSize.Y - noSp.Y) / 2);
+        _noSpMeasurements = new Vector2((windowData.GameSize.X - noSp.X) / 2, (windowData.GameSize.Y - noSp.Y) / 2);
 
         Vector2 ret = _font.MeasureString(Return);
-        _returnMeasurements = new Vector2((_window.GameSize.X - ret.X) / 2, _window.GameSize.Y - ret.Y - 1);
+        _returnMeasurements = new Vector2((windowData.GameSize.X - ret.X) / 2, windowData.GameSize.Y - ret.Y - 1);
 
         _controller.SetControllerButtons(GBGame.ControllerInventoryUp, GBGame.ControllerInventoryDown, GBGame.ControllerAction);
         _controller.SetKeyboardButtons(GBGame.KeyboardInventoryUp, GBGame.KeyboardInventoryDown, GBGame.KeyboardAction);
@@ -156,7 +153,7 @@ public class ControlCentre(Game windowData, InGame game, int zIndex = -1) : Enti
         Player player = game.Controller.GetFirst<Player>()!; 
         _skills = [
             new DoubleJump(player),
-            new MultiplyXP(_window),
+            new MultiplyXP(windowData),
             new MoreHP(player),
             new BombRadius(game)
         ];
@@ -199,7 +196,7 @@ public class ControlCentre(Game windowData, InGame game, int zIndex = -1) : Enti
             if (_questionOpacity > 0) _questionOpacity -= 0.4f;
         }
 
-        if (_picking && _canPick) _controller.Update(_window.MousePosition);
+        if (_picking && _canPick) _controller.Update(windowData.MousePosition);
     }
   
     public override void Draw(SpriteBatch batch, GameTime time)

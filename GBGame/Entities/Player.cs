@@ -13,7 +13,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace GBGame.Entities;
 
-public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(windowData, zIndex)
+public class Player(GameWindow windowData, Camera2D camera, int zIndex = 1) : Entity( zIndex)
 {
     private AnimatedSpriteSheet _sprite = null!;
     private AnimatedSpriteSheet _walkSprite = null!;
@@ -50,9 +50,8 @@ public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(w
     private int _basePosition = 1;
     
     private Flash _deathFlash = null!;
-    private GameWindow _window = null!;
 
-    public Stopwatch SurvivalWatch = new Stopwatch();
+    public readonly Stopwatch SurvivalWatch = new Stopwatch();
     public bool AllowInput = true;
 
     private void CycleWalk(GameTime time)
@@ -85,7 +84,7 @@ public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(w
         Health.HealthPoints--;
         if (Health.HealthPoints <= 0)
         {
-            _window.GameEnding = true;
+            windowData.GameEnding = true;
             Collider.Enabled = false;
             AllowInput = false; 
             _deathFlash.Begin();
@@ -123,9 +122,9 @@ public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(w
         Position.X = 40;
 
         _origin = new Vector2(4, 8);
-        _walkSprite = new AnimatedSpriteSheet(WindowData.Content.Load<Texture2D>("Sprites/Entities/Player_Walk"), new Vector2(4, 1), 0.2f, false, _origin);
-        _idleSprite = new AnimatedSpriteSheet(WindowData.Content.Load<Texture2D>("Sprites/Entities/Player_Idle"), Vector2.One, 0.2f, false, _origin);
-        _jumpSprite = new AnimatedSpriteSheet(WindowData.Content.Load<Texture2D>("Sprites/Entities/Player_Jump"), Vector2.One, 0.2f, false, _origin);
+        _walkSprite = new AnimatedSpriteSheet(windowData.Content.Load<Texture2D>("Sprites/Entities/Player_Walk"), new Vector2(4, 1), 0.2f, false, _origin);
+        _idleSprite = new AnimatedSpriteSheet(windowData.Content.Load<Texture2D>("Sprites/Entities/Player_Idle"), Vector2.One, 0.2f, false, _origin);
+        _jumpSprite = new AnimatedSpriteSheet(windowData.Content.Load<Texture2D>("Sprites/Entities/Player_Jump"), Vector2.One, 0.2f, false, _origin);
 
         _sprite = _idleSprite;
 
@@ -144,7 +143,7 @@ public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(w
         Components.AddComponent(new Health(3));
         Health = Components.GetComponent<Health>()!;
 
-        _healthSheet = WindowData.Content.Load<Texture2D>("Sprites/UI/Health");
+        _healthSheet = windowData.Content.Load<Texture2D>("Sprites/UI/Health");
         for (int i = 0; i < Health.HealthPoints; i++)
         { 
             SpriteSheet sheet = new SpriteSheet(_healthSheet, new Vector2(1, 2));
@@ -155,12 +154,11 @@ public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(w
             _basePosition += 17;
         }
 
-        _window = (GameWindow)WindowData;
-        Components.AddComponent(new Flash(WindowData, Color.Wheat, new Rectangle(0, 0, (int)_window.GameSize.X, (int)_window.GameSize.Y), 0.05f, "DeathFlash"));
+        Components.AddComponent(new Flash(windowData, Color.Wheat, new Rectangle(0, 0, (int)windowData.GameSize.X, (int)windowData.GameSize.Y), 0.05f, "DeathFlash"));
         _deathFlash = Components.GetComponent<Flash>("DeathFlash")!;
         _deathFlash.OnFlashFinished = () =>
         {
-            _window.GameEnded = true;
+            windowData.GameEnded = true;
         };
         
         SurvivalWatch.Start();
@@ -222,12 +220,12 @@ public class Player(Game windowData, Camera2D camera, int zIndex = 1) : Entity(w
         if (_deathFlash.Flashing)
             _deathFlash.Update(time);
 
-        if (_window.GameEnding) return;
+        if (windowData.GameEnding) return;
         
         Position += Velocity;
         
         // Clamp The player position
-        Position.X = Math.Clamp(Position.X, 4, _window.GameSize.X * 2 - 36);
+        Position.X = Math.Clamp(Position.X, 4, windowData.GameSize.X * 2 - 36);
         
         Position.X = float.Round(Position.X);
 

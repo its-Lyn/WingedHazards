@@ -16,10 +16,8 @@ using MonoGayme.Entities;
 
 namespace GBGame.States;
 
-public sealed class InGame(GameWindow windowData) : State(windowData)
+public sealed class InGame(GameWindow windowData) : State
 {
-    public int ScoreMultiplier = 1;
-
     public bool SkipFrame;
 
     private const int BatSpawnerHeight = -8;
@@ -92,8 +90,8 @@ public sealed class InGame(GameWindow windowData) : State(windowData)
     
     private Flash _fadeIn = null!;
 
-    private int _normalSlain = 0;
-    private int _projectileSlain = 0;
+    private int _normalSlain ;
+    private int _projectileSlain;
 
     private void SetupGround(int tileCountX, int tileCountY)
     {
@@ -191,7 +189,7 @@ public sealed class InGame(GameWindow windowData) : State(windowData)
     {
         if (Random.Shared.Next(0, 3) == 1)
         {
-            ProjectileBat pbat = new ProjectileBat((GameWindow)WindowData, position); 
+            ProjectileBat pbat = new ProjectileBat(windowData, position); 
             pbat.LockOn(_player);
 
             _enemyController.AddEntity(pbat);
@@ -199,7 +197,7 @@ public sealed class InGame(GameWindow windowData) : State(windowData)
             return;
         }
 
-        NormalBat bat = new NormalBat(WindowData, position); 
+        NormalBat bat = new NormalBat(windowData, position); 
         bat.LockOn(_player);
 
         _enemyController.AddEntity(bat);
@@ -211,8 +209,7 @@ public sealed class InGame(GameWindow windowData) : State(windowData)
         XPDropper? dropper = entity.Components.GetComponent<XPDropper>();
         if (dropper is null) return;
 
-        GameWindow window = (GameWindow)WindowData;
-        _player.XP += dropper.XP * window.XPMultiplier;
+        _player.XP += dropper.XP * windowData.XPMultiplier;
         
         if (_player.XP < _toLevelUp) return;
         
@@ -232,35 +229,35 @@ public sealed class InGame(GameWindow windowData) : State(windowData)
 
     public override void LoadContent()
     {
+        windowData.UpdateOptions();
+        
         _toLevelUp = BaseXP;
-        _starSprite = WindowData.Content.Load<Texture2D>("Sprites/UI/LevelStar");
+        _starSprite = windowData.Content.Load<Texture2D>("Sprites/UI/LevelStar");
 
         _strikeCollider.Bounds = new Rectangle();
 
         for (int i = 1; i <= 4; i++) 
-            _ground.Add(WindowData.Content.Load<Texture2D>($"Sprites/Ground/Ground_{i}"));
+            _ground.Add(windowData.Content.Load<Texture2D>($"Sprites/Ground/Ground_{i}"));
         
         for (int i = 1; i <= 2; i++)
-            _grass.Add(WindowData.Content.Load<Texture2D>($"Sprites/Grass/Grass_{i}"));
+            _grass.Add(windowData.Content.Load<Texture2D>($"Sprites/Grass/Grass_{i}"));
 
         for (int i = 1; i <= 3; i++)
-            _bushes.Add(WindowData.Content.Load<Texture2D>($"Sprites/Bushes/Bush_{i}"));
+            _bushes.Add(windowData.Content.Load<Texture2D>($"Sprites/Bushes/Bush_{i}"));
 
-        GameWindow window = (GameWindow)WindowData;
+        _gameWidth = (int)(windowData.GameSize.Y * 2);
 
-        _gameWidth = (int)(window.GameSize.Y * 2);
-
-        int tileCountY = (int)(window.GameSize.Y - TileSize);
+        int tileCountY = (int)(windowData.GameSize.Y - TileSize);
         int tileCountX = _gameWidth / TileSize; 
         SetupGround(tileCountX, tileCountY);
 
         GroundLine = tileCountY - TileSize - TileSize / 2;
 
-        _player = new Player(window, _camera);
+        _player = new Player(windowData, _camera);
         _player.Position.Y = GroundLine;
         Controller.AddEntity(_player);
 
-        _centre = new ControlCentre(window, this);
+        _centre = new ControlCentre(windowData, this);
         _centre.LoadContent();
         _centreCollider = _centre.Components.GetComponent<RectCollider>()!;
 
@@ -268,10 +265,10 @@ public sealed class InGame(GameWindow windowData) : State(windowData)
         _playerJump = _player.Components.GetComponent<Jump>()!;
         _playerDeathFlash = _player.Components.GetComponent<Flash>("DeathFlash")!;
 
-        _island = WindowData.Content.Load<Texture2D>("Sprites/BackGround/Island");
+        _island = windowData.Content.Load<Texture2D>("Sprites/BackGround/Island");
 
-        _slash = new AnimatedSpriteSheet(WindowData.Content.Load<Texture2D>("Sprites/Entities/Player_Slash"), new Vector2(4, 1), 0.1f, false, new Vector2(0, 4));
-        _sheet = new AnimatedSpriteSheet(WindowData.Content.Load<Texture2D>("Sprites/SpriteSheets/Strike"), new Vector2(6, 1), 0.02f)
+        _slash = new AnimatedSpriteSheet(windowData.Content.Load<Texture2D>("Sprites/Entities/Player_Slash"), new Vector2(4, 1), 0.1f, false, new Vector2(0, 4));
+        _sheet = new AnimatedSpriteSheet(windowData.Content.Load<Texture2D>("Sprites/SpriteSheets/Strike"), new Vector2(6, 1), 0.02f)
         {
             OnSheetFinished = () => 
             { 
@@ -279,10 +276,10 @@ public sealed class InGame(GameWindow windowData) : State(windowData)
             }
         };
 
-        _inventory.LoadContent(WindowData);
-        _inventory.AddItem(new Sword(WindowData, _sheet, _slash, _player));
+        _inventory.LoadContent(windowData);
+        _inventory.AddItem(new Sword(windowData, _sheet, _slash, _player));
 
-        Bomb = new Bomb(WindowData, _player);
+        Bomb = new Bomb(windowData, _player);
         _inventory.AddItem(Bomb);
 
         Bomb.Sheet.OnSheetFinished = () => 
@@ -294,7 +291,7 @@ public sealed class InGame(GameWindow windowData) : State(windowData)
             _shakeOffset = Vector2.Zero;
         };
 
-        _pause = new Pause(window);
+        _pause = new Pause(windowData);
 
         _enemyController.OnEntityUpdate = (_, _, entity) => {
             RectCollider? rect = entity.Components.GetComponent<RectCollider>("PlayerStriker");
@@ -399,16 +396,16 @@ public sealed class InGame(GameWindow windowData) : State(windowData)
             _canTry = true;
         };
 
-        _shapes = new Shapes(window.GraphicsDevice);
-        _font = WindowData.Content.Load<SpriteFont>("Sprites/Fonts/File");
+        _shapes = new Shapes(windowData.GraphicsDevice);
+        _font = windowData.Content.Load<SpriteFont>("Sprites/Fonts/File");
 
-        _gamepad = new GamePadVisualiser(window);
+        _gamepad = new GamePadVisualiser(windowData);
 
-        _fadeIn = new Flash(window, Color.Black, new Rectangle(0, 0, (int)window.GameSize.X, (int)window.GameSize.Y), 0.02f, null, true)
+        _fadeIn = new Flash(windowData, Color.Black, new Rectangle(0, 0, (int)windowData.GameSize.X, (int)windowData.GameSize.Y), 0.02f, null, true)
         {
             OnFlashFinished = () =>
             {
-                window.Context.SwitchState(new GameFinish(window, _normalSlain, _projectileSlain, _player.Level, _player.SurvivalWatch));
+                windowData.Context.SwitchState(new GameFinish(windowData, _normalSlain, _projectileSlain, _player.Level, _player.SurvivalWatch));
             }
         };
     }
@@ -423,12 +420,11 @@ public sealed class InGame(GameWindow windowData) : State(windowData)
 
         _gamepad.Update(time);
         
-        GameWindow window = (GameWindow)WindowData;
-        if (window.GameEnding)
+        if (windowData.GameEnding)
         {
             _player.Update(time);
 
-            if (window.GameEnded && !_fadeIn.Flashing) _fadeIn.Begin();
+            if (windowData.GameEnded && !_fadeIn.Flashing) _fadeIn.Begin();
             if (_fadeIn.Flashing) _fadeIn.Update(time);
             
             return;
@@ -449,8 +445,8 @@ public sealed class InGame(GameWindow windowData) : State(windowData)
         if (_centre.Interacting) return;
 
         // Update controllers.
-        Controller.UpdateEntities(WindowData.GraphicsDevice, time);
-        _enemyController.UpdateEntities(WindowData.GraphicsDevice, time);
+        Controller.UpdateEntities(windowData.GraphicsDevice, time);
+        _enemyController.UpdateEntities(windowData.GraphicsDevice, time);
         
         // Hardcoded ground checking (we don't need anything more complicated.)
         if (_player.Position.Y > GroundLine - 4) 
@@ -477,7 +473,7 @@ public sealed class InGame(GameWindow windowData) : State(windowData)
         }
 
         // Keep the camera position between the game sizes, so the _player doesn't see outside the map.
-        _camera.X = Math.Clamp(MathF.Floor(_player.Position.X - CameraOffset + _shakeOffset.X), 0, _gameWidth - window.GameSize.X);
+        _camera.X = Math.Clamp(MathF.Floor(_player.Position.X - CameraOffset + _shakeOffset.X), 0, _gameWidth - windowData.GameSize.X);
         _camera.Y = _shakeOffset.Y; 
 
         if (!SkipFrame)
@@ -495,7 +491,7 @@ public sealed class InGame(GameWindow windowData) : State(windowData)
    
     public override void Draw(GameTime time, SpriteBatch batch)
     {
-        WindowData.GraphicsDevice.Clear(_backDrop);
+        windowData.GraphicsDevice.Clear(_backDrop);
 
         batch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: _camera.Transform);
         { 

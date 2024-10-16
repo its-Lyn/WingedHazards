@@ -6,7 +6,7 @@ using MonoGayme.Utilities;
 
 namespace GBGame.Entities;
 
-public class Bullet(Game windowData, Vector2 pos, Vector2 target, int zIndex = 0) : Entity(windowData, zIndex)
+public class Bullet(GameWindow windowData, Vector2 pos, Vector2 target, int zIndex = 0) : Entity(zIndex)
 {
     private Texture2D _sprite = null!;
 
@@ -17,7 +17,7 @@ public class Bullet(Game windowData, Vector2 pos, Vector2 target, int zIndex = 0
 
     public override void LoadContent()
     {
-        _sprite = WindowData.Content.Load<Texture2D>("Sprites/Objects/Bullet");
+        _sprite = windowData.Content.Load<Texture2D>("Sprites/Objects/Bullet");
         Position = pos;
 
         _direction = Vector2.Normalize(target - Position);

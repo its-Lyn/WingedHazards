@@ -11,7 +11,7 @@ using MonoGayme.Utilities;
 
 namespace GBGame.States;
 
-public sealed class GameFinish(GameWindow window, int normal, int projectile, int level, Stopwatch watch) : State(window)
+public sealed class GameFinish(GameWindow window, int normal, int projectile, int level, Stopwatch watch) : State
 {
     private Texture2D _book = null!;
     private Vector2 _bookPosition;
@@ -41,17 +41,17 @@ public sealed class GameFinish(GameWindow window, int normal, int projectile, in
     public override void LoadContent()
     {
         _bookPosition = new Vector2(0, -window.GameSize.Y - 10);
-        _book = WindowData.Content.Load<Texture2D>("Sprites/Objects/EndBook");
+        _book = window.Content.Load<Texture2D>("Sprites/Objects/EndBook");
         
-        _font = WindowData.Content.Load<SpriteFont>("Sprites/Fonts/File");
+        _font = window.Content.Load<SpriteFont>("Sprites/Fonts/File");
         
-        _normal = new SpriteSheet(WindowData.Content.Load<Texture2D>("Sprites/Entities/NormalBat"), new Vector2(3, 1));
-        _projectile = new SpriteSheet(WindowData.Content.Load<Texture2D>("Sprites/Entities/ProjectileBat_Walk"), new Vector2(3, 1));
+        _normal = new SpriteSheet(window.Content.Load<Texture2D>("Sprites/Entities/NormalBat"), new Vector2(3, 1));
+        _projectile = new SpriteSheet(window.Content.Load<Texture2D>("Sprites/Entities/ProjectileBat_Walk"), new Vector2(3, 1));
 
-        _star = WindowData.Content.Load<Texture2D>("Sprites/UI/LevelStar");
-        _portrait = WindowData.Content.Load<Texture2D>("Sprites/UI/Player_Portrait");
-        _skull = WindowData.Content.Load<Texture2D>("Sprites/UI/Skull");
-        _watch = WindowData.Content.Load<Texture2D>("Sprites/UI/Watch");
+        _star = window.Content.Load<Texture2D>("Sprites/UI/LevelStar");
+        _portrait = window.Content.Load<Texture2D>("Sprites/UI/Player_Portrait");
+        _skull = window.Content.Load<Texture2D>("Sprites/UI/Skull");
+        _watch = window.Content.Load<Texture2D>("Sprites/UI/Watch");
 
         _controller = new UIController(true);
         _controller.SetKeyboardButtons(GBGame.KeyboardLeft, GBGame.KeyboardRight, GBGame.KeyboardAction);
@@ -130,7 +130,7 @@ public sealed class GameFinish(GameWindow window, int normal, int projectile, in
 
     public override void Draw(GameTime time, SpriteBatch batch)
     {
-        WindowData.GraphicsDevice.Clear(Color.Black);
+        window.GraphicsDevice.Clear(Color.Black);
         
         batch.Begin();
         {
