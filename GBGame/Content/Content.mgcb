@@ -342,6 +342,30 @@
 /processorParam:TextureFormat=Color
 /build:Sprites/UI/Bomb.png
 
+#begin Sprites/UI/CheckBox_Checked.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Sprites/UI/CheckBox_Checked.png
+
+#begin Sprites/UI/CheckBox_Normal.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Sprites/UI/CheckBox_Normal.png
+
 #begin Sprites/UI/Health.png
 /importer:TextureImporter
 /processor:TextureProcessor

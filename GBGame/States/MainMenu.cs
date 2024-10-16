@@ -1,4 +1,5 @@
 using System;
+using System.Security.Principal;
 using GBGame.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -52,7 +53,7 @@ public class MainMenu(GameWindow window) : State(window)
         {
             OnClick = () =>
             {
-                window.Context.SwitchState(new InGame(window));
+                window.Context.SwitchState(new Options(window));
             }
         };
         

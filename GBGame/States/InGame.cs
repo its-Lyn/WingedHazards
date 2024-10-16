@@ -146,6 +146,8 @@ public sealed class InGame(GameWindow windowData) : State(windowData)
 
     private void ShakeCamera(GameTime time)
     {
+        if (!windowData.Options.AllowScreenShake) return;
+        
         if (!_shaking) return;
         _intensity -= (float)time.ElapsedGameTime.TotalSeconds / ShakeDuration;
         if (_intensity <= 0) 
@@ -164,7 +166,9 @@ public sealed class InGame(GameWindow windowData) : State(windowData)
     }
     
     private void StartShake(float intensity, float magnitude)
-    { 
+    {
+        if (!windowData.Options.AllowScreenShake) return;
+        
         _shaking = true;
 
         _shakeMagnitude = magnitude;

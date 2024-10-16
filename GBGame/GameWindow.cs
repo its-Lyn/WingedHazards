@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using GBGame.States;
 using Microsoft.Xna.Framework;
@@ -27,6 +29,8 @@ public class GameWindow : Game
 
     private Vector2 _sizeBeforeResize;
     private bool _isFullScreen;
+    
+    public OptionData Options { get; private set; }
 
     public GameWindow()
     {
@@ -43,7 +47,62 @@ public class GameWindow : Game
         Window.AllowUserResizing = true;
 
         Context = new StateContext();
+        
+        UpdateOptions();
+        if ((bool)Options?.FullScreen)
+        {
+            ToggleFullScreen();
+        }
     }
+
+    public void UpdateOptions()
+        => Options = Xml.Deserialise<OptionData>(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "OptionData.xml"));
+
+    public void UpdateOptions(OptionData newOptions)
+        => Xml.Serialise(newOptions, Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "OptionData.xml"));
+
+    public void ToggleFullScreen()
+    {
+        if (_isFullScreen)
+        {
+            _graphics.SetWindowSize(_sizeBeforeResize);
+        }
+        else
+        {
+            _sizeBeforeResize = new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
+
+            _graphics.SetWindowSize(
+                GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width,
+                GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height
+            );
+        }
+
+        _isFullScreen = !_isFullScreen;
+        _graphics.ToggleFullScreen();
+    }
+
+    public void ToggleFullScreen(bool fs)
+    {
+        
+        if (fs)
+        {
+            _graphics.SetWindowSize(_sizeBeforeResize);
+        }
+        else
+        {
+            _sizeBeforeResize = new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
+
+            _graphics.SetWindowSize(
+                GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width,
+                GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height
+            );
+        }
+
+        _isFullScreen = !_isFullScreen;
+        _graphics.ToggleFullScreen();
+    }
+
+    public bool IsFullScreen() => _isFullScreen;
 
     protected override void Initialize()
     {
@@ -61,24 +120,7 @@ public class GameWindow : Game
     protected override void Update(GameTime gameTime)
     {
         if (InputManager.IsKeyPressed(Keys.F))
-        {
-            if (_isFullScreen)
-            {
-                _graphics.SetWindowSize(_sizeBeforeResize);
-            }
-            else
-            {
-                _sizeBeforeResize = new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
-
-                _graphics.SetWindowSize(
-                    GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width,
-                    GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height
-                );
-            }
-
-            _isFullScreen = !_isFullScreen;
-            _graphics.ToggleFullScreen();
-        }
+            ToggleFullScreen();
 
         MousePosition = _renderer.GetVirtualMousePosition();
         Context.Update(gameTime);
