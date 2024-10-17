@@ -1,6 +1,7 @@
 using System;
 using GBGame.States;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGayme.Components;
 using MonoGayme.Controllers;
@@ -70,8 +71,10 @@ public class Pause
             btn.Colour = _textColour;
         };
 
+        SoundEffect click = window.Content.Load<SoundEffect>("Sounds/Click");
         _controller.OnActiveUpdated = btn => {
             btn.Colour = _overlayColour;
+            window.PlayEffect(click);
         };
 
         _controller.Add(resume);

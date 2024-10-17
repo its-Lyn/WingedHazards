@@ -1,7 +1,7 @@
 using System;
-using System.Security.Principal;
 using GBGame.Components;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGayme.Components;
 using MonoGayme.Controllers;
@@ -27,6 +27,8 @@ public class MainMenu(GameWindow window) : State
     
     public override void LoadContent()
     {
+        SoundEffect click = window.Content.Load<SoundEffect>("Sounds/Click");
+        
         _font = window.Content.Load<SpriteFont>("Sprites/Fonts/File");
         _controller = new UIController(true)
         {
@@ -38,6 +40,7 @@ public class MainMenu(GameWindow window) : State
             OnActiveUpdated = btn =>
             {
                 btn.Colour = _overlayColour;
+                window.PlayEffect(click);
             }
         };
         

@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
-using System.Threading;
 using GBGame.States;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGayme.Extensions;
@@ -110,6 +109,12 @@ public class GameWindow : Game
     }
 
     public bool IsFullScreen() => _isFullScreen;
+
+    public void PlayEffect(SoundEffect effect)
+    {
+        if (Options.MuteAudio) return;
+        effect.Play();
+    }
 
     protected override void Initialize()
     {

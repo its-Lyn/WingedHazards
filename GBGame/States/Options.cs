@@ -1,4 +1,5 @@
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGayme.Controllers;
 using MonoGayme.States;
@@ -25,8 +26,14 @@ public class Options(GameWindow window) : State
         _shapes = new Shapes(window.GraphicsDevice);
         
         _controller.OnActiveUpdating = btn => btn.Colour = _textColour;
-        _controller.OnActiveUpdated = btn => btn.Colour = _overlayColour;
         
+        SoundEffect click = window.Content.Load<SoundEffect>("Sounds/Click");
+        _controller.OnActiveUpdated = btn =>
+        {
+            btn.Colour = _overlayColour;
+            window.PlayEffect(click);
+        };
+
         _controller.SetKeyboardButtons(GBGame.KeyboardInventoryUp, GBGame.KeyboardInventoryDown, GBGame.KeyboardAction);
         _controller.SetControllerButtons(GBGame.ControllerLeft, GBGame.ControllerRight, GBGame.ControllerAction);
 
@@ -61,8 +68,19 @@ public class Options(GameWindow window) : State
 
         CheckBox mute = new CheckBox(normal, check, _font, "mute sounds", new Vector2(1, 60), new Vector2(10, -1), _textColour, window.Options.MuteAudio)
         {
-            OnCheckChanged =  checks =>
-                window.UpdateOptions(new OptionData { AllowScreenShake = window.Options.AllowScreenShake, MuteAudio = checks, FullScreen = window.IsFullScreen()})
+            OnCheckChanged = checks =>
+            {
+                window.UpdateOptions(
+                    new OptionData
+                    {
+                        AllowScreenShake = window.Options.AllowScreenShake, 
+                        MuteAudio = checks, 
+                        FullScreen = window.IsFullScreen()
+                    }
+                );
+                
+                window.UpdateOptions();
+            }
         };
 
         _controller.Add(fs);

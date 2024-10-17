@@ -10,6 +10,8 @@ using GBGame.Items;
 using MonoGayme.Utilities;
 using Microsoft.Xna.Framework.Input;
 using GBGame.Entities.Enemies;
+using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Media;
 using MonoGayme.Controllers;
 using MonoGayme.Components.Colliders;
 using MonoGayme.Entities;
@@ -90,8 +92,10 @@ public sealed class InGame(GameWindow windowData) : State
     
     private Flash _fadeIn = null!;
 
-    private int _normalSlain ;
+    private int _normalSlain;
     private int _projectileSlain;
+
+    private SoundEffect _swing = null!;
 
     private void SetupGround(int tileCountX, int tileCountY)
     {
@@ -181,8 +185,12 @@ public sealed class InGame(GameWindow windowData) : State
         if (InputManager.IsKeyPressed(GBGame.KeyboardInventoryDown) || InputManager.IsGamePadPressed(GBGame.ControllerInventoryDown))
             _inventory.ActiveItemIndex++;
 
-        if (InputManager.IsKeyPressed(GBGame.KeyboardAction) || InputManager.IsGamePadPressed(GBGame.ControllerAction))
-            _inventory.UseActive();
+        if (!InputManager.IsKeyPressed(GBGame.KeyboardAction) && !InputManager.IsGamePadPressed(GBGame.ControllerAction)) return;
+        Sword? sword = _inventory.GetActive<Sword>();
+        if (sword is not null && _sheet.Finished)
+            windowData.PlayEffect(_swing);
+            
+        _inventory.UseActive();
     }
 
     private void AddBat(Vector2 position)
@@ -282,6 +290,7 @@ public sealed class InGame(GameWindow windowData) : State
         Bomb = new Bomb(windowData, _player);
         _inventory.AddItem(Bomb);
 
+        SoundEffect bomb = windowData.Content.Load<SoundEffect>("Sounds/Bomb");
         Bomb.Sheet.OnSheetFinished = () => 
         { 
             Bomb.CanPlace = true;
@@ -289,10 +298,16 @@ public sealed class InGame(GameWindow windowData) : State
 
             StartShake(1, 3);
             _shakeOffset = Vector2.Zero;
+            
+            bomb.Play();
         };
 
         _pause = new Pause(windowData);
 
+        SoundEffect batHurt = windowData.Content.Load<SoundEffect>("Sounds/Bat_Hurt");
+        SoundEffect batHit = windowData.Content.Load<SoundEffect>("Sounds/Bat_Hit");
+        
+        SoundEffect playerHit = windowData.Content.Load<SoundEffect>("Sounds/Player_Hit");
         _enemyController.OnEntityUpdate = (_, _, entity) => {
             RectCollider? rect = entity.Components.GetComponent<RectCollider>("PlayerStriker");
             if (rect is null) return;
@@ -304,6 +319,8 @@ public sealed class InGame(GameWindow windowData) : State
                 {
                     _player.ApplyKnockBack(playerHitter);
                     StartShake(1, 2);
+
+                    windowData.PlayEffect(playerHit);
                 }
             }
 
@@ -327,9 +344,13 @@ public sealed class InGame(GameWindow windowData) : State
 
                 Health? health = entity.Components.GetComponent<Health>();
                 if (health is null) return;
-
+                
                 health.HealthPoints--;
-                if (health.HealthPoints > 0) return;
+                if (health.HealthPoints > 0)
+                {
+                    windowData.PlayEffect(batHit);
+                    return;
+                }
 
                 switch (entity)
                 {
@@ -344,6 +365,8 @@ public sealed class InGame(GameWindow windowData) : State
                 CalculateXP(entity);
                 _enemyController.QueueRemove(entity);
 
+                windowData.PlayEffect(batHurt);
+                
                 return;
             }
 
@@ -369,7 +392,7 @@ public sealed class InGame(GameWindow windowData) : State
                 _canSpawn = true;
 
             int minPosition = (int)(_player.Position.X - BatSpawnerWidth);
-            int width = minPosition + (BatSpawnerWidth * 2);
+            int width = minPosition + BatSpawnerWidth * 2;
             Vector2 batPosition = new Vector2(Random.Shared.Next(minPosition, width), BatSpawnerHeight);
 
             AddBat(batPosition);
@@ -408,6 +431,8 @@ public sealed class InGame(GameWindow windowData) : State
                 windowData.Context.SwitchState(new GameFinish(windowData, _normalSlain, _projectileSlain, _player.Level, _player.SurvivalWatch));
             }
         };
+
+        _swing = windowData.Content.Load<SoundEffect>("Sounds/Swing");
     }
 
     public override void Update(GameTime time)
