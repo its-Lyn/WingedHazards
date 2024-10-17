@@ -19,7 +19,6 @@ public class Sword(Game windowData, AnimatedSpriteSheet sheet, AnimatedSpriteShe
     {
         if (!sheet.Finished) return;
         
-        Console.WriteLine("Using sword.");
         sheet.Finished = false;
         if (!slash.Finished)
             slash.Reset();

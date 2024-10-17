@@ -48,10 +48,7 @@ public class Bomb(Game windowData, Player player) : Item(windowData)
     public override void Use()
     {
         if (_bombCount - 1 < 0 || !CanPlace) 
-        {
-            Console.WriteLine("Cannot use Bomb!");
             return;
-        }
 
         _bombCount--;
         Description = _bombCount == 1 ? "1 bomb left." : $"{(_bombCount == 0 ? "No" : _bombCount)} bombs left."; 
@@ -60,8 +57,6 @@ public class Bomb(Game windowData, Player player) : Item(windowData)
         Sheet.Finished = false;
         _pos = Vector2.Floor(player.Position / 8) * 8;
         KillRadius = new Rectangle((int)_pos.X - RadiusData.X, (int)_pos.Y - RadiusData.Y, RadiusData.Width, RadiusData.Height);
-        
-        Console.WriteLine("Used Bomb.");
     }
 
     public void Draw(SpriteBatch batch)
