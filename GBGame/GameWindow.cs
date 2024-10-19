@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using GBGame.Models;
 using GBGame.States;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
@@ -31,6 +32,8 @@ public class GameWindow : Game
     
     public OptionData Options { get; private set; }
     public bool Updating { get; private set; }
+
+    public string Version { get; } = "0.9.1-dev";
 
     public GameWindow()
     {

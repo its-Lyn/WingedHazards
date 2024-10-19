@@ -1,3 +1,4 @@
+using GBGame.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
@@ -40,13 +41,17 @@ public class Options(GameWindow window) : State
         _font = window.Content.Load<SpriteFont>("Sprites/Fonts/File");
         TextButton ret = new TextButton(_font, "return", new Vector2((window.GameSize.X - _font.MeasureString("return").X) / 2, window.GameSize.Y - 12), _textColour)
         {
-            OnClick = () => 
-                window.Context.SwitchState(new MainMenu(window))
+            OnClick = () =>
+            {
+                window.UpdateOptions();
+                window.Context.SwitchState(new MainMenu(window));
+            }
         };
         
         _controller.AddIgnored(new Label("options", _overlayColour, _font, new Vector2((window.GameSize.X - _font.MeasureString("Options").X) / 2, 5)));
         _controller.AddIgnored(new Label("graphics", _overlayColour, _font, new Vector2(5, 20)));
         _controller.AddIgnored(new Label("audio", _overlayColour, _font, new Vector2(5, 50)));
+        _controller.AddIgnored(new Label("misc", _overlayColour, _font, new Vector2(5, 70)));
         
         Texture2D normal = window.Content.Load<Texture2D>("Sprites/UI/CheckBox_Normal");
         Texture2D check = window.Content.Load<Texture2D>("Sprites/UI/CheckBox_Checked");
@@ -56,14 +61,14 @@ public class Options(GameWindow window) : State
             OnCheckChanged = checks =>
             {
                 window.ToggleFullScreen(!checks);
-                window.UpdateOptions(new OptionData { AllowScreenShake = window.Options.AllowScreenShake, MuteAudio = window.Options.MuteAudio, FullScreen = window.IsFullScreen()});
+                window.UpdateOptions(new OptionData { AllowScreenShake = window.Options.AllowScreenShake, MuteAudio = window.Options.MuteAudio, FullScreen = window.IsFullScreen(), ShowVersion = window.Options.ShowVersion});
             }
         };
 
         CheckBox allowShake = new CheckBox(normal, check, _font, "allow screenshake", new Vector2(1, 40), new Vector2(10, -1), _textColour, window.Options.AllowScreenShake)
         {
             OnCheckChanged = checks => 
-                window.UpdateOptions(new OptionData { AllowScreenShake = checks, MuteAudio = window.Options.MuteAudio, FullScreen = window.IsFullScreen()})
+                window.UpdateOptions(new OptionData { AllowScreenShake = checks, MuteAudio = window.Options.MuteAudio, FullScreen = window.IsFullScreen(), ShowVersion = window.Options.ShowVersion})
         };
 
         CheckBox mute = new CheckBox(normal, check, _font, "mute sounds", new Vector2(1, 60), new Vector2(10, -1), _textColour, window.Options.MuteAudio)
@@ -75,7 +80,8 @@ public class Options(GameWindow window) : State
                     {
                         AllowScreenShake = window.Options.AllowScreenShake, 
                         MuteAudio = checks, 
-                        FullScreen = window.IsFullScreen()
+                        FullScreen = window.IsFullScreen(),
+                        ShowVersion = window.Options.ShowVersion
                     }
                 );
                 
@@ -83,9 +89,16 @@ public class Options(GameWindow window) : State
             }
         };
 
+        CheckBox ver = new CheckBox(normal, check, _font, "show build num.", new Vector2(1, 80), new Vector2(10, -1), _textColour, window.Options.ShowVersion)
+        {
+            OnCheckChanged = checks =>
+                window.UpdateOptions(new OptionData { AllowScreenShake = window.Options.AllowScreenShake, MuteAudio = window.Options.MuteAudio, FullScreen = window.IsFullScreen(), ShowVersion = checks })
+        };
+
         _controller.Add(fs);
         _controller.Add(allowShake);
         _controller.Add(mute);
+        _controller.Add(ver);
         _controller.Add(ret);
     }
 

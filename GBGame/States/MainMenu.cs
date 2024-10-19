@@ -72,6 +72,12 @@ public class MainMenu(GameWindow window) : State
         _controller.Add(options);
         _controller.Add(quit);
 
+        if (window.Options.ShowVersion)
+        {
+            Vector2 measurements = _font.MeasureString($"v{window.Version}");  
+            _controller.AddIgnored(new Label($"v{window.Version}", _textColour, _font, new Vector2(window.GameSize.X - measurements.X, window.GameSize.Y - measurements.Y)));
+        }
+        
         _measurement = _font.MeasureString("Winged Hazards").X;
         _logoPos = new Vector2( 
             (window.GameSize.X - _measurement) / 2,

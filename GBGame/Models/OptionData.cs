@@ -1,6 +1,6 @@
 using System.Xml.Serialization;
 
-namespace GBGame;
+namespace GBGame.Models;
 
 public class OptionData
 {
@@ -12,4 +12,7 @@ public class OptionData
     
     [XmlElement("MuteAudio")]
     public bool MuteAudio { get; set; }
+    
+    [XmlElement("ShowVersion")]
+    public bool ShowVersion { get; set; }
 }

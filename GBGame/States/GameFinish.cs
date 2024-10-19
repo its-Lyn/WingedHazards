@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using GBGame.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGayme.Components;

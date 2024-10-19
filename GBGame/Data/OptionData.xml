@@ -3,4 +3,5 @@
     <FullScreen>false</FullScreen>
     <AllowScreenShake>true</AllowScreenShake>
     <MuteAudio>false</MuteAudio>
+    <ShowVersion>true</ShowVersion>
 </OptionData>
