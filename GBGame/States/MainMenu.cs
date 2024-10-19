@@ -3,6 +3,7 @@ using GBGame.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using MonoGayme.Components;
 using MonoGayme.Controllers;
 using MonoGayme.States;

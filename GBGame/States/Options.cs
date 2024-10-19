@@ -1,3 +1,4 @@
+using System;
 using GBGame.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
@@ -61,14 +62,14 @@ public class Options(GameWindow window) : State
             OnCheckChanged = checks =>
             {
                 window.ToggleFullScreen(!checks);
-                window.UpdateOptions(new OptionData { AllowScreenShake = window.Options.AllowScreenShake, MuteAudio = window.Options.MuteAudio, FullScreen = window.IsFullScreen(), ShowVersion = window.Options.ShowVersion});
+                window.UpdateOptions(new OptionData { AllowScreenShake = window.Options.AllowScreenShake, MuteAudio = window.Options.MuteAudio, FullScreen = window.IsFullScreen(), ShowVersion = window.Options.ShowVersion, Keyboard = window.Options.Keyboard, GamePad = window.Options.GamePad });
             }
         };
 
         CheckBox allowShake = new CheckBox(normal, check, _font, "allow screenshake", new Vector2(1, 40), new Vector2(10, -1), _textColour, window.Options.AllowScreenShake)
         {
             OnCheckChanged = checks => 
-                window.UpdateOptions(new OptionData { AllowScreenShake = checks, MuteAudio = window.Options.MuteAudio, FullScreen = window.IsFullScreen(), ShowVersion = window.Options.ShowVersion})
+                window.UpdateOptions(new OptionData { AllowScreenShake = checks, MuteAudio = window.Options.MuteAudio, FullScreen = window.IsFullScreen(), ShowVersion = window.Options.ShowVersion, Keyboard = window.Options.Keyboard, GamePad = window.Options.GamePad})
         };
 
         CheckBox mute = new CheckBox(normal, check, _font, "mute sounds", new Vector2(1, 60), new Vector2(10, -1), _textColour, window.Options.MuteAudio)
@@ -81,7 +82,9 @@ public class Options(GameWindow window) : State
                         AllowScreenShake = window.Options.AllowScreenShake, 
                         MuteAudio = checks, 
                         FullScreen = window.IsFullScreen(),
-                        ShowVersion = window.Options.ShowVersion
+                        ShowVersion = window.Options.ShowVersion, 
+                        Keyboard = window.Options.Keyboard, 
+                        GamePad = window.Options.GamePad
                     }
                 );
                 
@@ -92,13 +95,35 @@ public class Options(GameWindow window) : State
         CheckBox ver = new CheckBox(normal, check, _font, "show build num.", new Vector2(1, 80), new Vector2(10, -1), _textColour, window.Options.ShowVersion)
         {
             OnCheckChanged = checks =>
-                window.UpdateOptions(new OptionData { AllowScreenShake = window.Options.AllowScreenShake, MuteAudio = window.Options.MuteAudio, FullScreen = window.IsFullScreen(), ShowVersion = checks })
+                window.UpdateOptions(new OptionData { AllowScreenShake = window.Options.AllowScreenShake, MuteAudio = window.Options.MuteAudio, FullScreen = window.IsFullScreen(), ShowVersion = checks, Keyboard = window.Options.Keyboard, GamePad = window.Options.GamePad })
         };
+        
+        _controller.AddIgnored(new Label("controls", _overlayColour, _font, new Vector2(5, 90)));
 
+        TextButton kb = new TextButton(_font, "Set Keyboard Binds", new Vector2(1, 100), _textColour, true)
+        {
+            OnClick = () =>
+            {
+                window.UpdateOptions();
+                Console.WriteLine("One Day");
+            }
+        };
+        
+        TextButton gp = new TextButton(_font, "Set GamePad Binds", new Vector2(1, 110), _textColour, true)
+        {
+            OnClick = () =>
+            {
+                window.UpdateOptions();
+                Console.WriteLine("One Day");
+            }
+        };
+        
         _controller.Add(fs);
         _controller.Add(allowShake);
         _controller.Add(mute);
         _controller.Add(ver);
+        _controller.Add(kb);
+        _controller.Add(gp);
         _controller.Add(ret);
     }
 
