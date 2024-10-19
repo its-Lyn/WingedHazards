@@ -20,14 +20,14 @@ Your name is River, a young scientist who has been tasked with seeing why the lo
 | Shift | Action / UI Accept                    |
 
 ### Controller
-| Key (PS4, XBox, Switch) | Description                           |
-|-------------------------|---------------------------------------|
-| DPad Up                 | Cycle inventory / Move up in the UI   |
-| DPad Down               | Cycle inventory / Move down in the UI |
-| DPad Left               | Move Left / Move left in the UI       |
-| DPad Right              | Move Right / Move right in the UI     |
-| Circle / B / A          | Jump                                  |
-| X / A / B               | Action / UI Accept                    |
+| Button (PS4, XBox, Switch) | Description                           |
+|----------------------------|---------------------------------------|
+| DPad Up                    | Cycle inventory / Move up in the UI   |
+| DPad Down                  | Cycle inventory / Move down in the UI |
+| DPad Left                  | Move Left / Move left in the UI       |
+| DPad Right                 | Move Right / Move right in the UI     |
+| Circle / B / A             | Jump                                  |
+| X / A / B                  | Action / UI Accept                    |
 
 ## Installation
 Instructions on installing the game.
