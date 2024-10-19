@@ -1,4 +1,10 @@
+# Dotnet and monogame data
 **/bin
 **/obj
+
+# IDE Data
 **/.vs
 **/.idea
+
+# Ignore release data
+Release/Releases

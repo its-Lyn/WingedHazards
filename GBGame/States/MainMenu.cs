@@ -45,7 +45,7 @@ public class MainMenu(GameWindow window) : State
         };
         
         _controller.SetKeyboardButtons(GBGame.KeyboardInventoryUp, GBGame.KeyboardInventoryDown, GBGame.KeyboardAction);
-        _controller.SetControllerButtons(GBGame.ControllerLeft, GBGame.ControllerRight, GBGame.ControllerAction);
+        _controller.SetControllerButtons(GBGame.ControllerInventoryUp, GBGame.ControllerInventoryDown, GBGame.ControllerAction);
 
         TextButton quit = new TextButton(_font, "quit", new Vector2((window.GameSize.X - _font.MeasureString("quit").X) / 2, window.GameSize.Y - 30), _textColour)
         {

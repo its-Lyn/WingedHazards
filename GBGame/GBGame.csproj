@@ -9,7 +9,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <ApplicationIcon>Content/Icons/Icon.ico</ApplicationIcon>
+    <ApplicationIcon>Content/Icons/Icon-500x.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="Data/**">
@@ -17,11 +17,11 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Content/Icons/Icon.ico">
-      <LogicalName>Icon.ico</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Content/Icons/Icon.bmp">
+    <EmbeddedResource Include="Content/Icons/Icon-500x.bmp">
       <LogicalName>Icon.bmp</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Content/Icons/Icon-500x.ico">
+      <LogicalName>Icon.ico</LogicalName>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

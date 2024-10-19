@@ -35,7 +35,7 @@ public class Options(GameWindow window) : State
         };
 
         _controller.SetKeyboardButtons(GBGame.KeyboardInventoryUp, GBGame.KeyboardInventoryDown, GBGame.KeyboardAction);
-        _controller.SetControllerButtons(GBGame.ControllerLeft, GBGame.ControllerRight, GBGame.ControllerAction);
+        _controller.SetControllerButtons(GBGame.ControllerInventoryUp, GBGame.ControllerInventoryDown, GBGame.ControllerAction);
 
         _font = window.Content.Load<SpriteFont>("Sprites/Fonts/File");
         TextButton ret = new TextButton(_font, "return", new Vector2((window.GameSize.X - _font.MeasureString("return").X) / 2, window.GameSize.Y - 12), _textColour)

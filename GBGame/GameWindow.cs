@@ -89,7 +89,6 @@ public class GameWindow : Game
 
     public void ToggleFullScreen(bool fs)
     {
-        
         if (fs)
         {
             _graphics.SetWindowSize(_sizeBeforeResize);
@@ -131,9 +130,6 @@ public class GameWindow : Game
 
     protected override void Update(GameTime gameTime)
     {
-        if (InputManager.IsKeyPressed(Keys.F))
-            ToggleFullScreen();
-
         MousePosition = _renderer.GetVirtualMousePosition();
         Context.Update(gameTime);
 
