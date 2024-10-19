@@ -47,12 +47,12 @@ public class MainMenu(GameWindow window) : State
         _controller.SetKeyboardButtons(GBGame.KeyboardInventoryUp, GBGame.KeyboardInventoryDown, GBGame.KeyboardAction);
         _controller.SetControllerButtons(GBGame.ControllerInventoryUp, GBGame.ControllerInventoryDown, GBGame.ControllerAction);
 
-        TextButton quit = new TextButton(_font, "quit", new Vector2((window.GameSize.X - _font.MeasureString("quit").X) / 2, window.GameSize.Y - 30), _textColour)
+        TextButton quit = new TextButton(_font, "quit", new Vector2((window.GameSize.X - _font.MeasureString("quit").X) / 2, window.GameSize.Y - 30), _textColour, true)
         {
             OnClick = window.Exit
         };
 
-        TextButton options = new TextButton(_font, "options", new Vector2((window.GameSize.X - _font.MeasureString("options").X) / 2, window.GameSize.Y - 40), _textColour)
+        TextButton options = new TextButton(_font, "options", new Vector2((window.GameSize.X - _font.MeasureString("options").X) / 2, window.GameSize.Y - 40), _textColour, true)
         {
             OnClick = () =>
             {
@@ -60,7 +60,7 @@ public class MainMenu(GameWindow window) : State
             }
         };
         
-        TextButton play = new TextButton(_font, "play", new Vector2((window.GameSize.X - _font.MeasureString("play").X) / 2, window.GameSize.Y - 50), _textColour)
+        TextButton play = new TextButton(_font, "play", new Vector2((window.GameSize.X - _font.MeasureString("play").X) / 2, window.GameSize.Y - 50), _textColour, true)
         {
             OnClick = () =>
             {

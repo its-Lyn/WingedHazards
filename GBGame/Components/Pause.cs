@@ -43,7 +43,7 @@ public class Pause
 
         _window = window;
 
-        TextButton resume = new TextButton(font, "resume", new Vector2((window.GameSize.X - font.MeasureString("resume").X) / 2, 40), _textColour) 
+        TextButton resume = new TextButton(font, "resume", new Vector2((window.GameSize.X - font.MeasureString("resume").X) / 2, 40), _textColour, true) 
         {
             OnClick = () =>
             { 
@@ -51,7 +51,7 @@ public class Pause
             }
         };
 
-        TextButton mainMenu = new TextButton(font, "main menu", new Vector2((window.GameSize.X - font.MeasureString("main menu").X) / 2, 50), _textColour) 
+        TextButton mainMenu = new TextButton(font, "main menu", new Vector2((window.GameSize.X - font.MeasureString("main menu").X) / 2, 50), _textColour, true) 
         {
             OnClick = () => 
             {
@@ -59,7 +59,7 @@ public class Pause
             }
         };
 
-        TextButton quit = new TextButton(font, "quit game", new Vector2((window.GameSize.X - font.MeasureString("quit game").X) / 2, 60), _textColour) 
+        TextButton quit = new TextButton(font, "quit game", new Vector2((window.GameSize.X - font.MeasureString("quit game").X) / 2, 60), _textColour, true) 
         {
             OnClick = window.Exit
         };

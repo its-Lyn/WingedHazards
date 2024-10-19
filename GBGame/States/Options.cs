@@ -39,7 +39,7 @@ public class Options(GameWindow window) : State
         _controller.SetControllerButtons(GBGame.ControllerInventoryUp, GBGame.ControllerInventoryDown, GBGame.ControllerAction);
 
         _font = window.Content.Load<SpriteFont>("Sprites/Fonts/File");
-        TextButton ret = new TextButton(_font, "return", new Vector2((window.GameSize.X - _font.MeasureString("return").X) / 2, window.GameSize.Y - 12), _textColour)
+        TextButton ret = new TextButton(_font, "return", new Vector2((window.GameSize.X - _font.MeasureString("return").X) / 2, window.GameSize.Y - 12), _textColour, true)
         {
             OnClick = () =>
             {
