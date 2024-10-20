@@ -33,7 +33,7 @@ public class GameWindow : Game
     public OptionData Options { get; private set; }
     public bool Updating { get; private set; }
 
-    public string Version { get; } = "0.9.1-dev";
+    public string Version { get; } = "0.9.1";
 
     public GameWindow()
     {
