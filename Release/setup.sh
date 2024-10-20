@@ -15,7 +15,7 @@ cp -rv ./* $HOME/.local/share/WingedHazards
 cat << EOF > $HOME/.local/share/applications/WingedHazards.desktop
 [Desktop Entry]
 Type=Application
-Name=Flappy Bird
+Name=Winged Hazards
 Icon=${HOME}/.local/share/WingedHazards/icon.png
 Exec=${HOME}/.local/share/WingedHazards/GBGame
 Categories=Games;
