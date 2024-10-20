@@ -97,7 +97,7 @@ public sealed class GameFinish(GameWindow window, int normal, int projectile, in
                 _showButtons = true;
                 TextButton retry = new TextButton(_font, "Retry", new Vector2(15, 120), _activeColour, true)
                 {
-                    OnClick = () =>
+                    OnClick = (_) =>
                     {
                         window.GameEnded = false;
                         window.GameEnding = false;
@@ -108,7 +108,7 @@ public sealed class GameFinish(GameWindow window, int normal, int projectile, in
 
                 TextButton menu = new TextButton(_font, "Menu", new Vector2(115, 120), _activeColour, true)
                 {
-                    OnClick = () =>
+                    OnClick = (_) =>
                     {
                         window.GameEnded = false;
                         window.GameEnding = false;

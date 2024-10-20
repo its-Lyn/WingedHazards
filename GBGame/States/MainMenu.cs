@@ -3,7 +3,6 @@ using GBGame.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using MonoGayme.Components;
 using MonoGayme.Controllers;
 using MonoGayme.States;
@@ -50,12 +49,12 @@ public class MainMenu(GameWindow window) : State
 
         TextButton quit = new TextButton(_font, "quit", new Vector2((window.GameSize.X - _font.MeasureString("quit").X) / 2, window.GameSize.Y - 30), _textColour, true)
         {
-            OnClick = window.Exit
+            OnClick = (_) => window.Exit()
         };
 
         TextButton options = new TextButton(_font, "options", new Vector2((window.GameSize.X - _font.MeasureString("options").X) / 2, window.GameSize.Y - 40), _textColour, true)
         {
-            OnClick = () =>
+            OnClick = (_) =>
             {
                 window.Context.SwitchState(new Options(window));
             }
@@ -63,7 +62,7 @@ public class MainMenu(GameWindow window) : State
         
         TextButton play = new TextButton(_font, "play", new Vector2((window.GameSize.X - _font.MeasureString("play").X) / 2, window.GameSize.Y - 50), _textColour, true)
         {
-            OnClick = () =>
+            OnClick = (_) =>
             {
                 window.Context.SwitchState(new InGame(window));
             }

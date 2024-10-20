@@ -12,6 +12,8 @@ public static class GBGame
     public static Keys KeyboardJump;
     public static Keys KeyboardAction;
 
+    public static Keys KeyboardPause;
+
     public static Buttons ControllerRight;
     public static Buttons ControllerLeft;
     public static Buttons ControllerInventoryUp;
@@ -19,6 +21,8 @@ public static class GBGame
 
     public static Buttons ControllerJump;
     public static Buttons ControllerAction;
+    
+    public static Buttons ControllerPause;
 
     public static void Main()
     {

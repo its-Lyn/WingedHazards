@@ -42,7 +42,7 @@ public class Options(GameWindow window) : State
         _font = window.Content.Load<SpriteFont>("Sprites/Fonts/File");
         TextButton ret = new TextButton(_font, "return", new Vector2((window.GameSize.X - _font.MeasureString("return").X) / 2, window.GameSize.Y - 12), _textColour, true)
         {
-            OnClick = () =>
+            OnClick = (btn) =>
             {
                 window.UpdateOptions();
                 window.Context.SwitchState(new MainMenu(window));
@@ -102,16 +102,16 @@ public class Options(GameWindow window) : State
 
         TextButton kb = new TextButton(_font, "Set Keyboard Binds", new Vector2(1, 100), _textColour, true)
         {
-            OnClick = () =>
+            OnClick = (btn) =>
             {
                 window.UpdateOptions();
-                Console.WriteLine("One Day");
+                window.Context.SwitchState(new KeyboardBinds(window));
             }
         };
         
         TextButton gp = new TextButton(_font, "Set GamePad Binds", new Vector2(1, 110), _textColour, true)
         {
-            OnClick = () =>
+            OnClick = (btn) =>
             {
                 window.UpdateOptions();
                 Console.WriteLine("One Day");

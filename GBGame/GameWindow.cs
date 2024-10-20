@@ -72,6 +72,25 @@ public class GameWindow : Game
         Updating = false;
     }
 
+    public void UpdateKeys()
+    {
+        KeyBinds binds = new KeyBinds
+        {
+            Left = GBGame.KeyboardLeft.ToString(),
+            Right = GBGame.KeyboardRight.ToString(),
+            InventoryUp = GBGame.KeyboardInventoryUp.ToString(),
+            InventoryDown = GBGame.KeyboardInventoryDown.ToString(),
+            
+            Action = GBGame.KeyboardAction.ToString(),
+            Jump = GBGame.KeyboardJump.ToString(),
+            
+            Pause = GBGame.KeyboardPause.ToString(),
+        };
+        
+        Options.Keyboard = binds;
+        UpdateOptions(Options);
+    }
+
     private Keys ParseKey(string key)
     {
         bool success = Enum.TryParse<Keys>(key, out Keys result);
@@ -101,6 +120,8 @@ public class GameWindow : Game
         GBGame.KeyboardJump = ParseKey(Options.Keyboard.Jump);
         GBGame.KeyboardAction = ParseKey(Options.Keyboard.Action);
         
+        GBGame.KeyboardPause = ParseKey(Options.Keyboard.Pause);
+        
         GBGame.ControllerLeft = ParseButton(Options.GamePad.Left);
         GBGame.ControllerRight = ParseButton(Options.GamePad.Right);
         GBGame.ControllerInventoryUp = ParseButton(Options.GamePad.InventoryUp);
@@ -108,6 +129,8 @@ public class GameWindow : Game
         
         GBGame.ControllerJump = ParseButton(Options.GamePad.Jump);
         GBGame.ControllerAction = ParseButton(Options.GamePad.Action);
+        
+        GBGame.ControllerPause = ParseButton(Options.GamePad.Pause);
     }
 
     public void ToggleFullScreen()

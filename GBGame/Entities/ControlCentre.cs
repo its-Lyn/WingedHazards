@@ -64,7 +64,7 @@ public class ControlCentre(GameWindow windowData, InGame game, int zIndex = -1) 
         }
 
         SkillButton btn = new SkillButton(_font, skill.Name, position, _textColour, skill);
-        btn.OnClick = () => {
+        btn.OnClick = (_) => {
             skill.OnActivate();
 
             SkillPoints--;
@@ -106,7 +106,7 @@ public class ControlCentre(GameWindow windowData, InGame game, int zIndex = -1) 
 
         _returnButton = new TextButton(_font, Return, _returnMeasurements, _textColour)
         {
-            OnClick = () => {
+            OnClick = (_) => {
                 Interacting = false;
 
                 _canPick = false;

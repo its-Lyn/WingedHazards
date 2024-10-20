@@ -1,4 +1,3 @@
-using System;
 using GBGame.States;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
@@ -45,7 +44,7 @@ public class Pause
 
         TextButton resume = new TextButton(font, "resume", new Vector2((window.GameSize.X - font.MeasureString("resume").X) / 2, 40), _textColour, true) 
         {
-            OnClick = () =>
+            OnClick = (_) =>
             { 
                 Paused = !Paused;
             }
@@ -53,7 +52,7 @@ public class Pause
 
         TextButton mainMenu = new TextButton(font, "main menu", new Vector2((window.GameSize.X - font.MeasureString("main menu").X) / 2, 50), _textColour, true) 
         {
-            OnClick = () => 
+            OnClick = (_) => 
             {
                 window.Context.SwitchState(new MainMenu(window));
             }
@@ -61,7 +60,7 @@ public class Pause
 
         TextButton quit = new TextButton(font, "quit game", new Vector2((window.GameSize.X - font.MeasureString("quit game").X) / 2, 60), _textColour, true) 
         {
-            OnClick = window.Exit
+            OnClick = (_) => window.Exit()
         };
 
         _controller.SetControllerButtons(GBGame.ControllerInventoryUp, GBGame.ControllerInventoryDown, GBGame.ControllerAction);

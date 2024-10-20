@@ -455,7 +455,7 @@ public sealed class InGame(GameWindow windowData) : State
             return;
         }
 
-        if (!_centre.Interacting && (InputManager.IsGamePadPressed(Buttons.Start) || InputManager.IsKeyPressed(Keys.Escape)))
+        if (!_centre.Interacting && (InputManager.IsGamePadPressed(GBGame.ControllerPause) || InputManager.IsKeyPressed(GBGame.KeyboardPause)))
             _pause.Paused = !_pause.Paused;
 
         if (_pause.Paused)
