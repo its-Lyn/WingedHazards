@@ -114,7 +114,7 @@ public class Options(GameWindow window) : State
             OnClick = (btn) =>
             {
                 window.UpdateOptions();
-                Console.WriteLine("One Day");
+                window.Context.SwitchState(new GamePadBinds(window));
             }
         };
         

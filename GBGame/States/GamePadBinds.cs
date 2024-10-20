@@ -11,7 +11,7 @@ using MonoGayme.Utilities;
 
 namespace GBGame.States;
 
-public class KeyboardBinds(GameWindow window) : State
+public class GamePadBinds(GameWindow window) : State
 {
     private readonly Color _backDrop = new Color(232, 240, 223);
 
@@ -22,7 +22,7 @@ public class KeyboardBinds(GameWindow window) : State
     private bool _canPick;
     private bool _updateController;
 
-    private KeyPick _current;
+    private ButtonPick _current;
 
     private SpriteFont _font = null!;
 
@@ -32,7 +32,7 @@ public class KeyboardBinds(GameWindow window) : State
     private Timer _errorTimer = null!;
     private bool _showError;
 
-    private void SetKey(Button btn, KeyPick pick)
+    private void SetButton(Button btn, ButtonPick pick)
     {
         _picking = true;
 
@@ -43,24 +43,24 @@ public class KeyboardBinds(GameWindow window) : State
         self.SetText($"{_current}: picking...");
     }
     
-    private bool IsKeyAlreadyAssigned(Keys newKey)
+    private bool IsButtonAlreadyAssigned(Buttons newKey)
     {
-        return GBGame.KeyboardLeft == newKey ||
-               GBGame.KeyboardRight == newKey ||
-               GBGame.KeyboardInventoryUp == newKey ||
-               GBGame.KeyboardInventoryDown == newKey ||
-               GBGame.KeyboardJump == newKey ||
-               GBGame.KeyboardAction == newKey ||
-               GBGame.KeyboardPause == newKey;
+        return GBGame.ControllerLeft == newKey ||
+               GBGame.ControllerRight == newKey ||
+               GBGame.ControllerInventoryUp == newKey ||
+               GBGame.ControllerInventoryDown == newKey ||
+               GBGame.ControllerJump == newKey ||
+               GBGame.ControllerAction == newKey ||
+               GBGame.ControllerPause == newKey;
     }    
 
-    private void HandlePick(KeyPick key)
+    private void HandlePick(ButtonPick button)
     {
-        Keys? newKey = InputManager.GetFirstKey();
+        Buttons? newKey = InputManager.GetFirstButton();
 
         if (newKey is null) return;
 
-        if (IsKeyAlreadyAssigned(newKey.Value))
+        if (IsButtonAlreadyAssigned(newKey.Value))
         {
             _showError = true;
             _errorTimer.Start();
@@ -68,37 +68,37 @@ public class KeyboardBinds(GameWindow window) : State
             return;
         }
 
-        switch (key)
+        switch (button)
         {
-            case KeyPick.Left:
-                GBGame.KeyboardLeft = newKey.Value;
+            case ButtonPick.Left:
+                GBGame.ControllerLeft = newKey.Value;
                 break;
-            case KeyPick.Right:
-                GBGame.KeyboardRight = newKey.Value;
+            case ButtonPick.Right:
+                GBGame.ControllerRight = newKey.Value;
                 break;
-            case KeyPick.Up:
-                GBGame.KeyboardInventoryUp = newKey.Value;
+            case ButtonPick.Up:
+                GBGame.ControllerInventoryUp = newKey.Value;
                 break;
-            case KeyPick.Down:
-                GBGame.KeyboardInventoryDown = newKey.Value;
+            case ButtonPick.Down:
+                GBGame.ControllerInventoryDown = newKey.Value;
                 break;
-            case KeyPick.Jump:
-                GBGame.KeyboardJump = newKey.Value;
+            case ButtonPick.Jump:
+                GBGame.ControllerJump = newKey.Value;
                 break;
-            case KeyPick.Action:
-                GBGame.KeyboardAction = newKey.Value;
+            case ButtonPick.Action:
+                GBGame.ControllerAction = newKey.Value;
                 break;
-            case KeyPick.Pause:
-                GBGame.KeyboardPause = newKey.Value;
+            case ButtonPick.Pause:
+                GBGame.ControllerPause = newKey.Value;
                 break;
         }
 
         _picking = false;
         _canPick = false;
         
-        _btn?.SetText($"{key}: {newKey}");
+        _btn?.SetText($"{button}: {newKey}");
 
-        window.UpdateKeys();
+        window.UpdateButtons();
     }
 
     public override void LoadContent()
@@ -132,34 +132,34 @@ public class KeyboardBinds(GameWindow window) : State
             }
         };
 
-        _controller.AddIgnored(new Label("keyboard", _overlayColour, _font, new Vector2((window.GameSize.X - _font.MeasureString("keyboard").X) / 2, 5)));
+        _controller.AddIgnored(new Label("gamepad", _overlayColour, _font, new Vector2((window.GameSize.X - _font.MeasureString("gamepad").X) / 2, 5)));
 
-        TextButton left = new TextButton(_font, $"left: {window.Options.Keyboard.Left}", new Vector2(1, 20), _textColour, true) {
-            OnClick = btn => { SetKey(btn, KeyPick.Left); }
+        TextButton left = new TextButton(_font, $"left: {window.Options.GamePad.Left}", new Vector2(1, 20), _textColour, true) {
+            OnClick = btn => { SetButton(btn, ButtonPick.Left); }
         };
 
-        TextButton right = new TextButton(_font, $"right: {window.Options.Keyboard.Right}", new Vector2(1, 30), _textColour, true) {
-            OnClick = btn => { SetKey(btn, KeyPick.Right); }
+        TextButton right = new TextButton(_font, $"right: {window.Options.GamePad.Right}", new Vector2(1, 30), _textColour, true) {
+            OnClick = btn => { SetButton(btn, ButtonPick.Right); }
         };
 
-        TextButton up = new TextButton(_font, $"up: {window.Options.Keyboard.InventoryUp}", new Vector2(1, 40), _textColour, true) {
-            OnClick = btn => { SetKey(btn, KeyPick.Up); }
+        TextButton up = new TextButton(_font, $"up: {window.Options.GamePad.InventoryUp}", new Vector2(1, 40), _textColour, true) {
+            OnClick = btn => { SetButton(btn, ButtonPick.Up); }
         };
         
-        TextButton down = new TextButton(_font, $"down: {window.Options.Keyboard.InventoryDown}", new Vector2(1, 50), _textColour, true) {
-            OnClick = btn => { SetKey(btn, KeyPick.Down); }
+        TextButton down = new TextButton(_font, $"down: {window.Options.GamePad.InventoryDown}", new Vector2(1, 50), _textColour, true) {
+            OnClick = btn => { SetButton(btn, ButtonPick.Down); }
         };
         
-        TextButton jump = new TextButton(_font, $"jump: {window.Options.Keyboard.Jump}", new Vector2(1, 70), _textColour, true) {
-            OnClick = btn => { SetKey(btn, KeyPick.Jump); }
+        TextButton jump = new TextButton(_font, $"jump: {window.Options.GamePad.Jump}", new Vector2(1, 70), _textColour, true) {
+            OnClick = btn => { SetButton(btn, ButtonPick.Jump); }
         };
         
-        TextButton action = new TextButton(_font, $"action: {window.Options.Keyboard.Action}", new Vector2(1, 80), _textColour, true) {
-            OnClick = btn => { SetKey(btn, KeyPick.Action); }
+        TextButton action = new TextButton(_font, $"action: {window.Options.GamePad.Action}", new Vector2(1, 80), _textColour, true) {
+            OnClick = btn => { SetButton(btn, ButtonPick.Action); }
         };
 
-        TextButton pause = new TextButton(_font, $"pause: {window.Options.Keyboard.Pause}", new Vector2(1, 100), _textColour, true) {
-            OnClick = btn => { SetKey(btn, KeyPick.Pause); }
+        TextButton pause = new TextButton(_font, $"pause: {window.Options.GamePad.Pause}", new Vector2(1, 100), _textColour, true) {
+            OnClick = btn => { SetButton(btn, ButtonPick.Pause); }
         };
         
         _controller.Add(left);
@@ -171,7 +171,7 @@ public class KeyboardBinds(GameWindow window) : State
         _controller.Add(action);
 
         _controller.Add(pause);
-        
+
         _controller.Add(ret);
     }
 
@@ -179,7 +179,7 @@ public class KeyboardBinds(GameWindow window) : State
     {
         if (_updateController)
         {
-            _controller.SetKeyboardButtons(GBGame.KeyboardInventoryUp, GBGame.KeyboardInventoryDown, GBGame.KeyboardAction);
+            _controller.SetControllerButtons(GBGame.ControllerInventoryUp, GBGame.ControllerInventoryDown, GBGame.ControllerAction);
             _updateController = false;
         }
         
@@ -187,7 +187,7 @@ public class KeyboardBinds(GameWindow window) : State
         {
             if (!_canPick)
             {
-                Keys? first = InputManager.GetFirstKey();
+                Buttons? first = InputManager.GetFirstButton();
                 if (first is null)
                     _canPick = true;
             }
@@ -227,7 +227,7 @@ public class KeyboardBinds(GameWindow window) : State
         batch.End();
     }
 
-    private enum KeyPick
+    private enum ButtonPick
     {
         Left, Right, Up, Down,
 

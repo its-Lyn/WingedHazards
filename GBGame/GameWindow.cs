@@ -91,6 +91,25 @@ public class GameWindow : Game
         UpdateOptions(Options);
     }
 
+    public void UpdateButtons()
+    {
+        KeyBinds binds = new KeyBinds
+        {
+            Left = GBGame.ControllerLeft.ToString(),
+            Right = GBGame.ControllerRight.ToString(),
+            InventoryUp = GBGame.ControllerInventoryUp.ToString(),
+            InventoryDown = GBGame.ControllerInventoryDown.ToString(),
+            
+            Action = GBGame.ControllerAction.ToString(),
+            Jump = GBGame.ControllerJump.ToString(),
+            
+            Pause = GBGame.ControllerPause.ToString(),
+        };
+        
+        Options.GamePad = binds;
+        UpdateOptions(Options);
+    }
+    
     private Keys ParseKey(string key)
     {
         bool success = Enum.TryParse<Keys>(key, out Keys result);
