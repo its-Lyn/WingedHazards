@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using GBGame.Models;
 using GBGame.States;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
@@ -32,6 +33,8 @@ public class GameWindow : Game
     public OptionData Options { get; private set; }
     public bool Updating { get; private set; }
 
+    public string Version { get; } = "0.9.1-dev";
+
     public GameWindow()
     {
         
@@ -53,6 +56,8 @@ public class GameWindow : Game
         {
             ToggleFullScreen();
         }
+        
+        SetKeyBinds();
     }
 
     public void UpdateOptions()
@@ -65,6 +70,86 @@ public class GameWindow : Game
         Updating = true;
         Xml.Serialise(newOptions, Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "OptionData.xml"));
         Updating = false;
+    }
+
+    public void UpdateKeys()
+    {
+        KeyBinds binds = new KeyBinds
+        {
+            Left = GBGame.KeyboardLeft.ToString(),
+            Right = GBGame.KeyboardRight.ToString(),
+            InventoryUp = GBGame.KeyboardInventoryUp.ToString(),
+            InventoryDown = GBGame.KeyboardInventoryDown.ToString(),
+            
+            Action = GBGame.KeyboardAction.ToString(),
+            Jump = GBGame.KeyboardJump.ToString(),
+            
+            Pause = GBGame.KeyboardPause.ToString(),
+        };
+        
+        Options.Keyboard = binds;
+        UpdateOptions(Options);
+    }
+
+    public void UpdateButtons()
+    {
+        KeyBinds binds = new KeyBinds
+        {
+            Left = GBGame.ControllerLeft.ToString(),
+            Right = GBGame.ControllerRight.ToString(),
+            InventoryUp = GBGame.ControllerInventoryUp.ToString(),
+            InventoryDown = GBGame.ControllerInventoryDown.ToString(),
+            
+            Action = GBGame.ControllerAction.ToString(),
+            Jump = GBGame.ControllerJump.ToString(),
+            
+            Pause = GBGame.ControllerPause.ToString(),
+        };
+        
+        Options.GamePad = binds;
+        UpdateOptions(Options);
+    }
+    
+    private Keys ParseKey(string key)
+    {
+        bool success = Enum.TryParse<Keys>(key, out Keys result);
+        if (!success)
+            throw new Exception();
+        
+        return result;
+    }
+
+    private Buttons ParseButton(string button)
+    {
+        bool success = Enum.TryParse<Buttons>(button, out Buttons result);
+        if (!success)
+            throw new Exception();
+        
+        return result;
+    }
+
+    public void SetKeyBinds()
+    {
+        // Please forgive me
+        GBGame.KeyboardLeft = ParseKey(Options.Keyboard.Left);
+        GBGame.KeyboardRight = ParseKey(Options.Keyboard.Right);
+        GBGame.KeyboardInventoryUp = ParseKey(Options.Keyboard.InventoryUp);
+        GBGame.KeyboardInventoryDown = ParseKey(Options.Keyboard.InventoryDown);
+        
+        GBGame.KeyboardJump = ParseKey(Options.Keyboard.Jump);
+        GBGame.KeyboardAction = ParseKey(Options.Keyboard.Action);
+        
+        GBGame.KeyboardPause = ParseKey(Options.Keyboard.Pause);
+        
+        GBGame.ControllerLeft = ParseButton(Options.GamePad.Left);
+        GBGame.ControllerRight = ParseButton(Options.GamePad.Right);
+        GBGame.ControllerInventoryUp = ParseButton(Options.GamePad.InventoryUp);
+        GBGame.ControllerInventoryDown = ParseButton(Options.GamePad.InventoryDown);
+        
+        GBGame.ControllerJump = ParseButton(Options.GamePad.Jump);
+        GBGame.ControllerAction = ParseButton(Options.GamePad.Action);
+        
+        GBGame.ControllerPause = ParseButton(Options.GamePad.Pause);
     }
 
     public void ToggleFullScreen()

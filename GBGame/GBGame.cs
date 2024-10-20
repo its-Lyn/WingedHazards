@@ -4,21 +4,25 @@ namespace GBGame;
 
 public static class GBGame
 {
-    public const Keys KeyboardRight = Keys.D;
-    public const Keys KeyboardLeft = Keys.A;
-    public const Keys KeyboardInventoryUp = Keys.W;
-    public const Keys KeyboardInventoryDown = Keys.S;
+    public static Keys KeyboardRight;
+    public static Keys KeyboardLeft;
+    public static Keys KeyboardInventoryUp;
+    public static Keys KeyboardInventoryDown;
 
-    public const Keys KeyboardJump = Keys.Space;
-    public const Keys KeyboardAction = Keys.LeftShift;
+    public static Keys KeyboardJump;
+    public static Keys KeyboardAction;
 
-    public const Buttons ControllerRight = Buttons.DPadRight;
-    public const Buttons ControllerLeft = Buttons.DPadLeft;
-    public const Buttons ControllerInventoryUp = Buttons.DPadUp;
-    public const Buttons ControllerInventoryDown = Buttons.DPadDown;
+    public static Keys KeyboardPause;
 
-    public const Buttons ControllerJump = Buttons.B;
-    public const Buttons ControllerAction = Buttons.A;
+    public static Buttons ControllerRight;
+    public static Buttons ControllerLeft;
+    public static Buttons ControllerInventoryUp;
+    public static Buttons ControllerInventoryDown;
+
+    public static Buttons ControllerJump;
+    public static Buttons ControllerAction;
+    
+    public static Buttons ControllerPause;
 
     public static void Main()
     {

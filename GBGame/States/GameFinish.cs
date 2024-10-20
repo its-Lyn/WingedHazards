@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using GBGame.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGayme.Components;
@@ -58,12 +59,12 @@ public sealed class GameFinish(GameWindow window, int normal, int projectile, in
         _controller.SetControllerButtons(GBGame.ControllerLeft, GBGame.ControllerRight, GBGame.ControllerAction);
         _controller.OnActiveUpdating = btn =>
         {
-            btn.Colour = _fontColour;
+            btn.Colour = _activeColour;
         };
 
         _controller.OnActiveUpdated = btn =>
         {
-            btn.Colour = _activeColour;
+            btn.Colour = _fontColour;
         };
 
         string savePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "SaveData.xml");
@@ -94,9 +95,9 @@ public sealed class GameFinish(GameWindow window, int normal, int projectile, in
                 _bookEase = false;
 
                 _showButtons = true;
-                TextButton retry = new TextButton(_font, "Retry", new Vector2(15, 120), _fontColour)
+                TextButton retry = new TextButton(_font, "Retry", new Vector2(15, 120), _activeColour, true)
                 {
-                    OnClick = () =>
+                    OnClick = (_) =>
                     {
                         window.GameEnded = false;
                         window.GameEnding = false;
@@ -105,9 +106,9 @@ public sealed class GameFinish(GameWindow window, int normal, int projectile, in
                     }
                 };
 
-                TextButton menu = new TextButton(_font, "Menu", new Vector2(115, 120), _fontColour)
+                TextButton menu = new TextButton(_font, "Menu", new Vector2(115, 120), _activeColour, true)
                 {
-                    OnClick = () =>
+                    OnClick = (_) =>
                     {
                         window.GameEnded = false;
                         window.GameEnding = false;

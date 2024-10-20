@@ -26,8 +26,8 @@ Your name is River, a young scientist who has been tasked with seeing why the lo
 | DPad Down                  | Cycle inventory / Move down in the UI |
 | DPad Left                  | Move Left / Move left in the UI       |
 | DPad Right                 | Move Right / Move right in the UI     |
-| Circle / B / A             | Jump                                  |
-| X / A / B                  | Action / UI Accept                    |
+| X / A / B                  | Jump                                  |
+| Circle / B / A             | Action / UI Accept                    |
 
 ## Installation
 Instructions on installing the game.

@@ -1,6 +1,7 @@
 using System.Xml.Serialization;
+using Microsoft.Xna.Framework.Input;
 
-namespace GBGame;
+namespace GBGame.Models;
 
 public class OptionData
 {
@@ -12,4 +13,13 @@ public class OptionData
     
     [XmlElement("MuteAudio")]
     public bool MuteAudio { get; set; }
+    
+    [XmlElement("ShowVersion")]
+    public bool ShowVersion { get; set; }
+    
+    [XmlElement("KeyboardBinds")]
+    public required KeyBinds Keyboard { get; set; }
+    
+    [XmlElement("GamePadBinds")]
+    public required KeyBinds GamePad { get; set; }
 }

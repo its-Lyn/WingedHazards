@@ -1,6 +1,6 @@
 using System.Xml.Serialization;
 
-namespace GBGame;
+namespace GBGame.Models;
 
 public class SaveData
 {

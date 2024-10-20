@@ -3,4 +3,28 @@
     <FullScreen>false</FullScreen>
     <AllowScreenShake>true</AllowScreenShake>
     <MuteAudio>false</MuteAudio>
+    <ShowVersion>true</ShowVersion>
+    
+    <KeyboardBinds>
+        <Left>A</Left>
+        <Right>D</Right>
+        <InventoryUp>W</InventoryUp>
+        <InventoryDown>S</InventoryDown>
+        
+        <Jump>Space</Jump>
+        <Action>LeftShift</Action>
+        
+        <Pause>Escape</Pause>
+    </KeyboardBinds>
+    <GamePadBinds>
+        <Left>DPadLeft</Left>
+        <Right>DPadRight</Right>
+        <InventoryUp>DPadUp</InventoryUp>
+        <InventoryDown>DPadDown</InventoryDown>
+
+        <Jump>B</Jump>
+        <Action>A</Action>
+        
+        <Pause>Start</Pause>
+    </GamePadBinds>
 </OptionData>

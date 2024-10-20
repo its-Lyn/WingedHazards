@@ -47,22 +47,22 @@ public class MainMenu(GameWindow window) : State
         _controller.SetKeyboardButtons(GBGame.KeyboardInventoryUp, GBGame.KeyboardInventoryDown, GBGame.KeyboardAction);
         _controller.SetControllerButtons(GBGame.ControllerInventoryUp, GBGame.ControllerInventoryDown, GBGame.ControllerAction);
 
-        TextButton quit = new TextButton(_font, "quit", new Vector2((window.GameSize.X - _font.MeasureString("quit").X) / 2, window.GameSize.Y - 30), _textColour)
+        TextButton quit = new TextButton(_font, "quit", new Vector2((window.GameSize.X - _font.MeasureString("quit").X) / 2, window.GameSize.Y - 30), _textColour, true)
         {
-            OnClick = window.Exit
+            OnClick = (_) => window.Exit()
         };
 
-        TextButton options = new TextButton(_font, "options", new Vector2((window.GameSize.X - _font.MeasureString("options").X) / 2, window.GameSize.Y - 40), _textColour)
+        TextButton options = new TextButton(_font, "options", new Vector2((window.GameSize.X - _font.MeasureString("options").X) / 2, window.GameSize.Y - 40), _textColour, true)
         {
-            OnClick = () =>
+            OnClick = (_) =>
             {
                 window.Context.SwitchState(new Options(window));
             }
         };
         
-        TextButton play = new TextButton(_font, "play", new Vector2((window.GameSize.X - _font.MeasureString("play").X) / 2, window.GameSize.Y - 50), _textColour)
+        TextButton play = new TextButton(_font, "play", new Vector2((window.GameSize.X - _font.MeasureString("play").X) / 2, window.GameSize.Y - 50), _textColour, true)
         {
-            OnClick = () =>
+            OnClick = (_) =>
             {
                 window.Context.SwitchState(new InGame(window));
             }
@@ -72,6 +72,12 @@ public class MainMenu(GameWindow window) : State
         _controller.Add(options);
         _controller.Add(quit);
 
+        if (window.Options.ShowVersion)
+        {
+            Vector2 measurements = _font.MeasureString($"v{window.Version}");  
+            _controller.AddIgnored(new Label($"v{window.Version}", _textColour, _font, new Vector2(window.GameSize.X - measurements.X, window.GameSize.Y - measurements.Y)));
+        }
+        
         _measurement = _font.MeasureString("Winged Hazards").X;
         _logoPos = new Vector2( 
             (window.GameSize.X - _measurement) / 2,
