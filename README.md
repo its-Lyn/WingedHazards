@@ -7,6 +7,27 @@ Winged Hazards is a game following the [GameBoy](https://en.wikipedia.org/wiki/G
 ## Game Description
 Your name is River, a young scientist who has been tasked with seeing why the local forest has been suddenly invaded by an invasive bat species. Try to survive as long as you can while fending the bats away, and gaining new Super Powers along the way!
 
+## Key Binds
+
+### Keyboard
+| Key   | Description                           |
+|-------|---------------------------------------|
+| W     | Cycle inventory / Move up in the UI   |
+| S     | Cycle inventory / Move down in the UI |
+| A     | Move Left / Move left in the UI       |
+| D     | Move Right / Move right in the UI     |
+| Space | Jump                                  |
+| Shift | Action / UI Accept                    |
+
+### Controller
+| Button (PS4, XBox, Switch) | Description                           |
+|----------------------------|---------------------------------------|
+| DPad Up                    | Cycle inventory / Move up in the UI   |
+| DPad Down                  | Cycle inventory / Move down in the UI |
+| DPad Left                  | Move Left / Move left in the UI       |
+| DPad Right                 | Move Right / Move right in the UI     |
+| Circle / B / A             | Jump                                  |
+| X / A / B                  | Action / UI Accept                    |
 
 ## Installation
 Instructions on installing the game.
