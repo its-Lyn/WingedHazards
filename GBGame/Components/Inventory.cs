@@ -31,9 +31,9 @@ public class Inventory
     public T? GetActive<T>() where T : Item 
         => (T?)Items.Find(item => item.GetType() == typeof(T));
 
-    public void LoadContent(Game windowData) 
+    public void LoadContent(GameWindow windowData) 
     {
-        _inventorySprite = windowData.Content.Load<Texture2D>("Sprites/UI/ItemFrame");
+        _inventorySprite = windowData.ContentData.Get("ItemFrame");
         _font = windowData.Content.Load<SpriteFont>("Sprites/Fonts/File");
     }
 
