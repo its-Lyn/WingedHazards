@@ -211,13 +211,6 @@ public class GameWindow : Game
 
     private void LoadAllAssets()
     {
-        UpdateOptions();
-        if (Options?.FullScreen == true)
-        {
-            ToggleFullScreen();
-        }
-        SetKeyBinds();
-        
         string basePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Content");
 
         _loadState = "sprites";
@@ -264,6 +257,13 @@ public class GameWindow : Game
 
     private async void LoadGameDataAsync()
     {
+        UpdateOptions();
+        if (Options?.FullScreen == true)
+        {
+            ToggleFullScreen();
+        }
+        SetKeyBinds();
+        
         await Task.Run(LoadAllAssets);
         
         Context.SwitchState(new MainMenu(this));
