@@ -54,8 +54,8 @@ public class Options(GameWindow window) : State
         _controller.AddIgnored(new Label("audio", _overlayColour, _font, new Vector2(5, 50)));
         _controller.AddIgnored(new Label("misc", _overlayColour, _font, new Vector2(5, 70)));
         
-        Texture2D normal = window.Content.Load<Texture2D>("Sprites/UI/CheckBox_Normal");
-        Texture2D check = window.Content.Load<Texture2D>("Sprites/UI/CheckBox_Checked");
+        Texture2D normal = window.ContentData.Get("CheckBox_Normal");
+        Texture2D check = window.ContentData.Get("CheckBox_Checked");
 
         CheckBox fs = new CheckBox(normal, check, _font, "fullscreen", new Vector2(1, 30), new Vector2(10, -1), _textColour, window.Options.FullScreen)
         {
@@ -129,7 +129,7 @@ public class Options(GameWindow window) : State
 
     public override void Update(GameTime time)
     {
-        if (!window.Updating)
+        if (!window.Loading)
             _controller.Update(window.MousePosition);
     }
 
@@ -140,7 +140,7 @@ public class Options(GameWindow window) : State
             _shapes.DrawRectangle(new Rectangle(0, 0, (int)window.GameSize.X, (int)window.GameSize.Y), _overlayColour, batch, 0.6f);
             _controller.Draw(batch);
 
-            if (window.Updating)
+            if (window.Loading)
             {
                 _shapes.DrawRectangle(new Rectangle(0, 0, (int)window.GameSize.X, (int)window.GameSize.Y), _overlayColour, batch);
             }

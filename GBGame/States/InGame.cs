@@ -27,9 +27,9 @@ public sealed class InGame(GameWindow windowData) : State
 
     private record struct GroundTile(Texture2D Sprite, int X, int Y);
 
-    private readonly List<Texture2D> _grass = [];
-    private readonly List<Texture2D> _ground = [];
-    private readonly List<Texture2D> _bushes = [];
+    private List<Texture2D> _grass = [];
+    private List<Texture2D> _ground = [];
+    private List<Texture2D> _bushes = [];
     private readonly List<GroundTile> _groundTiles = [];
 
     private const int TileSize = 8;
@@ -240,18 +240,13 @@ public sealed class InGame(GameWindow windowData) : State
         windowData.UpdateOptions();
         
         _toLevelUp = BaseXP;
-        _starSprite = windowData.Content.Load<Texture2D>("Sprites/UI/LevelStar");
+        _starSprite = windowData.ContentData.Get("LevelStar");
 
         _strikeCollider.Bounds = new Rectangle();
 
-        for (int i = 1; i <= 4; i++) 
-            _ground.Add(windowData.Content.Load<Texture2D>($"Sprites/Ground/Ground_{i}"));
-        
-        for (int i = 1; i <= 2; i++)
-            _grass.Add(windowData.Content.Load<Texture2D>($"Sprites/Grass/Grass_{i}"));
-
-        for (int i = 1; i <= 3; i++)
-            _bushes.Add(windowData.Content.Load<Texture2D>($"Sprites/Bushes/Bush_{i}"));
+        _grass = windowData.ContentData.SpecialTextures["Grass"];
+        _ground = windowData.ContentData.SpecialTextures["Ground"];
+        _bushes = windowData.ContentData.SpecialTextures["Bushes"];
 
         _gameWidth = (int)(windowData.GameSize.Y * 2);
 
@@ -273,10 +268,10 @@ public sealed class InGame(GameWindow windowData) : State
         _playerJump = _player.Components.GetComponent<Jump>()!;
         _playerDeathFlash = _player.Components.GetComponent<Flash>("DeathFlash")!;
 
-        _island = windowData.Content.Load<Texture2D>("Sprites/BackGround/Island");
+        _island = windowData.ContentData.Get("Island");
 
-        _slash = new AnimatedSpriteSheet(windowData.Content.Load<Texture2D>("Sprites/Entities/Player_Slash"), new Vector2(4, 1), 0.1f, false, new Vector2(0, 4));
-        _sheet = new AnimatedSpriteSheet(windowData.Content.Load<Texture2D>("Sprites/SpriteSheets/Strike"), new Vector2(6, 1), 0.02f)
+        _slash = new AnimatedSpriteSheet(windowData.ContentData.Get("Player_Slash"), new Vector2(4, 1), 0.1f, false, new Vector2(0, 4));
+        _sheet = new AnimatedSpriteSheet(windowData.ContentData.Get("Strike"), new Vector2(6, 1), 0.02f)
         {
             OnSheetFinished = () => 
             { 

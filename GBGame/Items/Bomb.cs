@@ -6,7 +6,7 @@ using MonoGayme.Components;
 
 namespace GBGame.Items;
 
-public class Bomb(Game windowData, Player player) : Item(windowData)
+public class Bomb(GameWindow windowData, Player player) : Item
 {
     private readonly Color _overlayColour = new Color(40, 56, 24);
 
@@ -34,14 +34,14 @@ public class Bomb(Game windowData, Player player) : Item(windowData)
 
     public override void LoadContent()
     {
-        InventorySprite = WindowData.Content.Load<Texture2D>("Sprites/UI/Bomb");
+        InventorySprite = windowData.ContentData.Get("Bomb");
 
         Name = "Bomb";
         Description = $"{_bombCount} bombs left.";
 
-        Sheet = new AnimatedSpriteSheet(WindowData.Content.Load<Texture2D>("Sprites/SpriteSheets/BombPlaced"), new Vector2(5, 1), 0.25f);
+        Sheet = new AnimatedSpriteSheet(windowData.ContentData.Get("BombPlaced"), new Vector2(5, 1), 0.25f);
     
-        _shapes = new Shapes(WindowData.GraphicsDevice);
+        _shapes = new Shapes(windowData.GraphicsDevice);
         RadiusData = new Rectangle(16, 16, 40, 40);
     }
 

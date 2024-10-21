@@ -3,10 +3,8 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace GBGame.Items;
 
-public abstract class Item(Game windowData)
+public abstract class Item
 {
-    protected readonly Game WindowData = windowData;
-    
     public Texture2D? InventorySprite;
     
     public string? Name;

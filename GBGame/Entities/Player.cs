@@ -122,9 +122,9 @@ public class Player(GameWindow windowData, Camera2D camera, int zIndex = 1) : En
         Position.X = 40;
 
         _origin = new Vector2(4, 8);
-        _walkSprite = new AnimatedSpriteSheet(windowData.Content.Load<Texture2D>("Sprites/Entities/Player_Walk"), new Vector2(4, 1), 0.2f, false, _origin);
-        _idleSprite = new AnimatedSpriteSheet(windowData.Content.Load<Texture2D>("Sprites/Entities/Player_Idle"), Vector2.One, 0.2f, false, _origin);
-        _jumpSprite = new AnimatedSpriteSheet(windowData.Content.Load<Texture2D>("Sprites/Entities/Player_Jump"), Vector2.One, 0.2f, false, _origin);
+        _walkSprite = new AnimatedSpriteSheet(windowData.ContentData.Get("Player_Walk"), new Vector2(4, 1), 0.2f, false, _origin);
+        _idleSprite = new AnimatedSpriteSheet(windowData.ContentData.Get("Player_Idle"), Vector2.One, 0.2f, false, _origin);
+        _jumpSprite = new AnimatedSpriteSheet(windowData.ContentData.Get("Player_Jump"), Vector2.One, 0.2f, false, _origin);
 
         _sprite = _idleSprite;
 
@@ -143,7 +143,7 @@ public class Player(GameWindow windowData, Camera2D camera, int zIndex = 1) : En
         Components.AddComponent(new Health(3));
         Health = Components.GetComponent<Health>()!;
 
-        _healthSheet = windowData.Content.Load<Texture2D>("Sprites/UI/Health");
+        _healthSheet = windowData.ContentData.Get("Health");
         for (int i = 0; i < Health.HealthPoints; i++)
         { 
             SpriteSheet sheet = new SpriteSheet(_healthSheet, new Vector2(1, 2));
