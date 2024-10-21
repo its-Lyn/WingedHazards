@@ -7,6 +7,8 @@ Winged Hazards is a game following the [GameBoy](https://en.wikipedia.org/wiki/G
 ## Game Description
 Your name is River, a young scientist who has been tasked with seeing why the local forest has been suddenly invaded by an invasive bat species. Try to survive as long as you can while fending the bats away, and gaining new Super Powers along the way!
 
+The game's stable builds are now available on [itch.io](https://itsLyn.itch.io/wingedhazards)!
+
 ## Key Binds
 
 ### Keyboard
@@ -57,7 +59,19 @@ sudo pacman -S git dotnet-sdk dotnet-runtime
 Now, we can start installing the game! <br>
 Begin by opening your favourite `terminal emulator`!
 
-```
+Aside the game, we will also need to clone the engine.
+
+```bash
+# They need to be NEXT to eachother.
+# so, something like this
+# YourDirectory/
+#   MonoGayme/
+#       ...
+#   WingedHazards/
+#       ...
+# This will be fixed in the future when the engine is done
+# and published as a nuget.
+git clone https://github.com/its-Lyn/MonoGayme
 git clone https://github.com/its-Lyn/WingedHazards
 cd WingedHazards
 ```
