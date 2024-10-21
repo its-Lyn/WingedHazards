@@ -204,6 +204,7 @@ public class GameWindow : Game
     public void PlayEffect(SoundEffect effect)
     {
         if (Options.MuteAudio) return;
+        SoundEffect.MasterVolume = Options.Volume;
         effect.Play();
     }
 

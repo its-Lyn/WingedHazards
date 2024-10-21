@@ -17,6 +17,9 @@ public class OptionData
     [XmlElement("ShowVersion")]
     public bool ShowVersion { get; set; }
     
+    [XmlElement("Volume")]
+    public float Volume { get; set; }
+    
     [XmlElement("KeyboardBinds")]
     public required KeyBinds Keyboard { get; set; }
     
