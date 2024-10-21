@@ -271,7 +271,7 @@ public sealed class InGame(GameWindow windowData) : State
         _island = windowData.ContentData.Get("Island");
 
         _slash = new AnimatedSpriteSheet(windowData.ContentData.Get("Player_Slash"), new Vector2(4, 1), 0.1f, false, new Vector2(0, 4));
-        _sheet = new AnimatedSpriteSheet(windowData.ContentData.Get("Strike"), new Vector2(6, 1), 0.02f)
+        _sheet = new AnimatedSpriteSheet(windowData.ContentData.Get("LongStrike"), new Vector2(6, 1), 0.02f)
         {
             OnSheetFinished = () => 
             { 
@@ -528,13 +528,13 @@ public sealed class InGame(GameWindow windowData) : State
             {
                 Vector2 strikePosition = new Vector2(
                     _player.FacingRight ? _player.Position.X + 4 : _player.Position.X - 12,
-                    _player.Position.Y - 2
+                    _player.Position.Y - 6
                 );
 
                 _strikeCollider.Bounds.X = (int)strikePosition.X + 2;
                 _strikeCollider.Bounds.Y = (int)strikePosition.Y;
                 _strikeCollider.Bounds.Width = 4;
-                _strikeCollider.Bounds.Height = 8;
+                _strikeCollider.Bounds.Height = 16;
 
                 _striking = true;
 
