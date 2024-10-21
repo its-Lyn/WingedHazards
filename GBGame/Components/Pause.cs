@@ -70,7 +70,7 @@ public class Pause
             btn.Colour = _textColour;
         };
 
-        SoundEffect click = window.Content.Load<SoundEffect>("Sounds/Click");
+        SoundEffect click = window.ContentData.GetAudio("Click");
         _controller.OnActiveUpdated = btn => {
             btn.Colour = _overlayColour;
             window.PlayEffect(click);

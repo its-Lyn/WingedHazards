@@ -27,7 +27,7 @@ public class MainMenu(GameWindow window) : State
     
     public override void LoadContent()
     {
-        SoundEffect click = window.Content.Load<SoundEffect>("Sounds/Click");
+        SoundEffect click = window.ContentData.GetAudio("Click");
         
         _font = window.Content.Load<SpriteFont>("Sprites/Fonts/File");
         _controller = new UIController(true)

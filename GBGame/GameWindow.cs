@@ -39,6 +39,7 @@ public class GameWindow : Game
     public OptionData Options { get; private set; } = null!;
     
     public bool Loading { get; private set; }
+    private string _loadState = "settings";
     public bool Loaded { get; private set; }
     
     public string Version { get; } = "0.9.2-dev";
@@ -210,8 +211,18 @@ public class GameWindow : Game
 
     private void LoadAllAssets()
     {
-        string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Content", "Sprites");
-        string[] dirs = Directory.GetDirectories(path);
+        UpdateOptions();
+        if (Options?.FullScreen == true)
+        {
+            ToggleFullScreen();
+        }
+        SetKeyBinds();
+        
+        string basePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Content");
+
+        _loadState = "sprites";
+        string texturePath = Path.Combine(basePath, "Sprites");
+        string[] dirs = Directory.GetDirectories(texturePath);
         foreach (string dir in dirs)
         {
             if (Path.GetFileName(dir) == "Fonts") continue; // Why is fonts in fucking Sprites?
@@ -239,17 +250,20 @@ public class GameWindow : Game
                 ContentData.Set(name, Content.Load<Texture2D>(loaderPath));
             }
         }
+
+        _loadState = "audio";
+        string audioPath = Path.Combine(basePath, "Sounds");
+        string[] sounds = Directory.GetFiles(audioPath);
+        foreach (string file in sounds)
+        {
+            string name = Path.GetFileNameWithoutExtension(file);
+            string loaderPath = Path.Combine(Path.GetFileName(audioPath), name);
+            ContentData.Audio.Add(name, Content.Load<SoundEffect>(loaderPath));
+        }
     }
 
     private async void LoadGameDataAsync()
     {
-        UpdateOptions();
-        if (Options?.FullScreen == true)
-        {
-            ToggleFullScreen();
-        }
-        SetKeyBinds();
-        
         await Task.Run(LoadAllAssets);
         
         Context.SwitchState(new MainMenu(this));
@@ -305,7 +319,7 @@ public class GameWindow : Game
                     (GameSize.Y - secondMeasurements.Y) / 2 + 2
                 );
 
-                Vector2 loadingMeasurements = _font.MeasureString("loading...");
+                Vector2 loadingMeasurements = _font.MeasureString($"loading {_loadState}...");
                 Vector2 loadingPos = new Vector2(
                     1, (GameSize.Y - loadingMeasurements.Y)
                 );
@@ -313,7 +327,7 @@ public class GameWindow : Game
                 _spriteBatch.DrawString(_font, "Winged Hazards", titlePos, _textColour);
                 _spriteBatch.DrawString(_font, "itsEve", namePos, _textColour);
                 
-                _spriteBatch.DrawString(_font, "loading...", loadingPos, _textColour);
+                _spriteBatch.DrawString(_font, $"loading {_loadState}...", loadingPos, _textColour);
             _spriteBatch.End();
             
             _renderer.DrawRenderer(_spriteBatch);

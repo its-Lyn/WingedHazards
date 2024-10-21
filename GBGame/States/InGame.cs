@@ -285,7 +285,7 @@ public sealed class InGame(GameWindow windowData) : State
         Bomb = new Bomb(windowData, _player);
         _inventory.AddItem(Bomb);
 
-        SoundEffect bomb = windowData.Content.Load<SoundEffect>("Sounds/Bomb");
+        SoundEffect bomb = windowData.ContentData.GetAudio("Bomb");
         Bomb.Sheet.OnSheetFinished = () => 
         { 
             Bomb.CanPlace = true;
@@ -299,10 +299,10 @@ public sealed class InGame(GameWindow windowData) : State
 
         _pause = new Pause(windowData);
 
-        SoundEffect batHurt = windowData.Content.Load<SoundEffect>("Sounds/Bat_Hurt");
-        SoundEffect batHit = windowData.Content.Load<SoundEffect>("Sounds/Bat_Hit");
+        SoundEffect batHurt = windowData.ContentData.GetAudio("Bat_Hurt");
+        SoundEffect batHit = windowData.ContentData.GetAudio("Bat_Hit");
         
-        SoundEffect playerHit = windowData.Content.Load<SoundEffect>("Sounds/Player_Hit");
+        SoundEffect playerHit = windowData.ContentData.GetAudio("Player_Hit");
         _enemyController.OnEntityUpdate = (_, _, entity) => {
             RectCollider? rect = entity.Components.GetComponent<RectCollider>("PlayerStriker");
             if (rect is null) return;
@@ -427,7 +427,7 @@ public sealed class InGame(GameWindow windowData) : State
             }
         };
 
-        _swing = windowData.Content.Load<SoundEffect>("Sounds/Swing");
+        _swing = windowData.ContentData.GetAudio("Swing");
     }
 
     public override void Update(GameTime time)

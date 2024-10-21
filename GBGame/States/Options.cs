@@ -36,7 +36,7 @@ public class Options(GameWindow window) : State
             btn.Colour = _textColour;
         };
         
-        SoundEffect click = window.Content.Load<SoundEffect>("Sounds/Click");
+        SoundEffect click = window.ContentData.GetAudio("Click");
         _controller.OnActiveUpdated = btn =>
         {
             if (btn is VolumeSlider slider)
