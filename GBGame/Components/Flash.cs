@@ -26,7 +26,7 @@ public class Flash : Component
 
     private readonly Rectangle _data;
 
-    private bool _oneWay;
+    private readonly bool _oneWay;
     
     public Flash(Game windowData, Color colour, Rectangle data, float speed, string? name = null, bool oneWay = false)
     {

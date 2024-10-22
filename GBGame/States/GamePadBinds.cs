@@ -111,8 +111,8 @@ public class GamePadBinds(GameWindow window) : State
         {
             OnTimeOut = () => _showError = false
         };
-        
-        SoundEffect click = window.Content.Load<SoundEffect>("Sounds/Click");
+
+        SoundEffect click = window.ContentData.GetAudio("Click");
         _controller.OnActiveUpdating = btn => btn.Colour = _textColour;
         _controller.OnActiveUpdated = btn => {
             btn.Colour = _overlayColour;

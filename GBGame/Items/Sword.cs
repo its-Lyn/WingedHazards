@@ -5,11 +5,11 @@ using Microsoft.Xna.Framework.Graphics;
 using MonoGayme.Components;
 
 namespace GBGame.Items;
-public class Sword(Game windowData, AnimatedSpriteSheet sheet, AnimatedSpriteSheet slash, Player player) : Item(windowData)
+public class Sword(GameWindow windowData, AnimatedSpriteSheet sheet, AnimatedSpriteSheet slash, Player player) : Item
 {
     public override void LoadContent()
     {
-        InventorySprite = WindowData.Content.Load<Texture2D>("Sprites/UI/Sword");
+        InventorySprite = windowData.ContentData.Get("Sword");
 
         Name = "Sword";
         Description = "Ol' reliable.";

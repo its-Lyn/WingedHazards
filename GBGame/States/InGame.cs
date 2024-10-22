@@ -27,9 +27,9 @@ public sealed class InGame(GameWindow windowData) : State
 
     private record struct GroundTile(Texture2D Sprite, int X, int Y);
 
-    private readonly List<Texture2D> _grass = [];
-    private readonly List<Texture2D> _ground = [];
-    private readonly List<Texture2D> _bushes = [];
+    private List<Texture2D> _grass = [];
+    private List<Texture2D> _ground = [];
+    private List<Texture2D> _bushes = [];
     private readonly List<GroundTile> _groundTiles = [];
 
     private const int TileSize = 8;
@@ -240,18 +240,13 @@ public sealed class InGame(GameWindow windowData) : State
         windowData.UpdateOptions();
         
         _toLevelUp = BaseXP;
-        _starSprite = windowData.Content.Load<Texture2D>("Sprites/UI/LevelStar");
+        _starSprite = windowData.ContentData.Get("LevelStar");
 
         _strikeCollider.Bounds = new Rectangle();
 
-        for (int i = 1; i <= 4; i++) 
-            _ground.Add(windowData.Content.Load<Texture2D>($"Sprites/Ground/Ground_{i}"));
-        
-        for (int i = 1; i <= 2; i++)
-            _grass.Add(windowData.Content.Load<Texture2D>($"Sprites/Grass/Grass_{i}"));
-
-        for (int i = 1; i <= 3; i++)
-            _bushes.Add(windowData.Content.Load<Texture2D>($"Sprites/Bushes/Bush_{i}"));
+        _grass = windowData.ContentData.SpecialTextures["Grass"];
+        _ground = windowData.ContentData.SpecialTextures["Ground"];
+        _bushes = windowData.ContentData.SpecialTextures["Bushes"];
 
         _gameWidth = (int)(windowData.GameSize.Y * 2);
 
@@ -273,10 +268,10 @@ public sealed class InGame(GameWindow windowData) : State
         _playerJump = _player.Components.GetComponent<Jump>()!;
         _playerDeathFlash = _player.Components.GetComponent<Flash>("DeathFlash")!;
 
-        _island = windowData.Content.Load<Texture2D>("Sprites/BackGround/Island");
+        _island = windowData.ContentData.Get("Island");
 
-        _slash = new AnimatedSpriteSheet(windowData.Content.Load<Texture2D>("Sprites/Entities/Player_Slash"), new Vector2(4, 1), 0.1f, false, new Vector2(0, 4));
-        _sheet = new AnimatedSpriteSheet(windowData.Content.Load<Texture2D>("Sprites/SpriteSheets/Strike"), new Vector2(6, 1), 0.02f)
+        _slash = new AnimatedSpriteSheet(windowData.ContentData.Get("Player_Slash"), new Vector2(4, 1), 0.1f, false, new Vector2(0, 4));
+        _sheet = new AnimatedSpriteSheet(windowData.ContentData.Get("LongStrike"), new Vector2(6, 1), 0.02f)
         {
             OnSheetFinished = () => 
             { 
@@ -290,7 +285,7 @@ public sealed class InGame(GameWindow windowData) : State
         Bomb = new Bomb(windowData, _player);
         _inventory.AddItem(Bomb);
 
-        SoundEffect bomb = windowData.Content.Load<SoundEffect>("Sounds/Bomb");
+        SoundEffect bomb = windowData.ContentData.GetAudio("Bomb");
         Bomb.Sheet.OnSheetFinished = () => 
         { 
             Bomb.CanPlace = true;
@@ -304,10 +299,10 @@ public sealed class InGame(GameWindow windowData) : State
 
         _pause = new Pause(windowData);
 
-        SoundEffect batHurt = windowData.Content.Load<SoundEffect>("Sounds/Bat_Hurt");
-        SoundEffect batHit = windowData.Content.Load<SoundEffect>("Sounds/Bat_Hit");
+        SoundEffect batHurt = windowData.ContentData.GetAudio("Bat_Hurt");
+        SoundEffect batHit = windowData.ContentData.GetAudio("Bat_Hit");
         
-        SoundEffect playerHit = windowData.Content.Load<SoundEffect>("Sounds/Player_Hit");
+        SoundEffect playerHit = windowData.ContentData.GetAudio("Player_Hit");
         _enemyController.OnEntityUpdate = (_, _, entity) => {
             RectCollider? rect = entity.Components.GetComponent<RectCollider>("PlayerStriker");
             if (rect is null) return;
@@ -432,7 +427,7 @@ public sealed class InGame(GameWindow windowData) : State
             }
         };
 
-        _swing = windowData.Content.Load<SoundEffect>("Sounds/Swing");
+        _swing = windowData.ContentData.GetAudio("Swing");
     }
 
     public override void Update(GameTime time)
@@ -533,13 +528,13 @@ public sealed class InGame(GameWindow windowData) : State
             {
                 Vector2 strikePosition = new Vector2(
                     _player.FacingRight ? _player.Position.X + 4 : _player.Position.X - 12,
-                    _player.Position.Y - 2
+                    _player.Position.Y - 6
                 );
 
                 _strikeCollider.Bounds.X = (int)strikePosition.X + 2;
                 _strikeCollider.Bounds.Y = (int)strikePosition.Y;
                 _strikeCollider.Bounds.Width = 4;
-                _strikeCollider.Bounds.Height = 8;
+                _strikeCollider.Bounds.Height = 16;
 
                 _striking = true;
 

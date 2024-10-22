@@ -125,8 +125,8 @@ public class ControlCentre(GameWindow windowData, InGame game, int zIndex = -1) 
         _overlay.SetData([_overlayColour]);
         _size = new Rectangle(0, 0, (int)windowData.GameSize.X, (int)windowData.GameSize.Y);
 
-        _sprite = windowData.Content.Load<Texture2D>("Sprites/Objects/CommandCentre");
-        _questionSprite = windowData.Content.Load<Texture2D>("Sprites/Objects/CommandCentre_Interact");
+        _sprite = windowData.ContentData.Get("CommandCentre");
+        _questionSprite = windowData.ContentData.Get("CommandCentre_Interact");
 
         Position = new Vector2(
             0,

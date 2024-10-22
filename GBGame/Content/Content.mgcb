@@ -360,6 +360,18 @@
 /processorParam:TextureFormat=Color
 /build:Sprites/SpriteSheets/BombPlaced.png
 
+#begin Sprites/SpriteSheets/LongStrike.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Sprites/SpriteSheets/LongStrike.png
+
 #begin Sprites/SpriteSheets/Strike.png
 /importer:TextureImporter
 /processor:TextureProcessor

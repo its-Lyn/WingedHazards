@@ -27,7 +27,7 @@ public class MainMenu(GameWindow window) : State
     
     public override void LoadContent()
     {
-        SoundEffect click = window.Content.Load<SoundEffect>("Sounds/Click");
+        SoundEffect click = window.ContentData.GetAudio("Click");
         
         _font = window.Content.Load<SpriteFont>("Sprites/Fonts/File");
         _controller = new UIController(true)
@@ -84,7 +84,7 @@ public class MainMenu(GameWindow window) : State
             30
         );
 
-        _bat = new AnimatedSpriteSheet(window.Content.Load<Texture2D>("Sprites/Entities/NormalBat"), new Vector2(3, 1), 0.25f, true);
+        _bat = new AnimatedSpriteSheet(window.ContentData.Get("NormalBat"), new Vector2(3, 1), 0.25f, true);
         _clouds = new Clouds(window, 7, 15, 8, (int)window.GameSize.Y - 8);
     }
 

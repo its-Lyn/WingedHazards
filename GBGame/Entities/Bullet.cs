@@ -17,7 +17,7 @@ public class Bullet(GameWindow windowData, Vector2 pos, Vector2 target, int zInd
 
     public override void LoadContent()
     {
-        _sprite = windowData.Content.Load<Texture2D>("Sprites/Objects/Bullet");
+        _sprite = windowData.ContentData.Get("Bullet");
         Position = pos;
 
         _direction = Vector2.Normalize(target - Position);

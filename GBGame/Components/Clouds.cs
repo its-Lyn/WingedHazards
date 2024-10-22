@@ -19,10 +19,7 @@ public class Clouds : Component
     {
         _window = window;
         
-        List<Texture2D> sprites = [
-            window.Content.Load<Texture2D>("Sprites/Clouds/Cloud_1"),
-            window.Content.Load<Texture2D>("Sprites/Clouds/Cloud_2")
-        ];
+        List<Texture2D> sprites = window.ContentData.SpecialTextures["Clouds"];
 
         // Create a bunch of clouds
         for (int i = 0; i < Random.Shared.Next(minCount, maxCount + 1); i++)

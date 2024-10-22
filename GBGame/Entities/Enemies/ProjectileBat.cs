@@ -53,10 +53,10 @@ public class ProjectileBat(GameWindow windowData, Vector2 pos, int zIndex = 0) :
     {
         Position = pos;
 
-        Texture2D walk = windowData.Content.Load<Texture2D>("Sprites/Entities/ProjectileBat_Walk");
+        Texture2D walk = windowData.ContentData.Get("ProjectileBat_Walk");
         _walkSprite = new AnimatedSpriteSheet(walk, new Vector2(3, 1), 0.15f, true);
 
-        Texture2D shoot = windowData.Content.Load<Texture2D>("Sprites/Entities/ProjectileBat_Shoot");
+        Texture2D shoot = windowData.ContentData.Get("ProjectileBat_Shoot");
         _shootSprite = new AnimatedSpriteSheet(shoot, new Vector2(4, 1), 0.1f);
 
         _activeSprite = _walkSprite;

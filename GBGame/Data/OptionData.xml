@@ -4,6 +4,7 @@
     <AllowScreenShake>true</AllowScreenShake>
     <MuteAudio>false</MuteAudio>
     <ShowVersion>true</ShowVersion>
+    <Volume>1.0</Volume>
     
     <KeyboardBinds>
         <Left>A</Left>
