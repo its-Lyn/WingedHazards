@@ -42,7 +42,7 @@ public class GameWindow : Game
     private string _loadState = "settings";
     public bool Loaded { get; private set; }
     
-    public string Version { get; } = "0.9.2-dev";
+    public string Version { get; } = "0.9.2";
 
     private SpriteFont _font = null!;
     
