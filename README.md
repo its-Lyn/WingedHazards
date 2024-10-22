@@ -38,6 +38,10 @@ Instructions on installing the game.
 Click on the [Releases page](https://github.com/its-Lyn/WingedHazards/releases)! <br>
 Once there, simply click on your OS's Release!
 
+There are two currently supported Operating Systems.
+- Linux
+- Windows   
+
 > [!TIP]
 > For Linux based distributions, you can run `setup.sh` to create a desktop entry!
 
@@ -53,6 +57,15 @@ sudo apt/dnf install git dotnet-sdk-8.0 dotnet-runtime-8.0
 
 # Arch based distributions
 sudo pacman -S git dotnet-sdk dotnet-runtime
+
+# Windows
+# Windows is less sigma so DOTNET is usually downloaded through Visual Studio.
+# Download here: https://visualstudio.microsoft.com/
+# And Git here: https://git-scm.com/downloads/win
+# Or if you have winget installed
+winget install --id Microsoft.VisualStudio.2022.Community
+winget install --id Git.Git
+# Good luck.
 ```
 
 #### Compilation
@@ -76,7 +89,10 @@ git clone https://github.com/its-Lyn/WingedHazards
 cd WingedHazards
 ```
 
-All that is left now is to compile the game. For Linux systems, you can also run `install.sh`, it will create a desktop entry for you. <br>
+All that is left now is to compile the game.
+> [!TIP]
+> For Linux systems, you can also run `install.sh`, it will create a desktop entry for you.
+
 Run the following command to compile the game.
 ```bash
 dotnet publish -c Release -p:PublishSingleFile=true
